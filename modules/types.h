@@ -1,0 +1,435 @@
+#if !defined(TYPES_HEADER)
+	#define TYPES_HEADER
+	#include "libc.h"
+	#include <limits>
+	#include <complex>
+	#include <type_traits>
+
+	//
+	// Immutable primitives:
+	//
+
+	typedef const uint8_t u8;
+	typedef const uint16_t u16;
+	typedef const uint32_t u32;
+	typedef const uint64_t u64;
+
+	typedef const size_t usize;
+
+	typedef const int8_t s8;
+	typedef const int16_t s16;
+	typedef const int32_t s32;
+	typedef const int64_t s64;
+
+	typedef const float f32;
+	typedef const double f64;
+	typedef const long double f128;
+
+	typedef const std::complex<float> c32;
+	typedef const std::complex<double> c64;
+	typedef const std::complex<long double> c128;
+
+	typedef const char* c_str;
+
+	//
+	// Mutable primitives:
+	//
+
+	#define mut(T) std::remove_const<T>::type
+
+	// NOTE: It occurs frequently in for-loops.
+	typedef mut(usize) msize;
+
+	//
+	// Utils:
+	//
+
+	template<typename T>
+	static constexpr bool as_bool(const T x)
+	{
+		return static_cast<bool>(x);
+	}
+
+	template<typename T>
+	static constexpr u8 as_u8(const T x)
+	{
+		return static_cast<u8>(x);
+	}
+
+	template<typename T>
+	static constexpr u16 as_u16(const T x)
+	{
+		return static_cast<u16>(x);
+	}
+
+	template<typename T>
+	static constexpr u32 as_u32(const T x)
+	{
+		return static_cast<u32>(x);
+	}
+
+	template<typename T>
+	static constexpr u64 as_u64(const T x)
+	{
+		return static_cast<u64>(x);
+	}
+
+	template<typename T>
+	static constexpr usize as_usize(const T x)
+	{
+		return static_cast<usize>(x);
+	}
+
+	template<typename T>
+	static constexpr s8 as_s8(const T x)
+	{
+		return static_cast<s8>(x);
+	}
+
+	template<typename T>
+	static constexpr s16 as_s16(const T x)
+	{
+		return static_cast<s16>(x);
+	}
+
+	template<typename T>
+	static constexpr s32 as_s32(const T x)
+	{
+		return static_cast<s32>(x);
+	}
+
+	template<typename T>
+	static constexpr s64 as_s64(const T x)
+	{
+		return static_cast<s64>(x);
+	}
+
+	template<typename T>
+	static constexpr char as_char(const T x)
+	{
+		return static_cast<char>(x);
+	}
+
+	template<typename T>
+	static constexpr f32 as_f32(const T x)
+	{
+		return static_cast<f32>(x);
+	}
+
+	template<typename T>
+	static constexpr f64 as_f64(const T x)
+	{
+		return static_cast<f64>(x);
+	}
+
+	template<typename T>
+	static constexpr f128 as_f128(const T x)
+	{
+		return static_cast<f128>(x);
+	}
+
+	template<typename T>
+	static constexpr c32 as_c32(const T re_x, const T im_x)
+	{
+		return c32(as_f32(re_x), as_f32(im_x));
+	}
+
+	template<typename T>
+	static constexpr c64 as_c64(const T re_x, const T im_x)
+	{
+		return c64(as_f64(re_x), as_f64(im_x));
+	}
+
+	template<typename T>
+	static constexpr c128 as_c128(const T re_x, const T im_x)
+	{
+		return c128(as_f128(re_x), as_f128(im_x));
+	}
+
+	template<typename T>
+	static constexpr void* as_void(T *x_ptr)
+	{
+		return static_cast<void*>(x_ptr);
+	}
+
+	template<typename T>
+	static constexpr bool is_bool()
+	{
+		return std::is_same<T, bool>::value || std::is_same<T, const bool>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_u8()
+	{
+		return std::is_same<T, u8>::value || std::is_same<T, mut(u8)>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_u16()
+	{
+		return std::is_same<T, u16>::value || std::is_same<T, mut(u16)>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_u32()
+	{
+		return std::is_same<T, u32>::value || std::is_same<T, mut(u32)>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_u64()
+	{
+		return std::is_same<T, u64>::value || std::is_same<T, mut(u64)>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_usize()
+	{
+		return std::is_same<T, usize>::value || std::is_same<T, mut(usize)>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_s8()
+	{
+		return std::is_same<T, s8>::value || std::is_same<T, mut(s8)>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_s16()
+	{
+		return std::is_same<T, s16>::value || std::is_same<T, mut(s16)>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_s32()
+	{
+		return std::is_same<T, s32>::value || std::is_same<T, mut(s32)>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_s64()
+	{
+		return std::is_same<T, s64>::value || std::is_same<T, mut(s64)>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_f32()
+	{
+		return std::is_same<T, f32>::value || std::is_same<T, mut(f32)>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_f64()
+	{
+		return std::is_same<T, f64>::value || std::is_same<T, mut(f64)>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_f128()
+	{
+		return std::is_same<T, f128>::value || std::is_same<T, mut(f128)>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_c32()
+	{
+		return std::is_same<T, c32>::value || std::is_same<T, mut(c32)>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_c64()
+	{
+		return std::is_same<T, c64>::value || std::is_same<T, mut(c64)>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_c128()
+	{
+		return std::is_same<T, c128>::value || std::is_same<T, mut(c128)>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_char()
+	{
+		return std::is_same<T, char>::value || std::is_same<T, const char>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_cstr()
+	{
+		return std::is_same<T, c_str>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_void()
+	{
+		return std::is_same<T, void>::value || std::is_same<T, const void>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_primitive()
+	{
+		return (
+		        is_bool<T>()
+		     || is_u8<T>()
+		     || is_u16<T>()
+		     || is_u32<T>()
+		     || is_u64<T>()
+		     || is_usize<T>()
+		     || is_s8<T>()
+		     || is_s16<T>()
+		     || is_s32<T>()
+		     || is_s64<T>()
+		     || is_f32<T>()
+		     || is_f64<T>()
+		     || is_f128<T>()
+		     || is_c32<T>()
+		     || is_c64<T>()
+		     || is_c128<T>()
+		     || is_cstr<T>()
+		     || is_char<T>()
+		     || is_void<T>()
+		);
+	}
+
+	template<typename T>
+	static constexpr bool is_mut()
+	{
+		return is_primitive<T>() && (std::is_const<T>::value == false);
+	}
+
+	template<typename T>
+	static constexpr c_str type_name()
+	{
+		if constexpr(is_bool<T>()) {
+			return "bool\0";
+		} else if constexpr(is_u8<T>()) {
+			return "u8\0";
+		} else if constexpr(is_u16<T>()) {
+			return "u16\0";
+		}  else if constexpr(is_u32<T>()) {
+			return "u32\0";
+		} else if constexpr(is_u64<T>()) {
+			return "u64\0";
+		} else if constexpr(is_usize<T>()) {
+			return "usize\0";
+		} else if constexpr(is_s8<T>()) {
+			return "s8\0";
+		} else if constexpr(is_s16<T>()) {
+			return "s16\0";
+		} else if constexpr(is_s32<T>()) {
+			return "s32\0";
+		} else if constexpr(is_s64<T>()) {
+			return "s64\0";
+		} else if constexpr(is_f32<T>()) {
+			return "f32\0";
+		} else if constexpr(is_f64<T>()) {
+			return "f64\0";
+		} else if constexpr(is_f128<T>()) {
+			return "f128\0";
+		} else if constexpr(is_c32<T>()) {
+			return "c32\0";
+		} else if constexpr(is_c64<T>()) {
+			return "c64\0";
+		} else if constexpr(is_c128<T>()) {
+			return "c128\0";
+		} else if constexpr(is_char<T>()) {
+			return "char\0";
+		} else if constexpr(is_cstr<T>()) {
+			return "c_str\0";
+		} else if constexpr(is_void<T>()) {
+			return "void\0";
+		} else {
+			return "\0";
+		}
+	}
+
+	template<typename T>
+	static constexpr c_str type_fmt()
+	{
+		// NOTE: For the number of decimal digits used for f32, f64 and f128, see
+		// the macros FLT_DIG, DBL_DIG and LDBL_DIG from the float.h header.
+
+		if constexpr(is_u8<T>() || is_u16<T>() || is_u32<T>() || is_u64<T>() || is_usize<T>()) {
+			return "%u";
+		}
+
+		if constexpr(is_s8<T>() || is_s16<T>() || is_s32<T>() || is_bool<T>()) {
+			return "%d";
+		}
+
+		if constexpr(std::is_enum<T>::value) {
+			return "%d";
+		}
+
+		if constexpr(is_s64<T>()) {
+			return "%ld";
+		}
+
+		if constexpr(is_f32<T>()) {
+			return "%.6E";
+		}
+
+		if constexpr(is_f64<T>()) {
+			return "%.15E";
+		}
+
+		if constexpr(is_f128<T>()) {
+			return "%.18E";
+		}
+
+		if constexpr(is_cstr<T>()) {
+			return "%s";
+		}
+
+		if constexpr(is_char<T>()) {
+			return "%c";
+		}
+
+		if constexpr(is_void<T>()) {
+			return "%p";
+		}
+
+		return "";
+	}
+
+	//
+	// Limits:
+	//
+
+	static constexpr u8 u8_min = std::numeric_limits<u8>::min();
+	static constexpr u8 u8_max = std::numeric_limits<u8>::max();
+
+	static constexpr u16 u16_min = std::numeric_limits<u16>::min();
+	static constexpr u16 u16_max = std::numeric_limits<u16>::max();
+
+	static constexpr u32 u32_min = std::numeric_limits<u32>::min();
+	static constexpr u32 u32_max = std::numeric_limits<u32>::max();
+
+	static constexpr u64 u64_min = std::numeric_limits<u64>::min();
+	static constexpr u64 u64_max = std::numeric_limits<u64>::max();
+
+	static constexpr usize usize_min = std::numeric_limits<usize>::min();
+	static constexpr usize usize_max = std::numeric_limits<usize>::max();
+
+	static constexpr s8 s8_min = std::numeric_limits<s8>::min();
+	static constexpr s8 s8_max = std::numeric_limits<s8>::max();
+
+	static constexpr s16 s16_min = std::numeric_limits<s16>::min();
+	static constexpr s16 s16_max = std::numeric_limits<s16>::max();
+
+	static constexpr s32 s32_min = std::numeric_limits<s32>::min();
+	static constexpr s32 s32_max = std::numeric_limits<s32>::max();
+
+	static constexpr s64 s64_min = std::numeric_limits<s64>::min();
+	static constexpr s64 s64_max = std::numeric_limits<s64>::max();
+
+	static constexpr f32 f32_min = std::numeric_limits<f32>::min();
+	static constexpr f32 f32_max = std::numeric_limits<f32>::max();
+
+	static constexpr f64 f64_min = std::numeric_limits<f64>::min();
+	static constexpr f64 f64_max = std::numeric_limits<f64>::max();
+
+	static constexpr f128 f128_min = std::numeric_limits<f128>::min();
+	static constexpr f128 f128_max = std::numeric_limits<f128>::max();
+#endif
