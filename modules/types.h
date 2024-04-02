@@ -347,47 +347,49 @@
 	template<typename T>
 	static constexpr c_str type_fmt()
 	{
+		static_assert(is_primitive<T>());
+
 		// NOTE: For the number of decimal digits used for f32, f64 and f128, see
 		// the macros FLT_DIG, DBL_DIG and LDBL_DIG from the float.h header.
 
 		if constexpr(is_u8<T>() || is_u16<T>() || is_u32<T>() || is_u64<T>() || is_usize<T>()) {
-			return "%u";
+			return "%*u";
 		}
 
 		if constexpr(is_s8<T>() || is_s16<T>() || is_s32<T>() || is_bool<T>()) {
-			return "%d";
+			return "%*d";
 		}
 
 		if constexpr(std::is_enum<T>::value) {
-			return "%d";
+			return "%*d";
 		}
 
 		if constexpr(is_s64<T>()) {
-			return "%ld";
+			return "%*ld";
 		}
 
 		if constexpr(is_f32<T>()) {
-			return "%.6E";
+			return "%*.6E";
 		}
 
 		if constexpr(is_f64<T>()) {
-			return "%.15E";
+			return "%*.15E";
 		}
 
 		if constexpr(is_f128<T>()) {
-			return "%.18E";
+			return "%*.18E";
 		}
 
 		if constexpr(is_cstr<T>()) {
-			return "%s";
+			return "%*s";
 		}
 
 		if constexpr(is_char<T>()) {
-			return "%c";
+			return "%*c";
 		}
 
 		if constexpr(is_void<T>()) {
-			return "%p";
+			return "%*p";
 		}
 
 		return "";
