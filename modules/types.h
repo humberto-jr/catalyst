@@ -263,7 +263,7 @@
 	template<typename T>
 	static constexpr bool is_void()
 	{
-		return std::is_same<T, void>::value || std::is_same<T, const void>::value;
+		return std::is_same<T, void*>::value || std::is_same<T, const void*>::value;
 	}
 
 	template<typename T>
