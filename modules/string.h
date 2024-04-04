@@ -63,7 +63,7 @@
 
 		void right_trim()
 		{
-			while (this->buf[this->end - 1] == ' ') {
+			while ((this->buf[this->end - 1] == ' ') && (this->end > this->begin)) {
 				--this->end;
 			}
 
