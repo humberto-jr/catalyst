@@ -63,7 +63,7 @@
 
 		void right_trim()
 		{
-			while ((this->buf[this->end - 1] == ' ') && (this->end > this->begin)) {
+			while (this->buf[this->end - 1] == ' ') {
 				--this->end;
 			}
 
@@ -126,7 +126,8 @@
 
 		inline char operator[](usize n) const
 		{
-			return (n < this->end? this->buf[this->begin + n] : '\0');
+			usize offset = this->begin + n;
+			return (offset < this->end? this->buf[offset] : '\0');
 		}
 
 		private:
