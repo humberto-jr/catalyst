@@ -298,6 +298,10 @@
 		return is_primitive<T>() && (std::is_const<T>::value == false);
 	}
 
+	constexpr bool is_32bit = (sizeof(usize) == sizeof(u32));
+
+	constexpr bool is_64bit = (sizeof(usize) == sizeof(u64));
+
 	template<typename T>
 	static constexpr c_str type_name()
 	{
