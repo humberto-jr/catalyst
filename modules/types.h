@@ -356,12 +356,16 @@
 		// NOTE: For the number of decimal digits used for f32, f64 and f128, see
 		// the macros FLT_DIG, DBL_DIG and LDBL_DIG from the float.h header.
 
-		if constexpr(is_u8<T>() || is_u16<T>() || is_u32<T>() || is_u64<T>() || is_usize<T>()) {
+		if constexpr(is_u8<T>() || is_u16<T>() || is_u32<T>() || (is_usize<T>() && is_32bit)) {
 			return "%*u";
 		}
 
 		if constexpr(is_s8<T>() || is_s16<T>() || is_s32<T>() || is_bool<T>()) {
 			return "%*d";
+		}
+
+		if constexpr(is_u64<T>() || (is_usize<T>() && is_64bit)) {
+			return "%*lu";
 		}
 
 		if constexpr(std::is_enum<T>::value) {
