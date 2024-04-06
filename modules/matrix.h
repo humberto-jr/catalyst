@@ -66,6 +66,16 @@
 			return matrix(*this);
 		}
 
+		void swap(matrix<T> &other)
+		{
+			auto max_col = this->max_col;
+
+			this->max_col = other.max_col;
+			this->buf.swap(other.buf);
+
+			other.max_col = max_col;
+		}
+
 		class view {
 			public:
 			inline usize rows() const
