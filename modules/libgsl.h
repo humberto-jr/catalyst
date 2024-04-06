@@ -44,4 +44,7 @@
 
 	// Numerical integration
 	#include <gsl/gsl_integration.h>
+
+	// NOTE: For compatibility with MKL and LAPACKE.
+	typedef enum CBLAS_TRANSPOSE CBLAS_TRANSPOSE;
 #endif
