@@ -7,7 +7,7 @@
 		#define DEFAULT_STRING_LENGTH 1023
 	#endif
 
-	typedef vector<char> str;
+	using str = vector<char>;
 
 	class string {
 		public:

@@ -2,7 +2,7 @@
 	#define VECTOR_HEADER
 	#include "print.h"
 
-	template<typename T = mut(f64)>
+	template<typename T = mut<f64>>
 	class vector {
 		public:
 		inline vector(): len(0), buf(nullptr)
@@ -127,6 +127,6 @@
 		}
 	};
 
-	typedef vector<mut(f32)> vec32;
-	typedef vector<mut(f64)> vec64;
+	using vec32 = vector<mut<f32>>;
+	using vec64 = vector<mut<f64>>;
 #endif

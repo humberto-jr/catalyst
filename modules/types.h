@@ -9,36 +9,37 @@
 	// Immutable primitives:
 	//
 
-	typedef const uint8_t u8;
-	typedef const uint16_t u16;
-	typedef const uint32_t u32;
-	typedef const uint64_t u64;
+	using u8  = const uint8_t;
+	using u16 = const uint16_t;
+	using u32 = const uint32_t;
+	using u64 = const uint64_t;
 
-	typedef const size_t usize;
+	using usize = const size_t;
 
-	typedef const int8_t s8;
-	typedef const int16_t s16;
-	typedef const int32_t s32;
-	typedef const int64_t s64;
+	using s8  = const int8_t;
+	using s16 = const int16_t;
+	using s32 = const int32_t;
+	using s64 = const int64_t;
 
-	typedef const float f32;
-	typedef const double f64;
-	typedef const long double f128;
+	using f32  = const float;
+	using f64  = const double;
+	using f128 = const long double;
 
-	typedef const std::complex<float> c32;
-	typedef const std::complex<double> c64;
-	typedef const std::complex<long double> c128;
+	using c32  = const std::complex<float>;
+	using c64  = const std::complex<double>;
+	using c128 = const std::complex<long double>;
 
-	typedef const char* c_str;
+	using c_str = const char*;
 
 	//
 	// Mutable primitives:
 	//
 
-	#define mut(T) std::remove_const<T>::type
+	template<typename T>
+	using mut = typename std::remove_const<T>::type;
 
 	// NOTE: It occurs frequently in for-loops.
-	typedef mut(usize) msize;
+	using msize = mut<usize>;
 
 	//
 	// Utils:
@@ -161,91 +162,91 @@
 	template<typename T>
 	static constexpr bool is_u8()
 	{
-		return std::is_same<T, u8>::value || std::is_same<T, mut(u8)>::value;
+		return std::is_same<T, u8>::value || std::is_same<T, mut<u8>>::value;
 	}
 
 	template<typename T>
 	static constexpr bool is_u16()
 	{
-		return std::is_same<T, u16>::value || std::is_same<T, mut(u16)>::value;
+		return std::is_same<T, u16>::value || std::is_same<T, mut<u16>>::value;
 	}
 
 	template<typename T>
 	static constexpr bool is_u32()
 	{
-		return std::is_same<T, u32>::value || std::is_same<T, mut(u32)>::value;
+		return std::is_same<T, u32>::value || std::is_same<T, mut<u32>>::value;
 	}
 
 	template<typename T>
 	static constexpr bool is_u64()
 	{
-		return std::is_same<T, u64>::value || std::is_same<T, mut(u64)>::value;
+		return std::is_same<T, u64>::value || std::is_same<T, mut<u64>>::value;
 	}
 
 	template<typename T>
 	static constexpr bool is_usize()
 	{
-		return std::is_same<T, usize>::value || std::is_same<T, mut(usize)>::value;
+		return std::is_same<T, usize>::value || std::is_same<T, mut<usize>>::value;
 	}
 
 	template<typename T>
 	static constexpr bool is_s8()
 	{
-		return std::is_same<T, s8>::value || std::is_same<T, mut(s8)>::value;
+		return std::is_same<T, s8>::value || std::is_same<T, mut<s8>>::value;
 	}
 
 	template<typename T>
 	static constexpr bool is_s16()
 	{
-		return std::is_same<T, s16>::value || std::is_same<T, mut(s16)>::value;
+		return std::is_same<T, s16>::value || std::is_same<T, mut<s16>>::value;
 	}
 
 	template<typename T>
 	static constexpr bool is_s32()
 	{
-		return std::is_same<T, s32>::value || std::is_same<T, mut(s32)>::value;
+		return std::is_same<T, s32>::value || std::is_same<T, mut<s32>>::value;
 	}
 
 	template<typename T>
 	static constexpr bool is_s64()
 	{
-		return std::is_same<T, s64>::value || std::is_same<T, mut(s64)>::value;
+		return std::is_same<T, s64>::value || std::is_same<T, mut<s64>>::value;
 	}
 
 	template<typename T>
 	static constexpr bool is_f32()
 	{
-		return std::is_same<T, f32>::value || std::is_same<T, mut(f32)>::value;
+		return std::is_same<T, f32>::value || std::is_same<T, mut<f32>>::value;
 	}
 
 	template<typename T>
 	static constexpr bool is_f64()
 	{
-		return std::is_same<T, f64>::value || std::is_same<T, mut(f64)>::value;
+		return std::is_same<T, f64>::value || std::is_same<T, mut<f64>>::value;
 	}
 
 	template<typename T>
 	static constexpr bool is_f128()
 	{
-		return std::is_same<T, f128>::value || std::is_same<T, mut(f128)>::value;
+		return std::is_same<T, f128>::value || std::is_same<T, mut<f128>>::value;
 	}
 
 	template<typename T>
 	static constexpr bool is_c32()
 	{
-		return std::is_same<T, c32>::value || std::is_same<T, mut(c32)>::value;
+		return std::is_same<T, c32>::value || std::is_same<T, mut<c32>>::value;
 	}
 
 	template<typename T>
 	static constexpr bool is_c64()
 	{
-		return std::is_same<T, c64>::value || std::is_same<T, mut(c64)>::value;
+		return std::is_same<T, c64>::value || std::is_same<T, mut<c64>>::value;
 	}
 
 	template<typename T>
 	static constexpr bool is_c128()
 	{
-		return std::is_same<T, c128>::value || std::is_same<T, mut(c128)>::value;
+		return std::is_same<T, c128>::value || std::is_same<T, mut<c128>>::value;
 	}
 
 	template<typename T>

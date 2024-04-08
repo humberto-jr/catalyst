@@ -46,5 +46,5 @@
 	#include <gsl/gsl_integration.h>
 
 	// NOTE: For compatibility with MKL and LAPACKE.
-	typedef enum CBLAS_TRANSPOSE CBLAS_TRANSPOSE;
+	using CBLAS_TRANSPOSE = enum CBLAS_TRANSPOSE;
 #endif

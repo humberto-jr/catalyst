@@ -8,7 +8,7 @@
 		class frontend;
 	}
 
-	template<typename T = mut(f64)>
+	template<typename T = mut<f64>>
 	class matrix {
 		public:
 		inline matrix(usize max_row, usize max_col): max_col(max_col), buf(vector<T>(max_row*max_col))
@@ -161,6 +161,6 @@
 		}
 	};
 
-	typedef matrix<mut(f32)> mat32;
-	typedef matrix<mut(f64)> mat64;
+	using mat32 = matrix<mut<f32>>;
+	using mat64 = matrix<mut<f64>>;
 #endif
