@@ -41,6 +41,8 @@
 	// NOTE: It occurs frequently in for-loops.
 	using msize = mut<usize>;
 
+	using byte = mut<u8>;
+
 	//
 	// Utils:
 	//
