@@ -218,7 +218,7 @@
 				info = std::fwrite(&data[0], sizeof(T), count, this->stream);
 
 				if (info != count) {
-					print::error(WHERE, "Only ", info, "/", count, " elements of ", sizeof(T), " bytes written to ", this->filename.as_cstr());
+					print::error(WHERE, "Only ", info/sizeof(T), "/", count, " elements of ", sizeof(T), " bytes written to ", this->filename.as_cstr());
 				}
 			}
 
