@@ -3,8 +3,6 @@
 	#include "essentials.h"
 
 	namespace nist {
-		static constexpr f64 PROTON_TO_ELECTRON_RATIO = 1836.15267343;
-
 		static constexpr f64 BOHR_TO_METER = 5.29177210903E-11;
 
 		static constexpr f64 HARTREE_TO_EV = 27.211386245988;
@@ -24,6 +22,8 @@
 		static constexpr f64 ELECTRON_MASS = 9.1093837015E-31; // Kg
 
 		static constexpr f64 PROTON_MASS = 1.67262192369E-27;  // Kg
+
+		static constexpr f64 PROTON_TO_ELECTRON_RATIO = PROTON_MASS/ELECTRON_MASS;
 
 		enum class isotope {
 			atom_1H = 0,
