@@ -11,6 +11,8 @@
 
 		static constexpr f64 BOLTZMANN_CONST = 1.380649E-23;   // J/K
 
+		static constexpr f64 AVOGADRO_CONST = 6.02214076E23;   // 1/mol
+
 		static constexpr f64 ELECTRON_MASS = 9.1093837015E-31; // Kg
 
 		static constexpr f64 PROTON_MASS = 1.67262192369E-27;  // Kg
