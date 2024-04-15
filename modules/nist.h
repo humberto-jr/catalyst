@@ -3,14 +3,6 @@
 	#include "essentials.h"
 
 	namespace nist {
-		static constexpr f64 BOHR_TO_METER = 5.29177210903E-11;
-
-		static constexpr f64 HARTREE_TO_EV = 27.211386245988;
-
-		static constexpr f64 HARTREE_TO_WAVENUM = 219474.63137054;
-
-		static constexpr f64 HARTREE_TO_JOULE = 4.3597447222071E-18;
-
 		static constexpr f64 INVERSE_FINE_STRUCT = 137.035999084;
 
 		static constexpr f64 BOHR_RADIUS = 5.29177210903E-11;  // m
@@ -24,6 +16,14 @@
 		static constexpr f64 PROTON_MASS = 1.67262192369E-27;  // Kg
 
 		static constexpr f64 PROTON_TO_ELECTRON_RATIO = PROTON_MASS/ELECTRON_MASS;
+
+		static constexpr f64 BOHR_TO_METER = BOHR_RADIUS;
+
+		static constexpr f64 HARTREE_TO_EV = 27.211386245988;
+
+		static constexpr f64 HARTREE_TO_WAVENUM = 219474.63137054;
+
+		static constexpr f64 HARTREE_TO_JOULE = 4.3597447222071E-18;
 
 		enum class isotope {
 			atom_1H = 0,
