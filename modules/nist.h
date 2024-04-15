@@ -3,6 +3,11 @@
 	#include "essentials.h"
 
 	namespace nist {
+		// NOTE: Below, the atomic mass unit (amu), or unified atomic mass unit,
+		// is referred to as atomic mass. Likewise, the atomic unit of mass is
+		// simply named the atomic unit, whereas atomic units of energy and
+		// length are referred to as Hartree and Bohr.
+
 		static constexpr f64 INVERSE_FINE_STRUCT = 137.035999084;
 
 		static constexpr f64 BOHR_RADIUS = 5.29177210903E-11;  // m
@@ -26,6 +31,10 @@
 		static constexpr f64 HARTREE_TO_WAVENUM = 219474.63137054;
 
 		static constexpr f64 HARTREE_TO_JOULE = 4.3597447222071E-18;
+
+		static constexpr f64 KILOGRAM_TO_ATOMIC_MASS = 1000.0*AVOGADRO_CONST;
+
+		static constexpr f64 ATOMIC_MASS_TO_ATOMIC_UNIT = 1.0/(ELECTRON_MASS*KILOGRAM_TO_ATOMIC_MASS);
 
 		enum class isotope {
 			atom_1H = 0,
