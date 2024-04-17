@@ -1,6 +1,7 @@
 #if !defined(VECTOR_HEADER)
 	#define VECTOR_HEADER
 	#include "print.h"
+	#include <initializer_list>
 
 	template<typename T = mut<f64>>
 	class vector {
@@ -18,6 +19,12 @@
 		{
 		}
 
+		inline vector(const std::initializer_list<T> &rhs): len(rhs.size()), buf(nullptr)
+		{
+			 this->resize(rhs.size());
+			*this = rhs;
+		}
+
 		inline usize length() const
 		{
 			return this->len;
@@ -26,6 +33,18 @@
 		inline usize size() const
 		{
 			return sizeof(T)*this->len;
+		}
+
+		void operator=(const std::initializer_list<T> &rhs)
+		{
+			usize n_max = (this->len < rhs.size()? this->len : rhs.size());
+
+			auto val = rhs.begin();
+
+			for (mut<usize> n = 0; n < n_max; ++n) {
+				this->buf[n] = *val;
+				++val;
+			}
 		}
 
 		inline void operator=(const vector<T> &rhs)
