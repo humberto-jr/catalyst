@@ -163,6 +163,18 @@
 						this->read_raw<T>(1, &data(n, m));
 			}
 
+			void read_all(vector<byte> &buf)
+			{
+				this->seek_set();
+				auto count = this->size();
+
+				if (count > buf.length()) {
+					buf.resize(count);
+				}
+
+				this->read<byte>(buf);
+			}
+
 			inline void seek_set(usize count = 0)
 			{
 				file::seek_set(this->stream, count);
@@ -171,6 +183,17 @@
 			inline void seek_end(usize count = 0)
 			{
 				file::seek_end(this->stream, count);
+			}
+
+			usize size()
+			{
+				auto caller_offset = std::ftell(this->stream);
+
+				this->seek_end();
+				auto count = std::ftell(this->stream);
+				this->seek_set(caller_offset);
+
+				return count;
 			}
 
 			inline bool end() const
