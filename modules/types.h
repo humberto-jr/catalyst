@@ -260,7 +260,7 @@
 	template<typename T>
 	static constexpr bool is_cstr()
 	{
-		return std::is_same<T, c_str>::value;
+		return std::is_same<T, c_str>::value || std::is_same<T, char*>::value;
 	}
 
 	template<typename T>
