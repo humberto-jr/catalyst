@@ -1,6 +1,6 @@
 #if !defined(TIMER_HEADER)
 	#define TIMER_HEADER
-	#include "types.h"
+	#include "essentials.h"
 	#include <chrono>
 	#include <thread>
 
@@ -34,6 +34,7 @@
 		inline void clear()
 		{
 			this->len = 0;
+			this->buf[0] = as_duration(0.0);
 		}
 
 		inline void start()
