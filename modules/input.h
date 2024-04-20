@@ -4,6 +4,7 @@
 	#include "nist.h"
 	#include <sstream>
 	#include <iostream>
+	#include <optional>
 
 	#if !defined(MAX_INPUT_LENGTH)
 		#define MAX_INPUT_LENGTH 2048
@@ -138,6 +139,119 @@
 			}
 
 			return nist::isotope_enum(val);
+		}
+
+		static std::optional<usize> find_argument_position(s32 argc, char* argv[], const char flag, u8 index = 0)
+		{
+			if (argc < 2) {
+				return {};
+			}
+
+			mut<s32> n = 1;
+			s32 offset = as_s32(index);
+
+			while ((n + offset) < argc) {
+				if ((argv[n][0] == '-') && (std::strlen(argv[n]) > 1)) {
+					if (argv[n][1] == flag) {
+						return (n + offset);
+					}
+				}
+
+				++n;
+			}
+
+			return {};
+		}
+
+		template<typename T>
+		static T argument_line(s32 argc, char* argv[], const char flag, u8 index, T min, T max, T dummy)
+		{
+			auto pos = find_argument_position(argc, argv, flag, index);
+
+			if (pos.has_value()) {
+				usize n = pos.value();
+
+				if ((argv[n][0] == '-')
+				 && (argv[n][1] != '0')
+				 && (argv[n][1] != '1')
+				 && (argv[n][1] != '2')
+				 && (argv[n][1] != '3')
+				 && (argv[n][1] != '4')
+				 && (argv[n][1] != '5')
+				 && (argv[n][1] != '6')
+				 && (argv[n][1] != '7')
+				 && (argv[n][1] != '8')
+				 && (argv[n][1] != '9')) {
+				 	// NOTE: If the entry starts with minus and it is not followed by
+				 	// digits, then this is likely another flag in an ill-formed line.
+					print::error(WHERE, "Argument ", index, " of flag -", flag, " expected a ", type_name<T>(), " value but received \"", argv[n], "\"");
+				}
+
+				if ((argv[n][0] != '-')
+				 && (argv[n][0] != '0')
+				 && (argv[n][0] != '1')
+				 && (argv[n][0] != '2')
+				 && (argv[n][0] != '3')
+				 && (argv[n][0] != '4')
+				 && (argv[n][0] != '5')
+				 && (argv[n][0] != '6')
+				 && (argv[n][0] != '7')
+				 && (argv[n][0] != '8')
+				 && (argv[n][0] != '9')) {
+				 	// NOTE: If the entry also starts with anything other than
+				 	// digits, then this is an ill-formed argument line too.
+					print::error(WHERE, "Argument ", index, " of flag -", flag, " expected a ", type_name<T>(), " value but received \"", argv[n], "\"");
+				}
+
+				// NOTE: See the note on the same cast used in the keyword<T>() function.
+				T result = static_cast<T>(std::strtold(argv[n], nullptr));
+
+				if (result < min) {
+					return min;
+				}
+
+				if (result > max) {
+					return max;
+				}
+
+				return result;
+			} else {
+				return dummy;
+			}
+		}
+
+		[[maybe_unused]]
+		static string argument_line(s32 argc, char* argv[], const char flag, u8 index, c_str dummy = "\0")
+		{
+			auto pos = find_argument_position(argc, argv, flag, index);
+
+			if (pos.has_value()) {
+				usize n = pos.value();
+
+				return string(argv[n]);
+			} else {
+				return string(dummy);
+			}
+		}
+
+		[[maybe_unused]]
+		static inline bool argument_line(s32 argc, char* argv[], const char flag)
+		{
+			return find_argument_position(argc, argv, flag).has_value();
+		}
+
+		[[maybe_unused]]
+		static nist::isotope argument_line(s32 argc, char* argv[], const char flag, u8 index, nist::isotope dummy)
+		{
+			auto pos = find_argument_position(argc, argv, flag, index);
+
+			if (pos.has_value()) {
+				usize n = pos.value();
+
+				return nist::isotope_enum(argv[n]);
+			} else {
+				return dummy;
+			}
 		}
 	}
 
