@@ -95,8 +95,8 @@
 
 			void operator=(const T rhs)
 			{
-				for (msize n = 0; n < this->rows(); ++n)
-					for (msize m = 0; m < this->cols(); ++m)
+				for (mut<usize> n = 0; n < this->rows(); ++n)
+					for (mut<usize> m = 0; m < this->cols(); ++m)
 						this->operator()(n, m) = rhs;
 			}
 
@@ -152,7 +152,7 @@
 		private:
 		friend class lapack::frontend;
 
-		msize max_col;
+		mut<usize> max_col;
 		vector<T> buf;
 
 		// NOTE: See the note on the private copy-constructor of vector.
