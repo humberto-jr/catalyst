@@ -78,8 +78,8 @@
 
 		void operator+=(c_str rhs)
 		{
-			msize n = 0;
-			msize max_len = this->capacity() - 1;
+			mut<usize> n = 0;
+			mut<usize> max_len = this->capacity() - 1;
 
 			while (rhs[n] != '\0') {
 				this->buf[this->end + n] = rhs[n];
@@ -132,8 +132,8 @@
 
 		private:
 		str buf;
-		msize end;
-		msize begin;
+		mut<usize> end;
+		mut<usize> begin;
 
 		// NOTE: See the note on the private copy-constructor of vector.
 		inline string(string &other): buf(other.buf.move()), end(other.end), begin(other.begin)
