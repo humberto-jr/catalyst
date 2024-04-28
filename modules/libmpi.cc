@@ -21,7 +21,10 @@
 	}
 #endif
 
+[[maybe_unused]]
 static constexpr s32 MESSAGE_COUNT_TAG = 666;
+
+[[maybe_unused]]
 static constexpr s32 MESSAGE_CONTENT_TAG = 667;
 
 //
