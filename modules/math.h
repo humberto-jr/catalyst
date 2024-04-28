@@ -323,7 +323,7 @@
 				case 170: return 7.25741561530799896739672821113e306;
 
 				// NOTE: Larger n values may cause overflow.
-				default: return as_f64(n)*factorial(n - 1);
+				default: return as_f64(n)*factorial(as_u8(n - 1));
 			}
 		}
 	}
