@@ -51,37 +51,37 @@
 		{
 			usize n_max = (this->len < rhs.len? this->len : rhs.len);
 
-			for (msize n = 0; n < n_max; ++n)
+			for (mut<usize> n = 0; n < n_max; ++n)
 				this->buf[n] = rhs.buf[n];
 		}
 
 		inline void operator=(const T &rhs)
 		{
-			for (msize n = 0; n < this->len; ++n)
+			for (mut<usize> n = 0; n < this->len; ++n)
 				this->buf[n] = rhs;
 		}
 
 		inline void operator+=(const T &rhs)
 		{
-			for (msize n = 0; n < this->len; ++n)
+			for (mut<usize> n = 0; n < this->len; ++n)
 				this->buf[n] += rhs;
 		}
 
 		inline void operator-=(const T &rhs)
 		{
-			for (msize n = 0; n < this->len; ++n)
+			for (mut<usize> n = 0; n < this->len; ++n)
 				this->buf[n] -= rhs;
 		}
 
 		inline void operator*=(const T &rhs)
 		{
-			for (msize n = 0; n < this->len; ++n)
+			for (mut<usize> n = 0; n < this->len; ++n)
 				this->buf[n] *= rhs;
 		}
 
 		inline void operator/=(const T &rhs)
 		{
-			for (msize n = 0; n < this->len; ++n)
+			for (mut<usize> n = 0; n < this->len; ++n)
 				this->buf[n] /= rhs;
 		}
 
@@ -135,7 +135,7 @@
 		}
 
 		private:
-		msize len;
+		mut<usize> len;
 		T *buf;
 
 		// NOTE: A copy-constructor from raw parts and internal use only which behaves
