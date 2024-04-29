@@ -6755,7 +6755,7 @@
 
 		static constexpr isotope isotope_enum(c_str symbol)
 		{
-			for (msize n = 0; n < MAX_ISOTOPE_COUNT; ++n) {
+			for (mut<usize> n = 0; n < MAX_ISOTOPE_COUNT; ++n) {
 				auto result = static_cast<isotope>(n);
 
 				auto found = std::strcmp(atomic_symbol(result), symbol) == 0;

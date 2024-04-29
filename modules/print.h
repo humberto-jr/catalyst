@@ -25,7 +25,7 @@
 
 		template<u8 PAD = DEFAULT_FMT_PADDING, usize LEN = DEFAULT_FMT_LENGTH>
 		struct fmt {
-			msize len;
+			mut<usize> len;
 			char buf[LEN + 1];
 
 			inline fmt(): len(0), buf{'\0'}
