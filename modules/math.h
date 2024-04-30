@@ -33,6 +33,8 @@
 
 		static constexpr f64 EULER_CONST = 0.57721566490153286060651209008;
 
+		static constexpr u32 MAX_LEGENDRE_POLY_DEGREE = 2700;
+
 		using integrand = f64 (*)(f64 x, void *params);
 
 		template<typename T = mut<f64>>
