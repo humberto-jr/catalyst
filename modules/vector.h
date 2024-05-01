@@ -146,6 +146,9 @@
 		}
 	};
 
+	template<typename T = mut<f64>>
+	using vec = vector<T>;
+
 	using vec32 = vector<mut<f32>>;
 	using vec64 = vector<mut<f64>>;
 #endif
