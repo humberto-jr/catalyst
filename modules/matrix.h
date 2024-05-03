@@ -161,6 +161,9 @@
 		}
 	};
 
+	template<typename T = mut<f64>>
+	using mat = matrix<T>;
+
 	using mat32 = matrix<mut<f32>>;
 	using mat64 = matrix<mut<f64>>;
 #endif
