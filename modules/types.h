@@ -38,9 +38,6 @@
 	template<typename T>
 	using mut = typename std::remove_const<T>::type;
 
-	// NOTE: It occurs frequently in for-loops.
-	using msize = mut<usize>;
-
 	using byte = mut<u8>;
 
 	//
