@@ -36,7 +36,7 @@
 
 		static constexpr f64 ATOMIC_MASS_TO_ATOMIC_UNIT = 1.0/(ELECTRON_MASS*KILOGRAM_TO_ATOMIC_MASS);
 
-		enum class isotope {
+		enum class isotope: u16 {
 			atom_1H = 0,
 			atom_2H,
 			atom_3H,
@@ -3396,7 +3396,7 @@
 
 		static constexpr c_str atomic_symbol(const isotope a)
 		{
-			switch (as_u32(a)) {
+			switch (as_u16(a)) {
 				case    0: return "1H\0";
 				case    1: return "2H\0";
 				case    2: return "3H\0";
@@ -6773,7 +6773,7 @@
 
 		static constexpr f64 atomic_mass(const isotope a)
 		{
-			switch (as_u32(a)) {
+			switch (as_u16(a)) {
 				case    0: return 1.007825032239;   // 1H
 				case    1: return 2.0141017781212;  // 2H
 				case    2: return 3.016049277924;   // 3H
@@ -10138,7 +10138,7 @@
 
 		static constexpr u32 atomic_number(const isotope a)
 		{
-			switch (as_u32(a)) {
+			switch (as_u16(a)) {
 				case    0: return 1;    // 1H
 				case    1: return 1;    // 2H
 				case    2: return 1;    // 3H
@@ -13501,7 +13501,7 @@
 			return atomic_number(as_enum);
 		}
 
-		enum class orbital {
+		enum class orbital: u8 {
 			s = 0,   // l = 0, m =  0
 			pz,      // l = 1, m =  0
 			px,      // l = 1, m = -1
