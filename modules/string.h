@@ -7,7 +7,7 @@
 		#define DEFAULT_STRING_LENGTH 1023
 	#endif
 
-	using str = vector<char>;
+	using str = vec<char>;
 
 	class string {
 		public:
@@ -76,6 +76,19 @@
 			this->right_trim();
 		}
 
+		template<u8 PAD = 1, typename T>
+		void write(const T rhs)
+		{
+			usize rhs_len = DEFAULT_STRING_LENGTH + 1;
+
+			char buf[rhs_len] = {'\0'};
+
+			s32 info = std::snprintf(&buf[0], rhs_len, type_fmt<T>(), PAD, rhs);
+			assert(info > -1);
+
+			*this += static_cast<c_str>(&buf[0]);
+		}
+
 		void operator+=(c_str rhs)
 		{
 			mut<usize> n = 0;
@@ -102,6 +115,12 @@
 			*this += rhs.as_cstr();
 		}
 
+		template<typename T>
+		void operator+=(const T rhs)
+		{
+			this->write(rhs);
+		}
+
 		inline void operator=(c_str rhs)
 		{
 			 this->clear();
@@ -114,6 +133,13 @@
 			this->end = rhs.end;
 			this->begin = rhs.begin;
 			this->buf.swap(rhs.buf);
+		}
+
+		template<typename T>
+		void operator=(const T rhs)
+		{
+			this->clear();
+			this->write(rhs);
 		}
 
 		string operator+(string &rhs)
