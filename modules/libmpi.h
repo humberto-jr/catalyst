@@ -107,13 +107,13 @@
 			}
 
 			template<typename T>
-			void send(u32 rank, const vector<T> &data) const
+			void send(u32 rank, const vec<T> &data) const
 			{
 				send(rank, as_u32(data.length()), &data[0]);
 			}
 
 			template<typename T>
-			void send(u32 rank, const matrix<T> &data) const
+			void send(u32 rank, const mat<T> &data) const
 			{
 				send(rank, as_u32(data.rows()*data.cols()), &data[0]);
 			}
@@ -149,14 +149,14 @@
 			}
 
 			template<typename T>
-			void receive(u32 rank, vector<T> &data) const
+			void receive(u32 rank, vec<T> &data) const
 			{
 				auto info = receive(rank, as_u32(data.length()), &data[0]);
 				assert(as_usize(info) <= data.length());
 			}
 
 			template<typename T>
-			void receive(u32 rank, matrix<T> &data) const
+			void receive(u32 rank, mat<T> &data) const
 			{
 				auto info = receive(rank, as_u32(data.rows()*data.cols()), &data[0]);
 				assert(as_usize(info) == data.rows()*data.cols());

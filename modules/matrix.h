@@ -11,7 +11,7 @@
 	template<typename T = mut<f64>>
 	class matrix {
 		public:
-		inline matrix(usize max_row, usize max_col): max_col(max_col), buf(vector<T>(max_row*max_col))
+		inline matrix(usize max_row, usize max_col): max_col(max_col), buf(vec<T>(max_row*max_col))
 		{
 		}
 
@@ -153,7 +153,7 @@
 		friend class lapack::frontend;
 
 		mut<usize> max_col;
-		vector<T> buf;
+		vec<T> buf;
 
 		// NOTE: See the note on the private copy-constructor of vector.
 		inline matrix(matrix &other): max_col(other.max_col), buf(other.buf.move())

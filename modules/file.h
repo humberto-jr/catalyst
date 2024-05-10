@@ -144,26 +144,26 @@
 			}
 
 			template<typename T>
-			inline void read(vector<T> &data)
+			inline void read(vec<T> &data)
 			{
 				this->read_raw<T>(data.length(), &data[0]);
 			}
 
 			template<typename T>
-			inline void read(matrix<T> &data)
+			inline void read(mat<T> &data)
 			{
 				this->read_raw<mut<T>>(data.rows()*data.cols(), &data[0]);
 			}
 
 			template<typename T>
-			inline void read(typename matrix<T>::view &data)
+			inline void read(typename mat<T>::view &data)
 			{
 				for (mut<usize> n = 0; n < data.rows(); ++n)
 					for (mut<usize> m = 0; m < data.cols(); ++m)
 						this->read_raw<T>(1, &data(n, m));
 			}
 
-			void read_all(vector<byte> &buf)
+			void read_all(vec<byte> &buf)
 			{
 				this->seek_set();
 				auto count = this->size();
@@ -311,19 +311,19 @@
 			}
 
 			template<typename T>
-			inline void write(const vector<T> &data)
+			inline void write(const vec<T> &data)
 			{
 				this->write_raw<T>(data.length(), &data[0]);
 			}
 
 			template<typename T>
-			inline void write(const matrix<T> &data)
+			inline void write(const mat<T> &data)
 			{
 				this->write_raw<T>(data.rows()*data.cols(), &data[0]);
 			}
 
 			template<typename T>
-			inline void write(const typename matrix<T>::view &data)
+			inline void write(const typename mat<T>::view &data)
 			{
 				for (mut<usize> n = 0; n < data.rows(); ++n)
 					for (mut<usize> m = 0; m < data.cols(); ++m)
