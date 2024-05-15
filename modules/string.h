@@ -77,13 +77,13 @@
 		}
 
 		template<u8 PAD = 1, typename T>
-		void write(const T rhs)
+		void append(const T val)
 		{
-			usize rhs_len = DEFAULT_STRING_LENGTH + 1;
+			usize buf_len = DEFAULT_STRING_LENGTH + 1;
 
-			char buf[rhs_len] = {'\0'};
+			char buf[buf_len] = {'\0'};
 
-			s32 info = std::snprintf(&buf[0], rhs_len, type_fmt<T>(), PAD, rhs);
+			s32 info = std::snprintf(&buf[0], buf_len, type_fmt<T>(), PAD, val);
 			assert(info > -1);
 
 			*this += static_cast<c_str>(&buf[0]);
@@ -118,7 +118,7 @@
 		template<typename T>
 		void operator+=(const T rhs)
 		{
-			this->write(rhs);
+			this->append(rhs);
 		}
 
 		inline void operator=(c_str rhs)
@@ -139,7 +139,7 @@
 		void operator=(const T rhs)
 		{
 			this->clear();
-			this->write(rhs);
+			this->append(rhs);
 		}
 
 		string operator+(string &rhs)
