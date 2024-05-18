@@ -11,7 +11,7 @@ f64 math::legendre_poly(u32 l, f64 x)
 f64 math::assoc_legendre_poly(u32 l, u32 m, f64 x)
 {
 	assert(l >= m);
-	assert(l < 2700);
+	assert(l <= math::MAX_LEGENDRE_POLY_DEGREE);
 	assert(std::fabs(x) <= 1.0);
 
 	return gsl_sf_legendre_sphPlm(l, m, x);
@@ -62,6 +62,22 @@ f64 math::sphe_bessel(const char type, u32 l, f64 x)
 		case 'y': return gsl_sf_bessel_yl(l, x);
 		case 'i': return gsl_sf_bessel_il_scaled(l, x);
 		case 'k': return gsl_sf_bessel_kl_scaled(l, x);
+
+		default:
+		print::error(WHERE, "Invalid type ", type);
+	}
+
+	// NOTE: Unreachable.
+	return 0.0;
+}
+
+f64 math::mod_sphe_bessel(const char type, u32 l, f64 wavenum, f64 x)
+{
+	assert(wavenum*x >= 0.0);
+
+	switch (type) {
+		case 'j': return std::sqrt(wavenum*x)*gsl_sf_bessel_il_scaled(l, wavenum*x);
+		case 'n': return std::sqrt(wavenum*x)*gsl_sf_bessel_kl_scaled(l, wavenum*x);
 
 		default:
 		print::error(WHERE, "Invalid type ", type);
