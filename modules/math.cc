@@ -57,11 +57,37 @@ f64 math::sphe_bessel(const char type, u32 l, f64 x)
 {
 	assert(x >= 0.0);
 
+	// NOTE:
+	// 'j' is the (regular) 1st kind;
+	// 'y' is the (irregular) 2nd kind also known as 'n';
+	// 'i' is the (regular) modified 1st kind;
+	// 'k' is the (irregular) modified 2nd kind.
+	//
+	// When the irregular type is used, x is the purely imaginary component.
+
 	switch (type) {
 		case 'j': return gsl_sf_bessel_jl(l, x);
 		case 'y': return gsl_sf_bessel_yl(l, x);
 		case 'i': return gsl_sf_bessel_il_scaled(l, x);
 		case 'k': return gsl_sf_bessel_kl_scaled(l, x);
+
+		default:
+		print::error(WHERE, "Invalid type ", type);
+	}
+
+	// NOTE: Unreachable.
+	return 0.0;
+}
+
+f64 math::sphe_bessel(const char type, f64 l, f64 x)
+{
+	assert(x >= 0.0);
+
+	switch (type) {
+		case 'j': return gsl_sf_bessel_Jnu(l, x);
+		case 'y': return gsl_sf_bessel_Ynu(l, x);
+		case 'i': return gsl_sf_bessel_Inu(l, x);
+		case 'k': return gsl_sf_bessel_Knu(l, x);
 
 		default:
 		print::error(WHERE, "Invalid type ", type);
