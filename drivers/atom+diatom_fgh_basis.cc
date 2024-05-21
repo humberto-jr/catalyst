@@ -187,7 +187,7 @@ int main()
 	}
 
 	// NOTE: Rewriting the placeholder in the second entry with the total count.
-	basis.seek_set(sizeof(fgh::MAGIC_NUMBER));
+	basis.seek_set(sizeof(fgh::MAGIC_NUMBER) + sizeof(fgh::FORMAT_VERSION));
 	basis.write(count);
 
 	return EXIT_SUCCESS;
