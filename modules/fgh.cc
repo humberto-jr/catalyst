@@ -87,3 +87,66 @@ void fgh::matrix(f64 mass, f64 step, const vec<mat64> &potential, mat64 &result)
 		}
 	}
 }
+
+u32 fgh::is_valid(file::input &buf)
+{
+	buf.seek_set();
+
+	mut<u32> tag = 0;
+	buf.read(tag);
+
+	if (tag != fgh::MAGIC_NUMBER) {
+		print::error(WHERE, buf.filename.as_cstr(), " does not correspond to a FGH basis file");
+	}
+
+	mut<u8> ver = 0;
+	buf.read(ver);
+
+	if (ver != fgh::FORMAT_VERSION) {
+		print::error(WHERE, buf.filename.as_cstr(), " does not have a valid format version");
+	}
+
+	mut<u32> count = 0;
+	buf.read(count);
+
+	if ((count == 0) || buf.end()) {
+		print::error(WHERE, buf.filename.as_cstr(), " has no basis functions stored");
+	}
+
+	return count;
+}
+
+void fgh::load_basis(u32 n, file::input &buf, fgh::basis &basis)
+{
+	buf.seek_set(sizeof(fgh::MAGIC_NUMBER) + sizeof(fgh::FORMAT_VERSION) + sizeof(u32));
+
+	buf.read(basis.n_min);
+	buf.read(basis.r_min);
+	buf.read(basis.r_max);
+	buf.read(basis.r_step);
+
+	basis.resize();
+
+	// NOTE: There is an extra u32 entry in each chunk of data for the basis indexing,
+	// which is not part of the struct fgh::basis (see saved_n below).
+	usize offset = n*(6*sizeof(u32) + sizeof(s32) + 2*sizeof(f64) + basis.eigenvec.size());
+
+	buf.seek_set(fgh::BASIS_FILE_HEADER + offset);
+
+	mut<u32> saved_n = 0;
+	buf.read(saved_n);
+
+	if (saved_n != n) {
+		print::error(WHERE, buf.filename.as_cstr(), " layout is inconsistent; expected n = ", n, ", but found n = ", saved_n);
+	}
+
+	buf.read(basis.j);
+	buf.read(basis.v);
+	buf.read(basis.J);
+	buf.read(basis.l);
+	buf.read(basis.p);
+	buf.read(basis.comp);
+	buf.read(basis.norm);
+	buf.read(basis.eigenval);
+	buf.read<mut<f64>>(basis.eigenvec);
+}

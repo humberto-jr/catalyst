@@ -46,5 +46,9 @@
 				return this->norm*this->eigenvec[n];
 			}
 		};
+
+		u32 is_valid(file::input &buf);
+
+		void load_basis(u32 n, file::input &buf, basis &data);
 	}
 #endif
