@@ -9,6 +9,18 @@
 
 	using str = vec<char>;
 
+	// NOTE: A forward declaration is used below to avoid including file.h and mpi.h
+	// here, since these are not part of the essentials.h header. Both file::input
+	// and mpi::frontend requires privileges to write the internal buffer of a string.
+
+	namespace file {
+		class input;
+	}
+
+	namespace mpi {
+		class frontend;
+	}
+
 	class string {
 		public:
 		inline string(usize capacity = DEFAULT_STRING_LENGTH): buf(capacity + 1), end(0), begin(0)
@@ -165,6 +177,9 @@
 		inline string(string &other): buf(other.buf.move()), end(other.end), begin(other.begin)
 		{
 		}
+
+		friend class file::input;
+		friend class mpi::frontend;
 	};
 
 	#undef DEFAULT_STRING_LENGTH
