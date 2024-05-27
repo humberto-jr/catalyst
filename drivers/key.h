@@ -10,6 +10,9 @@
 		// of all-in-uppercase on purpose.
 
 		[[maybe_unused]]
+		static constexpr c_str use_omp = "use_omp\0";
+
+		[[maybe_unused]]
 		static constexpr c_str J_min = "J_min\0";
 
 		[[maybe_unused]]
