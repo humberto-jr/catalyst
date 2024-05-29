@@ -97,22 +97,6 @@ f64 math::sphe_bessel(const char type, f64 l, f64 x)
 	return 0.0;
 }
 
-f64 math::mod_sphe_bessel(const char type, u32 l, f64 wavenum, f64 x)
-{
-	assert(wavenum*x >= 0.0);
-
-	switch (type) {
-		case 'j': return std::sqrt(wavenum*x)*gsl_sf_bessel_il_scaled(l, wavenum*x);
-		case 'n': return std::sqrt(wavenum*x)*gsl_sf_bessel_kl_scaled(l, wavenum*x);
-
-		default:
-		print::error(WHERE, "Invalid type ", type);
-	}
-
-	// NOTE: Unreachable.
-	return 0.0;
-}
-
 f64 math::clebsch_gordan_coeff(s32 ja, s32 jb, s32 jc, s32 ma, s32 mb, s32 mc)
 {
 	s32 n = ja - jb + mc;
