@@ -59,8 +59,8 @@ void pes::frontend::start_extern_pes(c_str filename)
 
 		// NOTE: Next is the first call to the external PES library. It may need to
 		// open files, access the standard output and/or perform some computation.
-		// It may also have global variables. Thus, only the master thread will make
-		// the call.
+		// It may also have global variables and be thread-unsafe. Thus, only the
+		// master thread will make the call.
 		#pragma omp master
 		this->call_extern_startup();
 	} else {
@@ -233,9 +233,18 @@ f64 pes::frontend::legendre_multipole_term(const char arrang, u32 lambda, f64 r,
 	return as_f64(2*lambda + 1)*result/2.0;
 }
 
+void pes::frontend::legendre_multipole_term(const char arrang, u32 lambda, f64 r_min, f64 r_step, f64 R, vec64 &result) const
+{
+	for (mut<usize> n = 0; n < result.length(); ++n) {
+		f64 r = r_min + as_f64(n)*r_step;
+
+		result[n] = this->legendre_multipole_term(arrang, lambda, r, R);
+	}
+}
+
 pes::frontend::~frontend()
 {
-	// NOTE: This is the last call to the external PES library.
+	// NOTE: This is the last call to the external PES library. It may be thread-unsafe.
 	#pragma omp master
 	this->call_extern_shutdown();
 }
