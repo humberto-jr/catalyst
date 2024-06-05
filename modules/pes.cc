@@ -233,10 +233,10 @@ f64 pes::frontend::legendre_multipole_term(const char arrang, u32 lambda, f64 r,
 	return as_f64(2*lambda + 1)*result/2.0;
 }
 
-void pes::frontend::legendre_multipole_term(const char arrang, u32 lambda, f64 r_min, f64 r_step, f64 R, vec64 &result) const
+void pes::frontend::legendre_multipole_term(const char arrang, u32 lambda, u32 n_min, f64 r_min, f64 r_step, f64 R, vec64 &result) const
 {
 	for (mut<usize> n = 0; n < result.length(); ++n) {
-		f64 r = r_min + as_f64(n)*r_step;
+		f64 r = r_min + as_f64(n_min + n)*r_step;
 
 		result[n] = this->legendre_multipole_term(arrang, lambda, r, R);
 	}
