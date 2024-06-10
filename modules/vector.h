@@ -117,13 +117,17 @@
 
 		void resize(usize count)
 		{
-			this->len = count;
-			auto new_buf = std::realloc(as_void(this->buf), sizeof(T)*this->len);
+			auto new_buf = std::realloc(as_void(this->buf), sizeof(T)*count);
 
 			if ((new_buf == nullptr) && (count > 0)) {
 				print::error(WHERE, "Unable to reallocate ", count, " elements of ", sizeof(T), " bytes");
 			}
 
+			if (this->len == 0) {
+				std::memset(new_buf, 0, sizeof(T)*count);
+			}
+
+			this->len = count;
 			this->buf = static_cast<T*>(new_buf);
 		}
 
