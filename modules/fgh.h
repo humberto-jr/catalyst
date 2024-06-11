@@ -8,6 +8,8 @@
 
 		static constexpr u32 MAGIC_NUMBER = 464748u;
 
+		static constexpr usize BASIS_FILE_HEADER = sizeof(MAGIC_NUMBER) + sizeof(FORMAT_VERSION) + 2*sizeof(u32) + 3*sizeof(f64);
+
 		void matrix(f64 mass, f64 step, const vec64 &potential, mat64 &result);
 
 		void matrix(f64 mass, f64 step, const vec<mat64> &potential, mat64 &result);
