@@ -21,6 +21,15 @@
 	}
 #endif
 
+#define CALL_MPI_BROADCAST(rank, count, buffer, datatype)                        \
+{                                                                                \
+  auto info = MPI_Bcast(as_void(buffer), count, datatype, rank, MPI_COMM_WORLD); \
+                                                                                 \
+  if (info != MPI_SUCCESS) {                                                     \
+    print::error(WHERE, "MPI_Bcast() failed with error code ", info);            \
+  }                                                                              \
+}
+
 [[maybe_unused]]
 static constexpr s32 MESSAGE_COUNT_TAG = 666;
 
