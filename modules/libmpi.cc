@@ -21,13 +21,13 @@
 	}
 #endif
 
-#define CALL_MPI_BROADCAST(rank, count, buffer, datatype)                        \
-{                                                                                \
-  auto info = MPI_Bcast(as_void(buffer), count, datatype, rank, MPI_COMM_WORLD); \
-                                                                                 \
-  if (info != MPI_SUCCESS) {                                                     \
-    print::error(WHERE, "MPI_Bcast() failed with error code ", info);            \
-  }                                                                              \
+#define CALL_MPI_BROADCAST(rank, count, buffer, datatype)                            \
+{                                                                                    \
+  auto info = MPI_Bcast(as_void(buffer), (count), datatype, (rank), MPI_COMM_WORLD); \
+                                                                                     \
+  if (info != MPI_SUCCESS) {                                                         \
+    print::error(WHERE, "MPI_Bcast() failed with error code ", info);                \
+  }                                                                                  \
 }
 
 [[maybe_unused]]
@@ -529,6 +529,127 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 	#endif
 
 	return recv_count;
+}
+
+void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+                              [[maybe_unused]] u32 count,
+                              [[maybe_unused]] mut<u8> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_BROADCAST(rank, count, data, MPI_UINT8_T)
+	#endif
+}
+
+void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+                              [[maybe_unused]] u32 count,
+                              [[maybe_unused]] mut<u16> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_BROADCAST(rank, count, data, MPI_UINT16_T)
+	#endif
+}
+
+void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+                              [[maybe_unused]] u32 count,
+                              [[maybe_unused]] mut<u32> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_BROADCAST(rank, count, data, MPI_UINT32_T)
+	#endif
+}
+
+void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+                              [[maybe_unused]] u32 count,
+                              [[maybe_unused]] mut<u64> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_BROADCAST(rank, count, data, MPI_UINT64_T)
+	#endif
+}
+
+void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+                              [[maybe_unused]] u32 count,
+                              [[maybe_unused]] mut<s8> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_BROADCAST(rank, count, data, MPI_INT8_T)
+	#endif
+}
+
+
+void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+                              [[maybe_unused]] u32 count,
+                              [[maybe_unused]] mut<s16> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_BROADCAST(rank, count, data, MPI_INT16_T)
+	#endif
+}
+
+void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+                              [[maybe_unused]] u32 count,
+                              [[maybe_unused]] mut<s32> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_BROADCAST(rank, count, data, MPI_INT32_T)
+	#endif
+}
+
+void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+                              [[maybe_unused]] u32 count,
+                              [[maybe_unused]] mut<s64> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_BROADCAST(rank, count, data, MPI_INT64_T)
+	#endif
+}
+
+void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+                              [[maybe_unused]] u32 count,
+                              [[maybe_unused]] char data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_BROADCAST(rank, count, data, MPI_CHAR)
+	#endif
+}
+
+void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+                              [[maybe_unused]] u32 count,
+                              [[maybe_unused]] mut<f32> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_BROADCAST(rank, count, data, MPI_FLOAT)
+	#endif
+}
+
+void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+                              [[maybe_unused]] u32 count,
+                              [[maybe_unused]] mut<f64> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_BROADCAST(rank, count, data, MPI_DOUBLE)
+	#endif
+}
+
+void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+                              [[maybe_unused]] u32 count,
+                              [[maybe_unused]] mut<f128> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_BROADCAST(rank, count, data, MPI_LONG_DOUBLE)
+	#endif
 }
 
 void mpi::frontend::wait() const

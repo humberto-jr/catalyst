@@ -162,6 +162,34 @@
 				assert(as_usize(info) == data.rows()*data.cols());
 			}
 
+			// NOTE: While the MPI broadcasts appear to be thread-safe, they are
+			// used herein with the same group communicator and, therefore, are
+			// also bound to OpenMP critical regions.
+
+			void broadcast(u32 rank, u32 count, mut<u8> data[]) const;
+
+			void broadcast(u32 rank, u32 count, mut<u16> data[]) const;
+
+			void broadcast(u32 rank, u32 count, mut<u32> data[]) const;
+
+			void broadcast(u32 rank, u32 count, mut<u64> data[]) const;
+
+			void broadcast(u32 rank, u32 count, mut<s8> data[]) const;
+
+			void broadcast(u32 rank, u32 count, mut<s16> data[]) const;
+
+			void broadcast(u32 rank, u32 count, mut<s32> data[]) const;
+
+			void broadcast(u32 rank, u32 count, mut<s64> data[]) const;
+
+			void broadcast(u32 rank, u32 count, char data[]) const;
+
+			void broadcast(u32 rank, u32 count, mut<f32> data[]) const;
+
+			void broadcast(u32 rank, u32 count, mut<f64> data[]) const;
+
+			void broadcast(u32 rank, u32 count, mut<f128> data[]) const;
+
 			void wait() const;
 
 			template<u8 PAD, usize LEN>
