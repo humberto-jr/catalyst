@@ -237,6 +237,69 @@
 				this->print_line(start, remainder...);
 			}
 
+			// NOTE: Since the MPI runtime redirects the stdin to rank 0, wrappers
+			// of the input::keyword() function are provided below to broadcast
+			// standard inputs from rank 0 to others.
+
+			template<typename T>
+			T input_keyword(c_str key, T min, T max, T dummy)
+			{
+				T val = static_cast<T>(0);
+
+				if (this->rank() == MASTER_PROCESS_RANK) {
+					val = input::keyword(key, min, max, dummy);
+				}
+
+				this->broadcast(MASTER_PROCESS_RANK, 1, &val);
+
+				return val;
+			}
+
+			string input_keyword(c_str key, c_str dummy = "\0")
+			{
+				string val;
+
+				if (this->rank() == MASTER_PROCESS_RANK) {
+					val += input::keyword(key, dummy).as_cstr();
+				}
+
+				this->broadcast(MASTER_PROCESS_RANK, 1, &val.end);
+
+				if ((this->rank() != MASTER_PROCESS_RANK) && (val.end > val.buf.length())) {
+					val.buf.resize(val.end);
+				}
+
+				this->broadcast(MASTER_PROCESS_RANK, as_u32(val.end), &val.buf[0]);
+
+				return val;
+			}
+
+			bool input_keyword(c_str key, bool dummy)
+			{
+				mut<s32> val = 0;
+
+				if (this->rank() == MASTER_PROCESS_RANK) {
+					val = input::keyword(key, dummy);
+				}
+
+				this->broadcast(MASTER_PROCESS_RANK, 1, &val);
+
+				return as_bool(val);
+			}
+
+			nist::isotope input_keyword(c_str key, nist::isotope dummy)
+			{
+				mut<u16> val = static_cast<u16>(nist::isotope::atom_unknown);
+
+				if (this->rank() == MASTER_PROCESS_RANK) {
+					val = static_cast<u16>(input::keyword(key, dummy));
+				}
+
+				this->broadcast(MASTER_PROCESS_RANK, 1, &val);
+
+				return static_cast<nist::isotope>(val);
+			}
+
 			~frontend();
 
 			private:
