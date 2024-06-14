@@ -21,6 +21,21 @@
 	}
 #endif
 
+#define CALL_SYNC_MPI_SEND(rank, count, buffer, datatype)                                      \
+{                                                                                              \
+  auto info = MPI_Send(&(count), 1, MPI_UINT32_T, (rank), MESSAGE_COUNT_TAG, MPI_COMM_WORLD);  \
+                                                                                               \
+  if (info != MPI_SUCCESS) {                                                                   \
+    print::error(WHERE, "1st MPI_Send() failed with error code ", info);                       \
+  }                                                                                            \
+                                                                                               \
+  info = MPI_Send(&buffer[0], (count), datatype, (rank), MESSAGE_CONTENT_TAG, MPI_COMM_WORLD); \
+                                                                                               \
+  if (info != MPI_SUCCESS) {                                                                   \
+    print::error(WHERE, "2nd MPI_Send() failed with error code ", info);                       \
+  }                                                                                            \
+}
+
 #define CALL_MPI_BROADCAST(rank, count, buffer, datatype)                            \
 {                                                                                    \
   auto info = MPI_Bcast(as_void(buffer), (count), datatype, (rank), MPI_COMM_WORLD); \
@@ -117,10 +132,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 {
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Send(&count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD);
-			MPI_Send(&data[0], count, MPI_UINT8_T, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD);
-		}
+		CALL_SYNC_MPI_SEND(rank, count, data, MPI_UINT8_T)
 	#endif
 }
 
@@ -130,10 +142,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 {
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Send(&count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD);
-			MPI_Send(&data[0], count, MPI_UINT16_T, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD);
-		}
+		CALL_SYNC_MPI_SEND(rank, count, data, MPI_UINT16_T)
 	#endif
 }
 
@@ -143,10 +152,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 {
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Send(&count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD);
-			MPI_Send(&data[0], count, MPI_UINT32_T, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD);
-		}
+		CALL_SYNC_MPI_SEND(rank, count, data, MPI_UINT32_T)
 	#endif
 }
 
@@ -156,10 +162,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 {
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Send(&count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD);
-			MPI_Send(&data[0], count, MPI_UINT64_T, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD);
-		}
+		CALL_SYNC_MPI_SEND(rank, count, data, MPI_UINT64_T)
 	#endif
 }
 
@@ -169,10 +172,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 {
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Send(&count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD);
-			MPI_Send(&data[0], count, MPI_INT8_T, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD);
-		}
+		CALL_SYNC_MPI_SEND(rank, count, data, MPI_INT8_T)
 	#endif
 }
 
@@ -182,10 +182,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 {
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Send(&count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD);
-			MPI_Send(&data[0], count, MPI_INT16_T, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD);
-		}
+		CALL_SYNC_MPI_SEND(rank, count, data, MPI_INT16_T)
 	#endif
 }
 
@@ -195,10 +192,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 {
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Send(&count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD);
-			MPI_Send(&data[0], count, MPI_INT32_T, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD);
-		}
+		CALL_SYNC_MPI_SEND(rank, count, data, MPI_INT32_T)
 	#endif
 }
 
@@ -208,10 +202,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 {
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Send(&count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD);
-			MPI_Send(&data[0], count, MPI_INT64_T, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD);
-		}
+		CALL_SYNC_MPI_SEND(rank, count, data, MPI_INT64_T)
 	#endif
 }
 
@@ -221,10 +212,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 {
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Send(&count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD);
-			MPI_Send(&data[0], count, MPI_CHAR, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD);
-		}
+		CALL_SYNC_MPI_SEND(rank, count, data, MPI_CHAR)
 	#endif
 }
 
@@ -234,10 +222,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 {
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Send(&count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD);
-			MPI_Send(&data[0], count, MPI_FLOAT, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD);
-		}
+		CALL_SYNC_MPI_SEND(rank, count, data, MPI_FLOAT)
 	#endif
 }
 
@@ -247,10 +232,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 {
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Send(&count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD);
-			MPI_Send(&data[0], count, MPI_DOUBLE, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD);
-		}
+		CALL_SYNC_MPI_SEND(rank, count, data, MPI_DOUBLE)
 	#endif
 }
 
@@ -260,10 +242,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 {
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Send(&count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD);
-			MPI_Send(&data[0], count, MPI_LONG_DOUBLE, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD);
-		}
+		CALL_SYNC_MPI_SEND(rank, count, data, MPI_LONG_DOUBLE)
 	#endif
 }
 
