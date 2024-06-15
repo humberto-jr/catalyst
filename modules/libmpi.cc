@@ -36,6 +36,23 @@
   }                                                                                            \
 }
 
+#define CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, buffer, datatype)                                            \
+{                                                                                                                   \
+  auto info = MPI_Recv(&recv_count, 1, MPI_UINT32_T, (rank), MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE); \
+                                                                                                                    \
+  if (info != MPI_SUCCESS) {                                                                                        \
+    print::error(WHERE, "1st MPI_Recv() failed with error code ", info);                                            \
+  }                                                                                                                 \
+                                                                                                                    \
+  if ((count) >= recv_count) {                                                                                      \
+    info = MPI_Recv(&data[0], (count), datatype, (rank), MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);   \
+                                                                                                                    \
+    if (info != MPI_SUCCESS) {                                                                                      \
+      print::error(WHERE, "2nd MPI_Recv() failed with error code ", info);                                          \
+    }                                                                                                               \
+  }                                                                                                                 \
+}
+
 #define CALL_MPI_BROADCAST(rank, count, buffer, datatype)                            \
 {                                                                                    \
   auto info = MPI_Bcast(as_void(buffer), (count), datatype, (rank), MPI_COMM_WORLD); \
@@ -254,15 +271,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Recv(&recv_count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-			if (recv_count > count) {
-				recv_count = count;
-			}
-
-			MPI_Recv(&data[0], recv_count, MPI_UINT8_T, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		}
+		CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, data, MPI_UINT8_T)
 	#endif
 
 	return recv_count;
@@ -276,15 +285,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Recv(&recv_count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-			if (recv_count > count) {
-				recv_count = count;
-			}
-
-			MPI_Recv(&data[0], recv_count, MPI_UINT16_T, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		}
+		CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, data, MPI_UINT16_T)
 	#endif
 
 	return recv_count;
@@ -298,15 +299,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Recv(&recv_count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-			if (recv_count > count) {
-				recv_count = count;
-			}
-
-			MPI_Recv(&data[0], recv_count, MPI_UINT32_T, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		}
+		CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, data, MPI_UINT32_T)
 	#endif
 
 	return recv_count;
@@ -320,15 +313,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Recv(&recv_count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-			if (recv_count > count) {
-				recv_count = count;
-			}
-
-			MPI_Recv(&data[0], recv_count, MPI_UINT64_T, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		}
+		CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, data, MPI_UINT64_T)
 	#endif
 
 	return recv_count;
@@ -342,15 +327,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Recv(&recv_count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-			if (recv_count > count) {
-				recv_count = count;
-			}
-
-			MPI_Recv(&data[0], recv_count, MPI_INT8_T, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		}
+		CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, data, MPI_INT8_T)
 	#endif
 
 	return recv_count;
@@ -364,15 +341,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Recv(&recv_count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-			if (recv_count > count) {
-				recv_count = count;
-			}
-
-			MPI_Recv(&data[0], recv_count, MPI_INT16_T, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		}
+		CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, data, MPI_INT16_T)
 	#endif
 
 	return recv_count;
@@ -386,15 +355,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Recv(&recv_count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-			if (recv_count > count) {
-				recv_count = count;
-			}
-
-			MPI_Recv(&data[0], recv_count, MPI_INT32_T, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		}
+		CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, data, MPI_INT32_T)
 	#endif
 
 	return recv_count;
@@ -408,15 +369,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Recv(&recv_count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-			if (recv_count > count) {
-				recv_count = count;
-			}
-
-			MPI_Recv(&data[0], recv_count, MPI_INT64_T, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		}
+		CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, data, MPI_INT64_T)
 	#endif
 
 	return recv_count;
@@ -430,15 +383,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Recv(&recv_count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-			if (recv_count > count) {
-				recv_count = count;
-			}
-
-			MPI_Recv(&data[0], recv_count, MPI_CHAR, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		}
+		CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, data, MPI_CHAR)
 	#endif
 
 	return recv_count;
@@ -452,15 +397,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Recv(&recv_count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-			if (recv_count > count) {
-				recv_count = count;
-			}
-
-			MPI_Recv(&data[0], recv_count, MPI_FLOAT, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		}
+		CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, data, MPI_FLOAT)
 	#endif
 
 	return recv_count;
@@ -474,15 +411,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Recv(&recv_count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-			if (recv_count > count) {
-				recv_count = count;
-			}
-
-			MPI_Recv(&data[0], recv_count, MPI_DOUBLE, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		}
+		CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, data, MPI_DOUBLE)
 	#endif
 
 	return recv_count;
@@ -496,15 +425,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 
 	#if defined(USE_MPI)
 		#pragma omp critical
-		{
-			MPI_Recv(&recv_count, 1, MPI_UINT32_T, rank, MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-			if (recv_count > count) {
-				recv_count = count;
-			}
-
-			MPI_Recv(&data[0], recv_count, MPI_LONG_DOUBLE, rank, MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		}
+		CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, data, MPI_LONG_DOUBLE)
 	#endif
 
 	return recv_count;
@@ -559,7 +480,6 @@ void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
 		CALL_MPI_BROADCAST(rank, count, data, MPI_INT8_T)
 	#endif
 }
-
 
 void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
                               [[maybe_unused]] u32 count,
