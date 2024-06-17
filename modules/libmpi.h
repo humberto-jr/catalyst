@@ -100,16 +100,36 @@
 
 			void send(u32 rank, u32 count, f128 data[]) const;
 
+			void send(u32 rank, const vec<mut<u8>> &data) const;
+
+			void send(u32 rank, const vec<mut<u16>> &data) const;
+
+			void send(u32 rank, const vec<mut<u32>> &data) const;
+
+			void send(u32 rank, const vec<mut<u64>> &data) const;
+
+			void send(u32 rank, const vec<mut<s8>> &data) const;
+
+			void send(u32 rank, const vec<mut<s16>> &data) const;
+
+			void send(u32 rank, const vec<mut<s32>> &data) const;
+
+			void send(u32 rank, const vec<mut<s64>> &data) const;
+
+			void send(u32 rank, const vec<char> &data) const;
+
+			void send(u32 rank, const vec<mut<f32>> &data) const;
+
+			void send(u32 rank, const vec<mut<f64>> &data) const;
+
+			void send(u32 rank, const vec<mut<f128>> &data) const;
+
+			void send(u32 rank, const string &data) const;
+
 			template<u8 PAD, usize LEN>
 			void send(u32 rank, const print::fmt<PAD, LEN> &data) const
 			{
 				send(rank, as_u32(data.len), &data.buf[0]);
-			}
-
-			template<typename T>
-			void send(u32 rank, const vec<T> &data) const
-			{
-				send(rank, as_u32(data.length()), &data[0]);
 			}
 
 			template<typename T>
@@ -142,17 +162,36 @@
 
 			u32 receive(u32 rank, u32 count, mut<f128> data[]) const;
 
+			u32 receive(u32 rank, vec<mut<u8>> &data) const;
+
+			u32 receive(u32 rank, vec<mut<u16>> &data) const;
+
+			u32 receive(u32 rank, vec<mut<u32>> &data) const;
+
+			u32 receive(u32 rank, vec<mut<u64>> &data) const;
+
+			u32 receive(u32 rank, vec<mut<s8>> &data) const;
+
+			u32 receive(u32 rank, vec<mut<s16>> &data) const;
+
+			u32 receive(u32 rank, vec<mut<s32>> &data) const;
+
+			u32 receive(u32 rank, vec<mut<s64>> &data) const;
+
+			u32 receive(u32 rank, vec<char> &data) const;
+
+			u32 receive(u32 rank, vec<mut<f32>> &data) const;
+
+			u32 receive(u32 rank, vec<mut<f64>> &data) const;
+
+			u32 receive(u32 rank, vec<mut<f128>> &data) const;
+
+			void receive(u32 rank, string &data) const;
+
 			template<u8 PAD, usize LEN>
 			void receive(u32 rank, print::fmt<PAD, LEN> &data) const
 			{
 				data.len = as_usize(receive(rank, LEN, &data.buf[0]));
-			}
-
-			template<typename T>
-			void receive(u32 rank, vec<T> &data) const
-			{
-				auto info = receive(rank, as_u32(data.length()), &data[0]);
-				assert(as_usize(info) <= data.length());
 			}
 
 			template<typename T>

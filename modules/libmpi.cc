@@ -263,6 +263,82 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 	#endif
 }
 
+// NOTE: For use inside mpi::frontend::send() methods only.
+#define SEND_VECTOR_DATA(rank, data)         \
+{                                            \
+  usize len = data.length();                 \
+  this->send((rank), 1, &len);               \
+  this->send((rank), as_u32(len), &data[0]); \
+}
+
+void mpi::frontend::send(u32 rank, const vec<mut<u8>> &data) const
+{
+	SEND_VECTOR_DATA(rank, data)
+}
+
+void mpi::frontend::send(u32 rank, const vec<mut<u16>> &data) const
+{
+	SEND_VECTOR_DATA(rank, data)
+}
+
+void mpi::frontend::send(u32 rank, const vec<mut<u32>> &data) const
+{
+	SEND_VECTOR_DATA(rank, data)
+}
+
+void mpi::frontend::send(u32 rank, const vec<mut<u64>> &data) const
+{
+	SEND_VECTOR_DATA(rank, data)
+}
+
+void mpi::frontend::send(u32 rank, const vec<mut<s8>> &data) const
+{
+	SEND_VECTOR_DATA(rank, data)
+}
+
+void mpi::frontend::send(u32 rank, const vec<mut<s16>> &data) const
+{
+	SEND_VECTOR_DATA(rank, data)
+}
+
+void mpi::frontend::send(u32 rank, const vec<mut<s32>> &data) const
+{
+	SEND_VECTOR_DATA(rank, data)
+}
+
+void mpi::frontend::send(u32 rank, const vec<mut<s64>> &data) const
+{
+	SEND_VECTOR_DATA(rank, data)
+}
+
+void mpi::frontend::send(u32 rank, const vec<char> &data) const
+{
+	SEND_VECTOR_DATA(rank, data)
+}
+
+void mpi::frontend::send(u32 rank, const vec<mut<f32>> &data) const
+{
+	SEND_VECTOR_DATA(rank, data)
+}
+
+void mpi::frontend::send(u32 rank, const vec<mut<f64>> &data) const
+{
+	SEND_VECTOR_DATA(rank, data)
+}
+
+void mpi::frontend::send(u32 rank, const vec<mut<f128>> &data) const
+{
+	SEND_VECTOR_DATA(rank, data)
+}
+
+void mpi::frontend::send(u32 rank, const string &data) const
+{
+	// NOTE: The string and the null-terminator character are sent.
+	auto len = data.length();
+	this->send(rank, 1, &len);
+	this->send(rank, as_u32(len + 1), data.as_ptr());
+}
+
 u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
                            [[maybe_unused]] u32 count,
                            [[maybe_unused]] mut<u8> data[]) const
@@ -429,6 +505,98 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 	#endif
 
 	return recv_count;
+}
+
+// NOTE: For use inside mpi::frontend::receive() methods only.
+#define RECEIVE_VECTOR_DATA(rank, data)                    \
+{                                                          \
+  mut<usize> new_len = 0;                                  \
+                                                           \
+  mut<u32> info = this->receive((rank), 1, &new_len);      \
+                                                           \
+  if (new_len > data.length()) {                           \
+    data.resize(new_len);                                  \
+  }                                                        \
+                                                           \
+  info = this->receive((rank), as_u32(new_len), &data[0]); \
+                                                           \
+  return info;                                             \
+}
+
+u32 mpi::frontend::receive(u32 rank, vec<mut<u8>> &data) const
+{
+	RECEIVE_VECTOR_DATA(rank, data)
+}
+
+u32 mpi::frontend::receive(u32 rank, vec<mut<u16>> &data) const
+{
+	RECEIVE_VECTOR_DATA(rank, data)
+}
+
+u32 mpi::frontend::receive(u32 rank, vec<mut<u32>> &data) const
+{
+	RECEIVE_VECTOR_DATA(rank, data)
+}
+
+u32 mpi::frontend::receive(u32 rank, vec<mut<u64>> &data) const
+{
+	RECEIVE_VECTOR_DATA(rank, data)
+}
+
+u32 mpi::frontend::receive(u32 rank, vec<mut<s8>> &data) const
+{
+	RECEIVE_VECTOR_DATA(rank, data)
+}
+
+u32 mpi::frontend::receive(u32 rank, vec<mut<s16>> &data) const
+{
+	RECEIVE_VECTOR_DATA(rank, data)
+}
+
+u32 mpi::frontend::receive(u32 rank, vec<mut<s32>> &data) const
+{
+	RECEIVE_VECTOR_DATA(rank, data)
+}
+
+u32 mpi::frontend::receive(u32 rank, vec<mut<s64>> &data) const
+{
+	RECEIVE_VECTOR_DATA(rank, data)
+}
+
+u32 mpi::frontend::receive(u32 rank, vec<char> &data) const
+{
+	RECEIVE_VECTOR_DATA(rank, data);
+}
+
+u32 mpi::frontend::receive(u32 rank, vec<mut<f32>> &data) const
+{
+	RECEIVE_VECTOR_DATA(rank, data);
+}
+
+u32 mpi::frontend::receive(u32 rank, vec<mut<f64>> &data) const
+{
+	RECEIVE_VECTOR_DATA(rank, data);
+}
+
+u32 mpi::frontend::receive(u32 rank, vec<mut<f128>> &data) const
+{
+	RECEIVE_VECTOR_DATA(rank, data);
+}
+
+void mpi::frontend::receive(u32 rank, string &data) const
+{
+	data.clear();
+
+	mut<u32> info = this->receive(rank, 1, &data.end);
+
+	if ((data.end + 1) > data.capacity()) {
+		data.resize(data.end + 1);
+	}
+
+	// NOTE: The string and the null-terminator character are expected.
+	info = this->receive(rank, as_u32(data.end + 1), data.as_ptr());
+
+	assert(info == as_u32(data.end + 1));
 }
 
 void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
