@@ -21,45 +21,43 @@
 	}
 #endif
 
+// NOTE: For use inside mpi::frontend methods only.
+#define CHECK_MPI_ERROR(name, code)                                                                  \
+{                                                                                                    \
+  if ((code) != MPI_SUCCESS) {                                                                       \
+    print::error(WHERE, "At rank ", this->rank(), ": ", (name), " failed with error code ", (code)); \
+  }                                                                                                  \
+}
+
 #define CALL_SYNC_MPI_SEND(rank, count, buffer, datatype)                                      \
 {                                                                                              \
   auto info = MPI_Send(&(count), 1, MPI_UINT32_T, (rank), MESSAGE_COUNT_TAG, MPI_COMM_WORLD);  \
                                                                                                \
-  if (info != MPI_SUCCESS) {                                                                   \
-    print::error(WHERE, "1st MPI_Send() failed with error code ", info);                       \
-  }                                                                                            \
+  CHECK_MPI_ERROR("1st MPI_Send()", info)                                                      \
                                                                                                \
   info = MPI_Send(&buffer[0], (count), datatype, (rank), MESSAGE_CONTENT_TAG, MPI_COMM_WORLD); \
                                                                                                \
-  if (info != MPI_SUCCESS) {                                                                   \
-    print::error(WHERE, "2nd MPI_Send() failed with error code ", info);                       \
-  }                                                                                            \
+  CHECK_MPI_ERROR("2nd MPI_Send()", info)                                                      \
 }
 
 #define CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, buffer, datatype)                                            \
 {                                                                                                                   \
   auto info = MPI_Recv(&recv_count, 1, MPI_UINT32_T, (rank), MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE); \
                                                                                                                     \
-  if (info != MPI_SUCCESS) {                                                                                        \
-    print::error(WHERE, "1st MPI_Recv() failed with error code ", info);                                            \
-  }                                                                                                                 \
+  CHECK_MPI_ERROR("1st MPI_Recv()", info)                                                                           \
                                                                                                                     \
   if ((count) >= recv_count) {                                                                                      \
     info = MPI_Recv(&data[0], (count), datatype, (rank), MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);   \
                                                                                                                     \
-    if (info != MPI_SUCCESS) {                                                                                      \
-      print::error(WHERE, "2nd MPI_Recv() failed with error code ", info);                                          \
-    }                                                                                                               \
+    CHECK_MPI_ERROR("2nd MPI_Recv()", info)                                                                         \
   }                                                                                                                 \
 }
 
-#define CALL_MPI_BROADCAST(rank, count, buffer, datatype)                            \
-{                                                                                    \
-  auto info = MPI_Bcast(as_void(buffer), (count), datatype, (rank), MPI_COMM_WORLD); \
-                                                                                     \
-  if (info != MPI_SUCCESS) {                                                         \
-    print::error(WHERE, "MPI_Bcast() failed with error code ", info);                \
-  }                                                                                  \
+#define CALL_MPI_BROADCAST(rank, count, buffer, datatype)                     \
+{                                                                             \
+  auto info = MPI_Bcast(&data[0], (count), datatype, (rank), MPI_COMM_WORLD); \
+                                                                              \
+  CHECK_MPI_ERROR("MPI_Bcast()", info)                                        \
 }
 
 [[maybe_unused]]
@@ -115,30 +113,37 @@ mpi::frontend::frontend(mut<s32> *argc, char **argv[]):
 	assert(argv != nullptr);
 
 	#if defined(USE_MPI)
-		#if !defined(USE_PETSC)
-			// NOTE: The process may be multi-threaded, and multiple threads may
-			// make MPI calls, but only one at a time, i.e., MPI calls are not made
-			// concurrently from two distinct threads (all MPI calls are serialized).
-			// This module is responsible for reinforcing the correct usage, unless
-			// PETSC and SLEPC are used, in which case the thread model is chosen by them.
-			mut<s32> thread_level = 0;
-
-			MPI_Init_thread(argc, argv, MPI_THREAD_SERIALIZED, &thread_level);
-			assert(thread_level == MPI_THREAD_SERIALIZED);
-		#else
-			auto info = PetscInitialize(&argc, &argv, nullptr, nullptr);
-			CHECK_PETSC_ERROR("PetscInitialize()", info)
-
-			#if defined(USE_SLEPC)
-				info = SlepcInitialize(&argc, &argv, nullptr, nullptr);
-				CHECK_PETSC_ERROR("SlepcInitialize()", info)
-			#endif
-		#endif
-
 		#pragma omp master
 		{
-			MPI_Comm_size(MPI_COMM_WORLD, &this->comm_size);
-			MPI_Comm_rank(MPI_COMM_WORLD, &this->my_rank);
+			auto info = 0;
+
+			#if defined(USE_PETSC)
+				info = PetscInitialize(&argc, &argv, nullptr, nullptr);
+				CHECK_PETSC_ERROR("PetscInitialize()", info)
+
+				#if defined(USE_SLEPC)
+					info = SlepcInitialize(&argc, &argv, nullptr, nullptr);
+					CHECK_PETSC_ERROR("SlepcInitialize()", info)
+				#endif
+			#else
+				// NOTE: The process may be multi-threaded, and multiple threads may
+				// make MPI calls, but only one at a time, i.e., MPI calls are not made
+				// concurrently from two distinct threads (all MPI calls are serialized).
+				// This module is responsible for reinforcing the correct usage, unless
+				// PETSC and SLEPC are used, in which case the thread model is chosen by them.
+				mut<s32> thread_level = 0;
+
+				info = MPI_Init_thread(argc, argv, MPI_THREAD_SERIALIZED, &thread_level);
+				CHECK_MPI_ERROR("MPI_Init_thread()", info)
+
+				assert(thread_level == MPI_THREAD_SERIALIZED);
+			#endif
+
+			info = MPI_Comm_size(MPI_COMM_WORLD, &this->comm_size);
+			CHECK_MPI_ERROR("MPI_Comm_size()", info)
+
+			info = MPI_Comm_rank(MPI_COMM_WORLD, &this->my_rank);
+			CHECK_MPI_ERROR("MPI_Comm_rank()", info)
 		}
 	#endif
 }
@@ -589,14 +594,16 @@ void mpi::frontend::receive(u32 rank, string &data) const
 
 	mut<u32> info = this->receive(rank, 1, &data.end);
 
-	if ((data.end + 1) > data.capacity()) {
-		data.resize(data.end + 1);
+	// NOTE: The string and the null-terminator character are expected.
+	usize new_len = data.end + 1;
+
+	if (new_len > data.capacity()) {
+		data.resize(new_len);
 	}
 
-	// NOTE: The string and the null-terminator character are expected.
-	info = this->receive(rank, as_u32(data.end + 1), data.as_ptr());
+	info = this->receive(rank, as_u32(new_len), data.as_ptr());
 
-	assert(info == as_u32(data.end + 1));
+	assert(as_u32(new_len) == info);
 }
 
 void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
@@ -732,19 +739,21 @@ mpi::frontend::~frontend()
 	this->wait();
 
 	#if defined(USE_MPI)
+		#pragma omp master
 		if (this->rank() == mpi::MASTER_PROCESS_RANK) {
-			#if !defined(USE_PETSC)
-				#pragma omp master
-				MPI_Finalize();
-			#else
-				// NOTE: We ignore if either PETSc or SLEPc fails to end properly.
-				auto info = PETSC_SUCCESS;
+			auto info = 0;
 
+			#if defined(USE_PETSC)
 				#if defined(USE_SLEPC)
 					info = SlepcFinalize();
+					CHECK_PETSC_ERROR("SlepcFinalize()", info)
 				#endif
 
 				info = PetscFinalize();
+				CHECK_PETSC_ERROR("PetscFinalize()", info)
+			#else
+				info = MPI_Finalize();
+				CHECK_MPI_ERROR("MPI_Finalize()", info)
 			#endif
 		}
 	#endif
