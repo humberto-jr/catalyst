@@ -173,6 +173,16 @@
 		mut<usize> end;
 		mut<usize> begin;
 
+		inline char* as_ptr() const
+		{
+			return &this->buf[this->begin];
+		}
+
+		inline void resize(usize count)
+		{
+			this->buf.resize(count);
+		}
+
 		// NOTE: See the note on the private copy-constructor of vector.
 		inline string(string &other): buf(other.buf.move()), end(other.end), begin(other.begin)
 		{
