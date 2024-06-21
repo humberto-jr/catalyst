@@ -103,14 +103,20 @@
 
 		void operator+=(c_str rhs)
 		{
+			if (this->capacity() == 0) {
+				this->resize(DEFAULT_STRING_LENGTH + 1);
+			}
+
 			mut<usize> n = 0;
 			mut<usize> max_len = this->capacity() - 1;
 
 			while (rhs[n] != '\0') {
-				this->buf[this->end + n] = rhs[n];
+				usize offset = this->end + n;
 
-				if (this->end + n == max_len) {
-					this->buf.resize(max_len + 2*max_len);
+				this->buf[offset] = rhs[n];
+
+				if (offset == max_len) {
+					this->resize(max_len + 2*max_len);
 
 					max_len = this->capacity() - 1;
 				}
