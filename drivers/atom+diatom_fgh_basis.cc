@@ -16,51 +16,51 @@ int main()
 	// Total angular momentum, J:
 	//
 
-	u32 J_min = input::keyword<u32>(key::J_min, 0, u32_max, 0);
+	u32 J_min = input::keyword(key::J_min, 0u, u32_max, 0u);
 
-	u32 J_max = input::keyword<u32>(key::J_max, J_min, u32_max, J_min);
+	u32 J_max = input::keyword(key::J_max, J_min, u32_max, J_min);
 
-	u32 J_step = input::keyword<u32>(key::J_step, 1, u32_max, 1);
+	u32 J_step = input::keyword(key::J_step, 1u, u32_max, 1u);
 
-	s32 J_parity = input::keyword<s32>(key::J_parity, -1, 1, 0);
+	s32 J_parity = input::keyword(key::J_parity, -1, 1, 0);
 
 	//
 	// Vibrational quantum numbers, v:
 	//
 
-	u32 v_min = input::keyword<u32>(key::v_min, 0, u32_max, 0);
+	u32 v_min = input::keyword(key::v_min, 0u, u32_max, 0u);
 
-	u32 v_max = input::keyword<u32>(key::v_max, v_min, u32_max, v_min);
+	u32 v_max = input::keyword(key::v_max, v_min, u32_max, v_min);
 
-	u32 v_step = input::keyword<u32>(key::v_step, 1, u32_max, 1);
+	u32 v_step = input::keyword(key::v_step, 1u, u32_max, 1u);
 
 	//
 	// Rotational quantum numbers, j:
 	//
 
-	u32 j_min = input::keyword<u32>(key::j_min, 0, u32_max, 0);
+	u32 j_min = input::keyword(key::j_min, 0u, u32_max, 0u);
 
-	u32 j_max = input::keyword<u32>(key::j_max, j_min, u32_max, j_min);
+	u32 j_max = input::keyword(key::j_max, j_min, u32_max, j_min);
 
-	u32 j_step = input::keyword<u32>(key::j_step, 1, u32_max, 1);
+	u32 j_step = input::keyword(key::j_step, 1u, u32_max, 1u);
 
 	//
 	// Orbital angular momentum, l:
 	//
 
-	u32 l_step = input::keyword<u32>(key::l_step, 1, u32_max, 1);
+	u32 l_step = input::keyword(key::l_step, 1u, u32_max, 1u);
 
 	//
 	// Vibrational grid:
 	//
 
-	u32 n_min = input::keyword<u32>(key::rovib_grid_start, 0, u32_max, 0);
+	u32 n_min = input::keyword(key::rovib_grid_start, 0u, u32_max, 0u);
 
-	u32 r_count = input::keyword<u32>(key::rovib_grid_size, 1, u32_max, 100);
+	u32 r_count = input::keyword(key::rovib_grid_size, 1u, u32_max, 100u);
 
-	f64 r_min = input::keyword<f64>(key::r_min, 0.0, f64_max, 0.5);
+	f64 r_min = input::keyword(key::r_min, 0.0, f64_max, 0.5);
 
-	f64 r_max = input::keyword<f64>(key::r_max, r_min, f64_max, r_min + 100.0);
+	f64 r_max = input::keyword(key::r_max, r_min, f64_max, r_min + 100.0);
 
 	f64 r_step = (r_max - r_min)/as_f64(r_count);
 
