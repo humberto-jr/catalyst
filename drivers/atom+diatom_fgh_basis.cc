@@ -173,7 +173,7 @@ int main()
 						basis.write(0u);
 						basis.write(norm);
 						basis.write(eigenval[v]);
-						basis.write<mut<f64>>(eigenvec);
+						basis.write(eigenvec);
 
 						print::line<8>(count, J, v, j, l, p,
 						               ' ', eigenval[v],

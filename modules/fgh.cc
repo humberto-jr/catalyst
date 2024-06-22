@@ -148,5 +148,5 @@ void fgh::load_basis(u32 n, file::input &buf, fgh::basis &basis)
 	buf.read(basis.comp);
 	buf.read(basis.norm);
 	buf.read(basis.eigenval);
-	buf.read<mut<f64>>(basis.eigenvec);
+	buf.read(basis.eigenvec);
 }
