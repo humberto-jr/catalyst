@@ -11,13 +11,13 @@ int main()
 	// Vibrational grid, r:
 	//
 
-	u32 n_min = input::keyword<u32>(key::rovib_grid_start, 0, u32_max, 0);
+	u32 n_min = input::keyword(key::rovib_grid_start, 0u, u32_max, 0u);
 
-	u32 r_count = input::keyword<u32>(key::rovib_grid_size, 1, u32_max, 100);
+	u32 r_count = input::keyword(key::rovib_grid_size, 1u, u32_max, 100u);
 
-	f64 r_min = input::keyword<f64>(key::r_min, 0.0, f64_max, 0.5);
+	f64 r_min = input::keyword(key::r_min, 0.0, f64_max, 0.5);
 
-	f64 r_max = input::keyword<f64>(key::r_max, r_min, f64_max, r_min + 100.0);
+	f64 r_max = input::keyword(key::r_max, r_min, f64_max, r_min + 100.0);
 
 	f64 r_step = (r_max - r_min)/as_f64(r_count);
 
@@ -25,13 +25,13 @@ int main()
 	// Scattering grid, R:
 	//
 
-	u32 m_min = input::keyword<u32>(key::scatt_grid_start, 0, u32_max, 0);
+	u32 m_min = input::keyword(key::scatt_grid_start, 0u, u32_max, 0u);
 
-	u32 R_count = input::keyword<u32>(key::scatt_grid_size, 1, u32_max, 100);
+	u32 R_count = input::keyword(key::scatt_grid_size, 1u, u32_max, 100u);
 
-	f64 R_min = input::keyword<f64>(key::R_min, 0.0, f64_max, 0.5);
+	f64 R_min = input::keyword(key::R_min, 0.0, f64_max, 0.5);
 
-	f64 R_max = input::keyword<f64>(key::R_max, R_min, f64_max, R_min + 100.0);
+	f64 R_max = input::keyword(key::R_max, R_min, f64_max, R_min + 100.0);
 
 	f64 R_step = (R_max - R_min)/as_f64(R_count);
 
@@ -39,13 +39,13 @@ int main()
 	// Angular grid, theta:
 	//
 
-	u32 p_min = input::keyword<u32>(key::theta_grid_start, 0, u32_max, 0);
+	u32 p_min = input::keyword(key::theta_grid_start, 0u, u32_max, 0u);
 
-	u32 theta_count = input::keyword<u32>(key::theta_grid_size, 1, u32_max, 181);
+	u32 theta_count = input::keyword(key::theta_grid_size, 1u, u32_max, 181u);
 
-	f64 theta_min = input::keyword<f64>(key::theta_min, 0.0, 180.0, 0.0);
+	f64 theta_min = input::keyword(key::theta_min, 0.0, 180.0, 0.0);
 
-	f64 theta_max = input::keyword<f64>(key::theta_max, theta_min, 180.0, 180.0);
+	f64 theta_max = input::keyword(key::theta_max, theta_min, 180.0, 180.0);
 
 	f64 theta_step = (theta_max - theta_min)/as_f64(theta_count);
 
@@ -53,21 +53,21 @@ int main()
 	// Rotational quantum number, j:
 	//
 
-	u32 j_min = input::keyword<u32>(key::j_min, 0, u32_max, 0);
+	u32 j_min = input::keyword(key::j_min, 0u, u32_max, 0u);
 
-	u32 j_max = input::keyword<u32>(key::j_max, j_min, u32_max, j_min);
+	u32 j_max = input::keyword(key::j_max, j_min, u32_max, j_min);
 
-	u32 j_step = input::keyword<u32>(key::j_step, 1, u32_max, 1);
+	u32 j_step = input::keyword(key::j_step, 1u, u32_max, 1u);
 
 	//
 	// Legendre multipole expansion, lambda:
 	//
 
-	u32 lambda_min = input::keyword<u32>(key::lambda_min, 0, u32_max, 0);
+	u32 lambda_min = input::keyword(key::lambda_min, 0u, u32_max, 0u);
 
-	u32 lambda_max = input::keyword<u32>(key::lambda_max, lambda_min, u32_max, lambda_min + 20);
+	u32 lambda_max = input::keyword(key::lambda_max, lambda_min, u32_max, lambda_min + 20u);
 
-	u32 lambda_step = input::keyword<u32>(key::lambda_step, 0, u32_max, 0);
+	u32 lambda_step = input::keyword(key::lambda_step, 0u, u32_max, 0u);
 
 	//
 	// Atomic masses and arrangement (a = 1, b = 2, c = 3):
@@ -91,9 +91,9 @@ int main()
 	// Energy scale and shift:
 	//
 
-	f64 shift = input::keyword<f64>(key::energy_shift, -f64_max, f64_max, 0.0);
+	f64 shift = input::keyword(key::energy_shift, -f64_max, f64_max, 0.0);
 
-	f64 scale = input::keyword<f64>(key::energy_scale, -f64_max, f64_max, 1.0);
+	f64 scale = input::keyword(key::energy_scale, -f64_max, f64_max, 1.0);
 
 	//
 	// Summary:
