@@ -1,6 +1,7 @@
 #if !defined(LIBMPI_HEADER)
 	#define LIBMPI_HEADER
 	#include "essentials.h"
+	#include "input.h"
 	#include <optional>
 
 	namespace mpi {
@@ -129,13 +130,13 @@
 			template<u8 PAD, usize LEN>
 			void send(u32 rank, const print::fmt<PAD, LEN> &data) const
 			{
-				send(rank, as_u32(data.len), &data.buf[0]);
+				this->send(rank, as_u32(data.len), &data.buf[0]);
 			}
 
 			template<typename T>
 			void send(u32 rank, const mat<T> &data) const
 			{
-				send(rank, as_u32(data.rows()*data.cols()), &data[0]);
+				this->send(rank, as_u32(data.rows()*data.cols()), &data[0]);
 			}
 
 			u32 receive(u32 rank, u32 count, mut<u8> data[]) const;
@@ -191,13 +192,13 @@
 			template<u8 PAD, usize LEN>
 			void receive(u32 rank, print::fmt<PAD, LEN> &data) const
 			{
-				data.len = as_usize(receive(rank, LEN, &data.buf[0]));
+				data.len = as_usize(this->receive(rank, LEN, &data.buf[0]));
 			}
 
 			template<typename T>
 			void receive(u32 rank, mat<T> &data) const
 			{
-				auto info = receive(rank, as_u32(data.rows()*data.cols()), &data[0]);
+				auto info = this->receive(rank, as_u32(data.rows()*data.cols()), &data[0]);
 				assert(as_usize(info) == data.rows()*data.cols());
 			}
 
