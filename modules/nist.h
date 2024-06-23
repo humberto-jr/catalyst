@@ -6753,7 +6753,7 @@
 			}
 		}
 
-		static constexpr isotope isotope_enum(c_str symbol)
+		static isotope isotope_enum(c_str symbol)
 		{
 			for (mut<usize> n = 0; n < MAX_ISOTOPE_COUNT; ++n) {
 				auto result = static_cast<isotope>(n);
