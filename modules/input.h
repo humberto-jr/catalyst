@@ -40,7 +40,7 @@
 
 			static char buf[LEN] = {'\0'};
 
-			constexpr char *MAX_BUFFER_ADDR = &buf[LEN - 1];
+			const char *MAX_BUFFER_ADDR = &buf[LEN - 1];
 
 			while (backup.eof() == false) {
 				backup.read(&buf[0], LEN);
