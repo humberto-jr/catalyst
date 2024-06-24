@@ -131,7 +131,7 @@
 			// destructors are called in a LIFO order. Still, care should be taken
 			// whenever handling complex lifetimes, like pointers to views and/or
 			// static views. Avoid those, if possible.
-			friend inline view matrix<T>::block_view(usize, usize, usize, usize);
+			friend class matrix<T>;
 		};
 
 		inline view block_view(usize row_start, usize row_end, usize col_start, usize col_end)
