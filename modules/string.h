@@ -35,7 +35,7 @@
 
 		inline string(c_str other): buf(DEFAULT_STRING_LENGTH + 1), end(0), begin(0)
 		{
-			this->buf[0] = '\0';
+			 this->buf[0] = '\0';
 			*this += other;
 		}
 
@@ -104,7 +104,7 @@
 		void operator+=(c_str rhs)
 		{
 			if (this->capacity() == 0) {
-				this->resize(DEFAULT_STRING_LENGTH + 1);
+				this->reallocate(DEFAULT_STRING_LENGTH);
 			}
 
 			mut<usize> n = 0;
@@ -116,7 +116,7 @@
 				this->buf[offset] = rhs[n];
 
 				if (offset == max_len) {
-					this->resize(max_len + 2*max_len);
+					this->reallocate(max_len + 2*max_len);
 
 					max_len = this->capacity() - 1;
 				}
@@ -174,6 +174,29 @@
 			return (offset < this->end? this->buf[offset] : '\0');
 		}
 
+		inline void fill(const char c = ' ')
+		{
+			std::memset(this->as_ptr(), c, this->length());
+		}
+
+		void resize(usize count, const char c = ' ')
+		{
+			usize new_end = this->begin + count;
+
+			if (new_end > this->capacity()) {
+				this->reallocate(new_end);
+			}
+
+			if (new_end > this->end) {
+				// NOTE: We preserve the current string, if any, and fill only
+				// the additional chunk of characters.
+				std::memset(&this->buf[this->end], c, (new_end - this->end));
+			}
+
+			this->end = new_end;
+			this->buf[new_end] = '\0';
+		}
+
 		private:
 		str buf;
 		mut<usize> end;
@@ -184,9 +207,9 @@
 			return &this->buf[this->begin];
 		}
 
-		inline void resize(usize count)
+		inline void reallocate(usize count)
 		{
-			this->buf.resize(count);
+			this->buf.resize(count + 1);
 		}
 
 		// NOTE: See the note on the private copy-constructor of vector.
