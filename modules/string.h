@@ -25,7 +25,6 @@
 		public:
 		inline string(usize capacity = DEFAULT_STRING_LENGTH): buf(capacity + 1), end(0), begin(0)
 		{
-			this->buf[0] = '\0';
 		}
 
 		inline string(string &&other): buf(other.buf.move()), end(other.end), begin(other.begin)
@@ -35,7 +34,6 @@
 
 		inline string(c_str other): buf(DEFAULT_STRING_LENGTH + 1), end(0), begin(0)
 		{
-			 this->buf[0] = '\0';
 			*this += other;
 		}
 
