@@ -10130,7 +10130,7 @@
 			}
 		}
 
-		static constexpr f64 atomic_mass(c_str symbol)
+		static inline f64 atomic_mass(c_str symbol)
 		{
 			auto as_enum = isotope_enum(symbol);
 			return atomic_mass(as_enum);
@@ -13495,7 +13495,7 @@
 			}
 		}
 
-		static constexpr u32 atomic_number(c_str symbol)
+		static inline u32 atomic_number(c_str symbol)
 		{
 			auto as_enum = isotope_enum(symbol);
 			return atomic_number(as_enum);
