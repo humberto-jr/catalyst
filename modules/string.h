@@ -94,17 +94,24 @@
 			this->right_trim();
 		}
 
-		template<u8 PAD = 1, typename T>
+		template<u8 PAD = DEFAULT_FMT_PADDING, typename T>
 		void append(const T val)
 		{
-			usize buf_len = DEFAULT_STRING_LENGTH + 1;
+			if constexpr(is_cstr<T>()) {
+				usize len = std::strlen(val);
+				this->check_avail_capacity(len, len);
+			} else {
+				this->check_avail_capacity();
+			}
 
-			char buf[buf_len] = {'\0'};
+			this->end += std::snprintf(&this->buf[this->end], (this->capacity() - this->end), type_fmt<T>(), PAD, val);
+		}
 
-			s32 info = std::snprintf(&buf[0], buf_len, type_fmt<T>(), PAD, val);
-			assert(info > -1);
-
-			*this += static_cast<c_str>(&buf[0]);
+		template<u8 PAD = DEFAULT_FMT_PADDING, typename T, typename... Ts>
+		void append(const T first, const Ts... remainder)
+		{
+			this->append<PAD>(first);
+			this->append<PAD>(remainder...);
 		}
 
 		void operator+=(c_str rhs)
