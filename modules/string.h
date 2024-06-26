@@ -7,6 +7,14 @@
 		#define DEFAULT_STRING_LENGTH 1023
 	#endif
 
+	#if !defined(REALLOC_LENGTH_LIMIT)
+		#define REALLOC_LENGTH_LIMIT 24
+	#endif
+
+	#if !defined(DEFAULT_FMT_PADDING)
+		#define DEFAULT_FMT_PADDING 1
+	#endif
+
 	using str = vec<char>;
 
 	// NOTE: A forward declaration is used below to avoid including file.h and mpi.h
@@ -210,6 +218,16 @@
 			this->buf.resize(count + 1);
 		}
 
+		void check_avail_capacity(usize count = DEFAULT_STRING_LENGTH, usize lim = REALLOC_LENGTH_LIMIT)
+		{
+			usize old_len = this->capacity();
+			usize new_len = old_len + 2*old_len;
+
+			if ((old_len - this->end) < lim) {
+				this->reallocate(new_len > count? new_len : old_len + count);
+			}
+		}
+
 		// NOTE: See the note on the private copy-constructor of vector.
 		inline string(string &other): buf(other.buf.move()), end(other.end), begin(other.begin)
 		{
@@ -220,4 +238,6 @@
 	};
 
 	#undef DEFAULT_STRING_LENGTH
+	#undef REALLOC_LENGTH_LIMIT
+	#undef DEFAULT_FMT_PADDING
 #endif
