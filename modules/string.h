@@ -220,11 +220,10 @@
 
 		void check_avail_capacity(usize count = DEFAULT_STRING_LENGTH, usize lim = REALLOC_LENGTH_LIMIT)
 		{
-			usize old_len = this->capacity();
-			usize new_len = old_len + 2*old_len;
+			usize buf_len = this->capacity();
 
-			if ((old_len - this->end) < lim) {
-				this->reallocate(new_len > count? new_len : old_len + count);
+			if ((buf_len - this->end) < lim) {
+				this->reallocate(2*buf_len > count? buf_len + 2*buf_len : buf_len + count);
 			}
 		}
 
