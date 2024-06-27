@@ -57,9 +57,7 @@
 
 		inline void clear()
 		{
-			this->end = 0;
-			this->begin = 0;
-			this->buf[0] = '\0';
+			this->end = this->begin = this->buf[0] = 0;
 		}
 
 		inline c_str as_cstr() const
@@ -114,71 +112,25 @@
 			this->append<PAD>(remainder...);
 		}
 
-		void operator+=(c_str rhs)
-		{
-			if (this->capacity() == 0) {
-				this->reallocate(DEFAULT_STRING_LENGTH);
-			}
-
-			mut<usize> n = 0;
-			mut<usize> max_len = this->capacity() - 1;
-
-			while (rhs[n] != '\0') {
-				usize offset = this->end + n;
-
-				this->buf[offset] = rhs[n];
-
-				if (offset == max_len) {
-					this->reallocate(max_len + 2*max_len);
-
-					max_len = this->capacity() - 1;
-				}
-
-				++n;
-			}
-
-			this->end += n;
-			this->buf[this->end] = '\0';
-		}
-
-		inline void operator+=(string &rhs)
-		{
-			*this += rhs.as_cstr();
-		}
-
 		template<typename T>
-		void operator+=(const T rhs)
+		inline void operator+=(const T rhs)
 		{
 			this->append(rhs);
 		}
 
-		inline void operator=(c_str rhs)
+		template<typename T>
+		inline void operator=(const T rhs)
 		{
-			 this->clear();
-			*this += rhs;
+			this->clear();
+			this->append(rhs);
 		}
 
 		void operator=(string &rhs)
 		{
-			this->clear();
 			this->end = rhs.end;
 			this->begin = rhs.begin;
 			this->buf.swap(rhs.buf);
-		}
-
-		template<typename T>
-		void operator=(const T rhs)
-		{
-			this->clear();
-			this->append(rhs);
-		}
-
-		string operator+(string &rhs)
-		{
-			string result(this->capacity() + rhs.capacity() + 1);
-			result += this->as_cstr();
-			result += rhs.as_cstr();
-			return result;
+			rhs.clear();
 		}
 
 		inline char operator[](usize n) const
