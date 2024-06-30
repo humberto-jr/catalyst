@@ -76,6 +76,12 @@
 			other.max_col = max_col;
 		}
 
+		inline void resize(usize max_row, usize max_col)
+		{
+			this->max_col = max_col;
+			this->buf.resize(max_row*max_col);
+		}
+
 		class view {
 			public:
 			inline usize rows() const
