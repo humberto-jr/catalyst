@@ -8,7 +8,7 @@
 		class frontend;
 	}
 
-	template<typename T = mut<f64>>
+	template<typename T = f64>
 	class matrix {
 		public:
 		inline matrix(usize max_row, usize max_col): max_col(max_col), buf(vec<T>(max_row*max_col))
@@ -50,13 +50,13 @@
 			this->buf = rhs.buf;
 		}
 
-		inline T& operator()(usize n, usize m) const
+		inline mut<T>& operator()(usize n, usize m) const
 		{
 			// NOTE: Row-major layout.
 			return this->buf[n*this->max_col + m];
 		}
 
-		inline T& operator[](usize n) const
+		inline mut<T>& operator[](usize n) const
 		{
 			return this->buf[n];
 		}
@@ -106,7 +106,7 @@
 						this->operator()(n, m) = rhs;
 			}
 
-			T& operator()(usize n, usize m) const
+			mut<T>& operator()(usize n, usize m) const
 			{
 				usize block_n = this->row_min + n;
 				assert(block_n < this->row_max + 1);
@@ -167,9 +167,9 @@
 		}
 	};
 
-	template<typename T = mut<f64>>
+	template<typename T = f64>
 	using mat = matrix<T>;
 
-	using mat32 = matrix<mut<f32>>;
-	using mat64 = matrix<mut<f64>>;
+	using mat32 = matrix<f32>;
+	using mat64 = matrix<f64>;
 #endif
