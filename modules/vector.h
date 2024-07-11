@@ -3,7 +3,7 @@
 	#include "print.h"
 	#include <initializer_list>
 
-	template<typename T = mut<f64>>
+	template<typename T = f64>
 	class vector {
 		public:
 		inline vector(): len(0), buf(nullptr)
@@ -85,7 +85,7 @@
 				this->buf[n] /= rhs;
 		}
 
-		inline T& operator[](usize n) const
+		inline mut<T>& operator[](usize n) const
 		{
 			return this->buf[n];
 		}
@@ -107,7 +107,7 @@
 			other.buf = buf;
 		}
 
-		T* release()
+		mut<T>* release()
 		{
 			auto raw = this->buf;
 			this->buf = nullptr;
@@ -128,7 +128,7 @@
 			}
 
 			this->len = count;
-			this->buf = static_cast<T*>(new_buf);
+			this->buf = static_cast<mut<T>*>(new_buf);
 		}
 
 		inline ~vector()
@@ -140,7 +140,7 @@
 
 		private:
 		mut<usize> len;
-		T *buf;
+		mut<T> *buf;
 
 		// NOTE: A copy-constructor from raw parts and internal use only which behaves
 		// as a move-constructor. If made public, the compiler will perform unintended
@@ -150,9 +150,9 @@
 		}
 	};
 
-	template<typename T = mut<f64>>
+	template<typename T = f64>
 	using vec = vector<T>;
 
-	using vec32 = vector<mut<f32>>;
-	using vec64 = vector<mut<f64>>;
+	using vec32 = vector<f32>;
+	using vec64 = vector<f64>;
 #endif
