@@ -101,29 +101,29 @@
 
 			void send(u32 rank, u32 count, f128 data[]) const;
 
-			void send(u32 rank, const vec<mut<u8>> &data) const;
+			void send(u32 rank, const vec<u8> &data) const;
 
-			void send(u32 rank, const vec<mut<u16>> &data) const;
+			void send(u32 rank, const vec<u16> &data) const;
 
-			void send(u32 rank, const vec<mut<u32>> &data) const;
+			void send(u32 rank, const vec<u32> &data) const;
 
-			void send(u32 rank, const vec<mut<u64>> &data) const;
+			void send(u32 rank, const vec<u64> &data) const;
 
-			void send(u32 rank, const vec<mut<s8>> &data) const;
+			void send(u32 rank, const vec<s8> &data) const;
 
-			void send(u32 rank, const vec<mut<s16>> &data) const;
+			void send(u32 rank, const vec<s16> &data) const;
 
-			void send(u32 rank, const vec<mut<s32>> &data) const;
+			void send(u32 rank, const vec<s32> &data) const;
 
-			void send(u32 rank, const vec<mut<s64>> &data) const;
+			void send(u32 rank, const vec<s64> &data) const;
 
 			void send(u32 rank, const vec<char> &data) const;
 
-			void send(u32 rank, const vec<mut<f32>> &data) const;
+			void send(u32 rank, const vec<f32> &data) const;
 
-			void send(u32 rank, const vec<mut<f64>> &data) const;
+			void send(u32 rank, const vec<f64> &data) const;
 
-			void send(u32 rank, const vec<mut<f128>> &data) const;
+			void send(u32 rank, const vec<f128> &data) const;
 
 			void send(u32 rank, const string &data) const;
 
@@ -163,29 +163,29 @@
 
 			u32 receive(u32 rank, u32 count, mut<f128> data[]) const;
 
-			u32 receive(u32 rank, vec<mut<u8>> &data) const;
+			u32 receive(u32 rank, vec<u8> &data) const;
 
-			u32 receive(u32 rank, vec<mut<u16>> &data) const;
+			u32 receive(u32 rank, vec<u16> &data) const;
 
-			u32 receive(u32 rank, vec<mut<u32>> &data) const;
+			u32 receive(u32 rank, vec<u32> &data) const;
 
-			u32 receive(u32 rank, vec<mut<u64>> &data) const;
+			u32 receive(u32 rank, vec<u64> &data) const;
 
-			u32 receive(u32 rank, vec<mut<s8>> &data) const;
+			u32 receive(u32 rank, vec<s8> &data) const;
 
-			u32 receive(u32 rank, vec<mut<s16>> &data) const;
+			u32 receive(u32 rank, vec<s16> &data) const;
 
-			u32 receive(u32 rank, vec<mut<s32>> &data) const;
+			u32 receive(u32 rank, vec<s32> &data) const;
 
-			u32 receive(u32 rank, vec<mut<s64>> &data) const;
+			u32 receive(u32 rank, vec<s64> &data) const;
 
 			u32 receive(u32 rank, vec<char> &data) const;
 
-			u32 receive(u32 rank, vec<mut<f32>> &data) const;
+			u32 receive(u32 rank, vec<f32> &data) const;
 
-			u32 receive(u32 rank, vec<mut<f64>> &data) const;
+			u32 receive(u32 rank, vec<f64> &data) const;
 
-			u32 receive(u32 rank, vec<mut<f128>> &data) const;
+			u32 receive(u32 rank, vec<f128> &data) const;
 
 			void receive(u32 rank, string &data) const;
 
