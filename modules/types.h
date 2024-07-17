@@ -31,14 +31,14 @@
 
 	using c_str = const char*;
 
+	using byte = u8;
+
 	//
 	// Mutable primitives:
 	//
 
 	template<typename T>
 	using mut = typename std::remove_const<T>::type;
-
-	using byte = mut<u8>;
 
 	//
 	// Utils:
