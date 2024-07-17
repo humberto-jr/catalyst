@@ -97,6 +97,24 @@ f64 math::sphe_bessel(const char type, f64 l, f64 x)
 	return 0.0;
 }
 
+f64 math::riccati_bessel(const char type, f64 l, f64 x)
+{
+	// NOTE: See https://mathworld.wolfram.com/Riccati-BesselFunctions.html
+
+	f64 fact = std::sqrt(math::PI*x/2.0);
+
+	switch (type) {
+		case 'j': return  fact*gsl_sf_bessel_Jnu(l + 0.5, x);
+		case 'n': return -fact*gsl_sf_bessel_Ynu(l + 0.5, x);
+
+		default:
+		print::error(WHERE, "Invalid type ", type);
+	}
+
+	// NOTE: Unreachable.
+	return 0.0;
+}
+
 f64 math::clebsch_gordan_coeff(s32 ja, s32 jb, s32 jc, s32 ma, s32 mb, s32 mc)
 {
 	s32 n = ja - jb + mc;

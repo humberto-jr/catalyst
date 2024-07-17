@@ -141,6 +141,8 @@
 
 		f64 sphe_bessel(const char type, f64 l, f64 x);
 
+		f64 riccati_bessel(const char type, f64 l, f64 x);
+
 		f64 clebsch_gordan_coeff(s32 ja, s32 jb, s32 jc, s32 ma, s32 mb, s32 mc);
 
 		f64 percival_seaton_coeff(s32 J, s32 ja, s32 jb, s32 la, s32 lb, s32 lambda);
