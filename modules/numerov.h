@@ -7,6 +7,33 @@
 	namespace numerov {
 		using basis = vec<fgh::basis>;
 
+		struct potential {
+			public:
+			u32 n_min;
+			f64 R_min;
+			f64 R_max;
+			f64 R_step;
+			f64 mass;
+
+			inline potential(u32 n_min, f64 R_min, f64 R_max, f64 R_step, f64 mass, mat<f64> &coupling, file::input &input):
+				n_min(n_min), R_min(R_min), R_max(R_max), R_step(R_step), mass(mass), coupling(coupling.move()), input(input)
+			{
+			}
+
+			const mat<f64>& operator[](u32 n);
+
+			inline c_str filename() const
+			{
+				return this->input.filename.as_cstr();
+			}
+
+			private:
+			mat<f64> coupling;
+			file::input input;
+		};
+
+		numerov::potential open(string &filename);
+
 		void renormalized(f64 mass,
 		                  f64 step,
 		                  f64 tot_energy,
