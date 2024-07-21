@@ -268,6 +268,78 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 	#endif
 }
 
+void mpi::frontend::send([[maybe_unused]] u32 rank,
+                         [[maybe_unused]] u8 data) const
+{
+	this->send(rank, 1, &data);
+}
+
+void mpi::frontend::send([[maybe_unused]] u32 rank,
+                         [[maybe_unused]] u16 data) const
+{
+	this->send(rank, 1, &data);
+}
+
+void mpi::frontend::send([[maybe_unused]] u32 rank,
+                         [[maybe_unused]] u32 data) const
+{
+	this->send(rank, 1, &data);
+}
+
+void mpi::frontend::send([[maybe_unused]] u32 rank,
+                         [[maybe_unused]] u64 data) const
+{
+	this->send(rank, 1, &data);
+}
+
+void mpi::frontend::send([[maybe_unused]] u32 rank,
+                         [[maybe_unused]] s8 data) const
+{
+	this->send(rank, 1, &data);
+}
+
+void mpi::frontend::send([[maybe_unused]] u32 rank,
+                         [[maybe_unused]] s16 data) const
+{
+	this->send(rank, 1, &data);
+}
+
+void mpi::frontend::send([[maybe_unused]] u32 rank,
+                         [[maybe_unused]] s32 data) const
+{
+	this->send(rank, 1, &data);
+}
+
+void mpi::frontend::send([[maybe_unused]] u32 rank,
+                         [[maybe_unused]] s64 data) const
+{
+	this->send(rank, 1, &data);
+}
+
+void mpi::frontend::send([[maybe_unused]] u32 rank,
+                         [[maybe_unused]] const char data) const
+{
+	this->send(rank, 1, &data);
+}
+
+void mpi::frontend::send([[maybe_unused]] u32 rank,
+                         [[maybe_unused]] f32 data) const
+{
+	this->send(rank, 1, &data);
+}
+
+void mpi::frontend::send([[maybe_unused]] u32 rank,
+                         [[maybe_unused]] f64 data) const
+{
+	this->send(rank, 1, &data);
+}
+
+void mpi::frontend::send([[maybe_unused]] u32 rank,
+                         [[maybe_unused]] f128 data) const
+{
+	this->send(rank, 1, &data);
+}
+
 // NOTE: For use inside mpi::frontend::send() methods only.
 #define SEND_VECTOR_DATA(rank, data)         \
 {                                            \
@@ -510,6 +582,90 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 	#endif
 
 	return recv_count;
+}
+
+void mpi::frontend::receive([[maybe_unused]] u32 rank,
+                            [[maybe_unused]] mut<u8> &data) const
+{
+	u32 info = this->receive(rank, 1, &data);
+	assert((info == 0) || (info == 1));
+}
+
+void mpi::frontend::receive([[maybe_unused]] u32 rank,
+                            [[maybe_unused]] mut<u16> &data) const
+{
+	u32 info = this->receive(rank, 1, &data);
+	assert((info == 0) || (info == 1));
+}
+
+void mpi::frontend::receive([[maybe_unused]] u32 rank,
+                            [[maybe_unused]] mut<u32> &data) const
+{
+	u32 info = this->receive(rank, 1, &data);
+	assert((info == 0) || (info == 1));
+}
+
+void mpi::frontend::receive([[maybe_unused]] u32 rank,
+                            [[maybe_unused]] mut<u64> &data) const
+{
+	u32 info = this->receive(rank, 1, &data);
+	assert((info == 0) || (info == 1));
+}
+
+void mpi::frontend::receive([[maybe_unused]] u32 rank,
+                            [[maybe_unused]] mut<s8> &data) const
+{
+	u32 info = this->receive(rank, 1, &data);
+	assert((info == 0) || (info == 1));
+}
+
+void mpi::frontend::receive([[maybe_unused]] u32 rank,
+                            [[maybe_unused]] mut<s16> &data) const
+{
+	u32 info = this->receive(rank, 1, &data);
+	assert((info == 0) || (info == 1));
+}
+
+void mpi::frontend::receive([[maybe_unused]] u32 rank,
+                            [[maybe_unused]] mut<s32> &data) const
+{
+	u32 info = this->receive(rank, 1, &data);
+	assert((info == 0) || (info == 1));
+}
+
+void mpi::frontend::receive([[maybe_unused]] u32 rank,
+                            [[maybe_unused]] mut<s64> &data) const
+{
+	u32 info = this->receive(rank, 1, &data);
+	assert((info == 0) || (info == 1));
+}
+
+void mpi::frontend::receive([[maybe_unused]] u32 rank,
+                            [[maybe_unused]] char &data) const
+{
+	u32 info = this->receive(rank, 1, &data);
+	assert((info == 0) || (info == 1));
+}
+
+void mpi::frontend::receive([[maybe_unused]] u32 rank,
+                            [[maybe_unused]] mut<f32> &data) const
+{
+	u32 info = this->receive(rank, 1, &data);
+	assert((info == 0) || (info == 1));
+}
+
+void mpi::frontend::receive([[maybe_unused]] u32 rank,
+                            [[maybe_unused]] mut<f64> &data) const
+{
+	u32 info = this->receive(rank, 1, &data);
+	assert((info == 0) || (info == 1));
+}
+
+void mpi::frontend::receive([[maybe_unused]] u32 rank,
+                            [[maybe_unused]] mut<f128> &data) const
+{
+	u32 info = this->receive(rank, 1, &data);
+	assert((info == 0) || (info == 1));
 }
 
 // NOTE: For use inside mpi::frontend::receive() methods only.
