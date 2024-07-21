@@ -1,6 +1,71 @@
 #include "numerov.h"
 #include "math.h"
 
+static constexpr usize FILE_HEADER_OFFSET
+	= 2*sizeof(u32) + sizeof(u8) + 4*sizeof(f64) + sizeof(usize);
+
+numerov::potential numerov::open(string &filename)
+{
+	file::input input(filename);
+
+	mut<u32> tag = 0;
+	input.read(tag);
+
+	if ((tag != logd::MAGIC_NUMBER) || input.end()) {
+		print::error(WHERE, input.filename.as_cstr(), " does not correspond to a numerov potential file");
+	}
+
+	mut<u8> ver = 0;
+	input.read(ver);
+
+	if ((ver != 1) || input.end()) {
+		print::error(WHERE, input.filename.as_cstr(), " does not have a valid format version");
+	}
+
+	mut<u32> n_min = 0;
+	input.read(n_min);
+
+	mut<f64> R_min = 0.0;
+	input.read(R_min);
+
+	mut<f64> R_max = 0.0;
+	input.read(R_max);
+
+	mut<f64> R_step = 0.0;
+	input.read(R_step);
+
+	mut<f64> mass = 0.0;
+	input.read(mass);
+
+	mut<usize> ch_count = 0;
+	input.read(ch_count);
+
+	mat<f64> coupling(ch_count, ch_count);
+
+	return {n_min, R_min, R_max, R_step, mass, coupling, input};
+}
+
+const mat<f64>& numerov::potential::operator[](u32 n)
+{
+	usize offset = sizeof(u32) + sizeof(f64) + this->coupling.size();
+
+	this->input.seek_set(FILE_HEADER_OFFSET + n*offset);
+
+	mut<u32> n_saved = 0;
+	this->input.read(n_saved);
+
+	if (n_saved != n) {
+		print::error(WHERE, "Expected n = ", n, ", but received n = ", n_saved, " when reading from ", this->input.filename.as_cstr());
+	}
+
+	mut<f64> R = 0.0;
+	this->input.read(R);
+
+	this->input.read(this->coupling);
+
+	return this->coupling;
+}
+
 void numerov::renormalized(f64 mass,
                            f64 step,
                            f64 tot_energy,
