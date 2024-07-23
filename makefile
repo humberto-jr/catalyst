@@ -168,7 +168,7 @@ endif
 #
 
 USE_CUDA = no
-CUDA_DIR = /usr/local/cuda
+CUDA_DIR = $(CUDA_PATH)
 
 ifeq ($(USE_CUDA), yes)
 	LINEAR_ALGEBRA_INC = -I$(CUDA_DIR)/include
