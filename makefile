@@ -185,18 +185,6 @@ ifeq ($(LINEAR_ALGEBRA), ESSL)
 endif
 
 #
-# CUDA: The variable USE_CUDA=yes will trigger all CUDA-related configuration.
-#
-
-USE_CUDA = no
-CUDA_DIR = $(CUDA_PATH)
-
-ifeq ($(USE_CUDA), yes)
-	LINEAR_ALGEBRA_INC = -I$(CUDA_DIR)/include
-	LINEAR_ALGEBRA_LIB = -L$(CUDA_DIR)/lib64
-endif
-
-#
 # MAGMA library:
 #
 
