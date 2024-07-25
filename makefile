@@ -9,6 +9,7 @@ SHELL = /bin/sh
 
 GSL_DIR =
 LINEAR_ALGEBRA = GSL
+CHECKLIST = check_gsl_dir
 
 #
 # Default compiler: GNU g++ is the default option when the CC variable is omitted.
@@ -89,6 +90,7 @@ NVCC = nvcc
 NVFLAGS = -std=c++17 --Werror all-warnings --threads 0
 
 ifeq ($(USE_CUDA), yes)
+	CHECKLIST += check_cuda_dir
 	LINEAR_ALGEBRA_INC = -I$(CUDA_PATH)/include
 	LINEAR_ALGEBRA_LIB = -L$(CUDA_PATH)/lib64
 
@@ -114,6 +116,7 @@ FC =
 MKL_DIR = $(MKLROOT)
 
 ifeq ($(LINEAR_ALGEBRA), MKL)
+	CHECKLIST += check_mkl_dir
 	LINEAR_ALGEBRA_INC = -DMKL_ILP64 -m64 -I$(MKL_DIR)/include -DUSE_MKL
 
 	ifeq ($(CC), icpc)
@@ -144,6 +147,7 @@ LAPACK_DIR = $(LAPACKE_DIR)
 BLAS_DIR = $(LAPACKE_DIR)
 
 ifeq ($(LINEAR_ALGEBRA), LAPACKE)
+	CHECKLIST += check_lapacke_dir
 	LINEAR_ALGEBRA_INC = -I$(LAPACKE_DIR)/include -DUSE_LAPACKE
 	LINEAR_ALGEBRA_LIB = -L$(LAPACKE_DIR)/lib -L$(LAPACKE_DIR)/lib64 -llapacke -llapack -lrefblas -lm
 endif
@@ -180,6 +184,8 @@ endif
 ESSL_DIR =
 
 ifeq ($(LINEAR_ALGEBRA), ESSL)
+	CFLAGS += -DUSE_ESSL
+	CHECKLIST += check_essl_dir
 	LINEAR_ALGEBRA_INC = -I$(ESSL_DIR)/include -DUSE_ESSL
 	LINEAR_ALGEBRA_LIB = -L$(ESSL_DIR)/lib64 -lesslbg -lm
 endif
@@ -192,6 +198,7 @@ MAGMA_DIR = /usr/local/magma
 
 ifeq ($(LINEAR_ALGEBRA), MAGMA)
 	CFLAGS += -DUSE_MAGMA
+	CHECKLIST += check_magma_dir
 	LINEAR_ALGEBRA_INC += -I$(MAGMA_DIR)/include -DADD_
 	LINEAR_ALGEBRA_LIB += -L$(MAGMA_DIR)/lib -lmagma -lm
 endif
@@ -203,6 +210,7 @@ endif
 ATLAS_DIR = /usr/local/atlas
 
 ifeq ($(LINEAR_ALGEBRA), ATLAS)
+	CHECKLIST += check_atlas_dir
 	LINEAR_ALGEBRA_INC = -I$(ATLAS_DIR)/include -DUSE_ATLAS
 	LINEAR_ALGEBRA_LIB = -L$(ATLAS_DIR)/lib -latlas -lptcblas -lm
 endif
@@ -263,7 +271,7 @@ tests: mpi_ring.out gemm_timer.out mpi_print.out mpi_tasks.out numerov_benchmark
 #
 
 MOD_DIR = modules
-ESSENTIALS = check_gsl_dir $(wildcard $(MOD_DIR)/*.h)
+ESSENTIALS = $(CHECKLIST) $(wildcard $(MOD_DIR)/*.h)
 
 libmpi.o: $(MOD_DIR)/libmpi.cc $(ESSENTIALS)
 ifeq ($(USE_MPI), yes)
@@ -387,7 +395,7 @@ gsl: $(LIB_DIR)/gsl-2.7.1.tar.gz check_gsl_dir
 	cd gsl-2.7.1/; ./configure CC=$(CC) --prefix=$(GSL_DIR); make; make install
 	rm -rf gsl-2.7.1
 
-lapacke: $(LIB_DIR)/lapack-3.12.0.tar.gz
+lapacke: $(LIB_DIR)/lapack-3.12.0.tar.gz check_lapacke_dir
 	tar -xvf $<
 	mkdir $(LAPACKE_DIR)/lib
 	mkdir $(LAPACKE_DIR)/include
@@ -397,7 +405,7 @@ lapacke: $(LIB_DIR)/lapack-3.12.0.tar.gz
 	cd lapack-3.12.0; cp lib*.a $(LAPACKE_DIR)/lib/; cp LAPACKE/include/*.h $(LAPACKE_DIR)/include/
 	rm -rf lapack-3.12.0
 
-magma: $(LIB_DIR)/magma-2.5.1-alpha1.tar.gz $(CUDA_DIR) $(MAGMA_DIR)
+magma: $(LIB_DIR)/magma-2.5.1-alpha1.tar.gz check_magma_dir
 	tar -zxvf $<
 	cp magma-2.5.1-alpha1/make.inc-examples/make.inc.mkl-$(CC) magma-2.5.1-alpha1/make.inc
 	cd magma-2.5.1-alpha1/; export CUDADIR=$(CUDA_DIR); export GPU_TARGET="Kepler Maxwell Pascal"; make; make install prefix=$(MAGMA_DIR);
@@ -414,7 +422,7 @@ openmpi: $(LIB_DIR)/openmpi-5.0.3.tar.bz2
 # Utils:
 #
 
-PHONY += clean check_gsl_dir
+PHONY += clean check_gsl_dir check_mkl_dir check_lapacke_dir check_magma_dir check_atlas_dir check_cuda_dir
 
 clean:
 	rm -f *.o *.out
@@ -424,5 +432,35 @@ ifndef GSL_DIR
 	$(error The GSL_DIR variable is not set)
 endif
 	@test -d $(GSL_DIR) || { echo "Unable to find GSL_DIR=$(GSL_DIR)"; exit 666; }
+
+check_mkl_dir:
+ifndef MKLROOT
+	$(error The MKLROOT environment variable is not set)
+endif
+	@test -d $(MKLROOT) || { echo "Unable to find MKLROOT=$(MKLROOT)"; exit 666; }
+
+check_lapacke_dir:
+ifndef LAPACKE_DIR
+	$(error The LAPACKE_DIR variable is not set)
+endif
+	@test -d $(LAPACKE_DIR) || { echo "Unable to find LAPACKE_DIR=$(LAPACKE_DIR)"; exit 666; }
+
+check_magma_dir:
+ifndef MAGMA_DIR
+	$(error The MAGMA_DIR variable is not set)
+endif
+	@test -d $(MAGMA_DIR) || { echo "Unable to find MAGMA_DIR=$(MAGMA_DIR)"; exit 666; }
+
+check_atlas_dir:
+ifndef ATLAS_DIR
+	$(error The ATLAS_DIR variable is not set)
+endif
+	@test -d $(ATLAS_DIR) || { echo "Unable to find ATLAS_DIR=$(ATLAS_DIR)"; exit 666; }
+
+check_cuda_dir:
+ifndef CUDA_PATH
+	$(error The CUDA_PATH environment variable is not set)
+endif
+	@test -d $(CUDA_PATH) || { echo "Unable to find CUDA_PATH=$(CUDA_PATH)"; exit 666; }
 
 .PHONY: $(PHONY)
