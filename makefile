@@ -80,14 +80,14 @@ endif
 #
 # Nvidia nvcc compiler: Since there is only one CUDA compiler, instead of using the CC
 # variable to set the compiler name and presets, use the variable USE_CUDA=yes. The CC
-# variable and its CFLAGS is passed to nvcc as the host compiler for the C++ parts of
+# variable and its CFLAGS are passed to nvcc as the host compiler for the C++ parts of
 # the code.
 #
 
 USE_CUDA = no
 
 NVCC = nvcc
-NVFLAGS = -std=c++17 --Werror all-warnings --threads 0
+NVFLAGS = -std=c++17 --Werror all-warnings --threads 0 -DUSE_CUDA
 
 ifeq ($(USE_CUDA), yes)
 	CHECKLIST += check_cuda_dir
