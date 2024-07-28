@@ -5,6 +5,12 @@
 	#include "fgh.h"
 
 	namespace numerov {
+		// NOTE: The first file format is intended for input coupling potentials
+		// and the second for output Numerov ratio matrices.
+		constexpr u8 FORMAT_VERSION = 2;
+
+		constexpr u32 MAGIC_NUMBER = 1701998454u;
+
 		using basis = vec<fgh::basis>;
 
 		struct potential {
@@ -32,12 +38,12 @@
 			file::input input;
 		};
 
-		numerov::potential open(string &filename);
+		numerov::potential open(string &filename, u8 ver = 1);
 
 		void renormalized(f64 mass,
 		                  f64 step,
 		                  f64 tot_energy,
-		                  mat<f64> &pot_energy,
+		                  const mat<f64> &pot_energy,
 		                  mat<f64> &workspace,
 		                  mat<f64> &old_ratio,
 		                  mat<f64> &new_ratio,
