@@ -106,7 +106,7 @@ endif
 # Undefined references to Fortran symbols are likely to be solved by setting FC.
 #
 
-FC =
+FC = none
 
 #
 # Intel MKL: Only for GNU g++ and Intel icx (icpc) compilers. The environment
@@ -427,7 +427,7 @@ openmpi: $(LIB_DIR)/openmpi-5.0.3.tar.bz2
 # Utils:
 #
 
-PHONY += clean check_gsl_dir check_mkl_dir check_lapacke_dir check_magma_dir check_atlas_dir check_cuda_dir
+PHONY += clean check_gsl_dir check_mkl_dir check_lapacke_dir check_magma_dir check_atlas_dir check_cuda_dir check_fort
 
 clean:
 	rm -f *.o *.out
@@ -444,7 +444,7 @@ ifndef MKLROOT
 endif
 	@test -d $(MKLROOT) || { echo "Unable to find MKLROOT=$(MKLROOT)"; exit 666; }
 
-check_lapacke_dir:
+check_lapacke_dir: check_fort
 ifndef LAPACKE_DIR
 	$(error The LAPACKE_DIR variable is not set)
 endif
@@ -467,5 +467,10 @@ ifndef CUDA_PATH
 	$(error The CUDA_PATH environment variable is not set)
 endif
 	@test -d $(CUDA_PATH) || { echo "Unable to find CUDA_PATH=$(CUDA_PATH)"; exit 666; }
+
+check_fort:
+ifeq ($(FC), none)
+	$(error A Fortran compiler is required on the FC variable)
+endif
 
 .PHONY: $(PHONY)
