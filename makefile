@@ -335,6 +335,11 @@ pes_view.out: $(DRIVER_DIR)/pes_view.cc pes.o math.o $(ESSENTIALS)
 	$(CC) $(CFLAGS) $< -o $@ pes.o math.o $(LDFLAGS)
 	@echo
 
+numerov.out: $(DRIVER_DIR)/numerov.cc numerov.o liblapack.o libmpi.o math.o $(ESSENTIALS)
+	@echo "$<:"
+	$(CC) $(CFLAGS) $< -o $@ numerov.o liblapack.o libmpi.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
+	@echo
+
 #
 # Rules for tests:
 #

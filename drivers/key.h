@@ -70,6 +70,15 @@
 		static constexpr c_str R_step = "R_step\0";
 
 		[[maybe_unused]]
+		static constexpr c_str E_min = "E_min\0";
+
+		[[maybe_unused]]
+		static constexpr c_str E_max = "E_max\0";
+
+		[[maybe_unused]]
+		static constexpr c_str E_step = "E_step\0";
+
+		[[maybe_unused]]
 		static constexpr c_str atom_a = "atom_a\0";
 
 		[[maybe_unused]]
@@ -127,6 +136,9 @@
 		static constexpr c_str theta_grid_size = "theta_grid_size\0";
 
 		[[maybe_unused]]
+		static constexpr c_str coll_grid_size = "coll_grid_size\0";
+
+		[[maybe_unused]]
 		static constexpr c_str extern_pes_filename = "pes_extern_lib\0";
 
 		[[maybe_unused]]
@@ -143,5 +155,8 @@
 
 		[[maybe_unused]]
 		static constexpr c_str logd_output_filename = "logd_matrix_output\0";
+
+		[[maybe_unused]]
+		static constexpr c_str numerov_output_filename = "numerov_ratio_output\0";
 	}
 #endif
