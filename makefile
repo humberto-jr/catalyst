@@ -29,7 +29,7 @@ CFLAGS = -std=c++17 -pedantic -Wall -Wconversion -fopenmp -O3 -I$(GSL_DIR)/inclu
 #
 
 USE_MPI = no
-OPENMPI_DIR =
+OPENMPI_DIR = none
 
 ifeq ($(CC), mpic++)
 	USE_MPI = yes
@@ -113,26 +113,24 @@ FC = none
 # variable MKLROOT is used and needs to have been exported elsewhere.
 #
 
-MKL_DIR = $(MKLROOT)
-
 ifeq ($(LINEAR_ALGEBRA), MKL)
 	CHECKLIST += check_mkl_dir
-	LINEAR_ALGEBRA_INC = -DMKL_ILP64 -m64 -I$(MKL_DIR)/include -DUSE_MKL
+	LINEAR_ALGEBRA_INC = -DMKL_ILP64 -m64 -I$(MKLROOT)/include -DUSE_MKL
 
 	ifeq ($(CC), icpc)
-		LINEAR_ALGEBRA_LIB = -parallel -Wl,--start-group $(MKL_DIR)/lib/intel64/libmkl_intel_ilp64.a $(MKL_DIR)/lib/intel64/libmkl_intel_thread.a $(MKL_DIR)/lib/intel64/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl
+		LINEAR_ALGEBRA_LIB = -parallel -Wl,--start-group $(MKLROOT)/lib/intel64/libmkl_intel_ilp64.a $(MKLROOT)/lib/intel64/libmkl_intel_thread.a $(MKLROOT)/lib/intel64/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl
 	endif
 
 	ifeq ($(CC), mpiicpc)
-		LINEAR_ALGEBRA_LIB = -parallel -Wl,--start-group $(MKL_DIR)/lib/intel64/libmkl_intel_ilp64.a $(MKL_DIR)/lib/intel64/libmkl_intel_thread.a $(MKL_DIR)/lib/intel64/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl
+		LINEAR_ALGEBRA_LIB = -parallel -Wl,--start-group $(MKLROOT)/lib/intel64/libmkl_intel_ilp64.a $(MKLROOT)/lib/intel64/libmkl_intel_thread.a $(MKLROOT)/lib/intel64/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl
 	endif
 
 	ifeq ($(CC), g++)
-		LINEAR_ALGEBRA_LIB = -Wl,--start-group $(MKL_DIR)/lib/intel64/libmkl_intel_ilp64.a $(MKL_DIR)/lib/intel64/libmkl_gnu_thread.a $(MKL_DIR)/lib/intel64/libmkl_core.a -Wl,--end-group -lgomp -lpthread -lm -ldl
+		LINEAR_ALGEBRA_LIB = -Wl,--start-group $(MKLROOT)/lib/intel64/libmkl_intel_ilp64.a $(MKLROOT)/lib/intel64/libmkl_gnu_thread.a $(MKLROOT)/lib/intel64/libmkl_core.a -Wl,--end-group -lgomp -lpthread -lm -ldl
 	endif
 
 	ifeq ($(CC), mpic++)
-		LINEAR_ALGEBRA_LIB = -Wl,--start-group $(MKL_DIR)/lib/intel64/libmkl_intel_ilp64.a $(MKL_DIR)/lib/intel64/libmkl_gnu_thread.a $(MKL_DIR)/lib/intel64/libmkl_core.a -Wl,--end-group -lgomp -lpthread -lm -ldl
+		LINEAR_ALGEBRA_LIB = -Wl,--start-group $(MKLROOT)/lib/intel64/libmkl_intel_ilp64.a $(MKLROOT)/lib/intel64/libmkl_gnu_thread.a $(MKLROOT)/lib/intel64/libmkl_core.a -Wl,--end-group -lgomp -lpthread -lm -ldl
 	endif
 endif
 
