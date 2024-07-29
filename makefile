@@ -93,10 +93,6 @@ ifeq ($(USE_CUDA), yes)
 	CHECKLIST += check_cuda_dir
 	LINEAR_ALGEBRA_INC = -I$(CUDA_PATH)/include
 	LINEAR_ALGEBRA_LIB = -L$(CUDA_PATH)/lib64
-
-	# FIXME: It appears that nvcc emits some intermediate C code that uses GNU extensions. The build
-	# fails due to the -pedantic flag in the host compiler. Thus, we are forced to remove it.
-	NVFLAGS += -ccbin $(CC) $(patsubst -%, --compiler-options=-%, $(patsubst -pedantic,, $(CFLAGS)))
 endif
 
 #
@@ -250,6 +246,23 @@ ifeq ($(FC), ifort)
 	ifeq ($(LINEAR_ALGEBRA), LAPACKE)
 		LINEAR_ALGEBRA_LIB += -lifcore
 	endif
+endif
+
+#
+# nvcc flags: The CFLAGS and LINEAR_ALGEBRA_INC are passed down to the host compiler
+# set in CC by means of nvcc's flag "--compiler-options". This is done at the very
+# last step before compilation to make sure the CFLAGS are no longer mutating as the
+# makefile is traversed.
+#
+
+ifeq ($(USE_CUDA), yes)
+	NVFLAGS += -ccbin $(CC)
+
+	# FIXME: It appears that nvcc emits some intermediate C code that uses GNU extensions. The build
+	# fails due to the "-pedantic" flag in the host compiler. Thus, we are forced to remove it.
+	NVFLAGS += $(patsubst -%, --compiler-options=-%, $(patsubst -pedantic,, $(CFLAGS)))
+
+	NVFLAGS += $(patsubst -%, --compiler-options=-%, $(LINEAR_ALGEBRA_INC))
 endif
 
 #
