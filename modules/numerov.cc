@@ -127,7 +127,7 @@ void numerov::renormalized(f64 mass,
 
 	//
 	// Step 3: Solve the system of linear equations (I - T)U = (2I + 10T) for U;
-	// on exit, new_rate holds U temporarily.
+	// on exit, new_ratio holds U temporarily.
 	//
 
 	lapack.dgesv(workspace, new_ratio);
