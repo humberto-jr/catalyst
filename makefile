@@ -351,6 +351,11 @@ numerov.out: $(DRIVER_DIR)/numerov.cc numerov.o liblapack.o libmpi.o math.o $(ES
 	$(CC) $(CFLAGS) $< -o $@ numerov.o liblapack.o libmpi.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
 	@echo
 
+smatrix.out: $(DRIVER_DIR)/smatrix.cc fgh.o numerov.o liblapack.o libmpi.o math.o $(ESSENTIALS)
+	@echo "$<:"
+	$(CC) $(CFLAGS) $< -o $@ fgh.o numerov.o liblapack.o libmpi.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
+	@echo
+
 #
 # Rules for tests:
 #
