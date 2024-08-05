@@ -112,10 +112,89 @@
 			this->append<PAD>(remainder...);
 		}
 
-		template<typename T>
-		inline void operator+=(const T rhs)
+		inline void operator+=(c_str rhs)
 		{
 			this->append(rhs);
+		}
+
+		inline void operator+=(const bool rhs)
+		{
+			this->append(rhs? "true" : "false");
+		}
+
+		inline void operator+=(u8 rhs)
+		{
+			this->append(rhs);
+		}
+
+		inline void operator+=(u16 rhs)
+		{
+			this->append(rhs);
+		}
+
+		inline void operator+=(u32 rhs)
+		{
+			this->append(rhs);
+		}
+
+		inline void operator+=(u64 rhs)
+		{
+			this->append(rhs);
+		}
+
+		inline void operator+=(s8 rhs)
+		{
+			this->append(rhs);
+		}
+
+		inline void operator+=(s16 rhs)
+		{
+			this->append(rhs);
+		}
+
+		inline void operator+=(s32 rhs)
+		{
+			this->append(rhs);
+		}
+
+		inline void operator+=(s64 rhs)
+		{
+			this->append(rhs);
+		}
+
+		inline void operator+=(const char rhs)
+		{
+			this->append(rhs);
+		}
+
+		inline void operator+=(f32 rhs)
+		{
+			this->append(rhs);
+		}
+
+		inline void operator+=(f64 rhs)
+		{
+			this->append(rhs);
+		}
+
+		inline void operator+=(f128 rhs)
+		{
+			this->append(rhs);
+		}
+
+		inline void operator+=(c32 rhs)
+		{
+			this->append(rhs.real(), "  ", rhs.imag());
+		}
+
+		inline void operator+=(c64 rhs)
+		{
+			this->append(rhs.real(), "  ", rhs.imag());
+		}
+
+		inline void operator+=(string &rhs)
+		{
+			this->append(rhs.as_cstr());
 		}
 
 		inline void operator=(c_str rhs)
