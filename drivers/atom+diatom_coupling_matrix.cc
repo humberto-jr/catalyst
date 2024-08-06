@@ -1,10 +1,10 @@
 #include "modules/essentials.h"
+#include "modules/numerov.h"
 #include "modules/libmpi.h"
 #include "modules/input.h"
 #include "modules/timer.h"
 #include "modules/math.h"
 #include "modules/file.h"
-#include "modules/logd.h"
 #include "modules/pes.h"
 #include "modules/fgh.h"
 #include "key.h"
@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
 	//
 
 	if (mpi.rank() == mpi::MASTER_PROCESS_RANK) {
-		coupling.write(logd::MAGIC_NUMBER);
+		coupling.write(numerov::MAGIC_NUMBER);
 		coupling.write(FORMAT_VERSION);
 		coupling.write(n_min);
 		coupling.write(R_min);
