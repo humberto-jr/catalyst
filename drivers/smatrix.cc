@@ -152,7 +152,7 @@ int main()
 			smatrix.write(basis[ch_b].comp);
 
 			for (mut<u32> n = 0; n < energy_count; ++n) {
-				usize open_count = task[n].re_s.rows();
+				u32 open_count = as_u32(task[n].re_s.rows());
 
 				smatrix.write(n);
 				smatrix.write(open_count);
