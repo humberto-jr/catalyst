@@ -152,9 +152,10 @@ int main()
 			smatrix.write(basis[ch_b].comp);
 
 			for (mut<u32> n = 0; n < energy_count; ++n) {
-				smatrix.write(n);
-
 				usize open_count = task[n].re_s.rows();
+
+				smatrix.write(n);
+				smatrix.write(open_count);
 
 				if ((ch_a >= open_count) || (ch_b >= open_count)) {
 					// NOTE: Assuming energies and basis are sorted in ascending
