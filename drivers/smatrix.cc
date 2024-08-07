@@ -162,7 +162,6 @@ int main()
 					// closed at the n-th energy, they may be open at energies
 					// n+1, n+2, etc.
 
-					smatrix.write(n);
 					smatrix.write(0.0);
 					smatrix.write(0.0);
 					smatrix.write(0.0);
