@@ -115,7 +115,10 @@ int main()
 
 		mat<f64> re_s(open_count, open_count), im_s(open_count, open_count);
 
-		numerov::build_scatt_matrix(k, re_s, im_s, lapack);
+		if (open_count > 0) {
+			k.resize(open_count, open_count);
+			numerov::build_scatt_matrix(k, re_s, im_s, lapack);
+		}
 
 		task[n].k.swap(k);
 		task[n].re_s.swap(re_s);
