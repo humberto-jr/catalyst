@@ -5,9 +5,9 @@
 	#include "fgh.h"
 
 	namespace numerov {
-		// NOTE: The first file format is intended for input coupling potentials
-		// and the second for output Numerov ratio matrices.
-		constexpr u8 FORMAT_VERSION = 2;
+		// NOTE: The first file format is intended for input coupling potentials,
+		// the second for output Numerov ratio matrices and the third for S-matrices.
+		constexpr u8 FORMAT_VERSION = 3;
 
 		constexpr u32 MAGIC_NUMBER = 1701998454u;
 
