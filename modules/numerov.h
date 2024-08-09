@@ -38,6 +38,8 @@
 			file::input input;
 		};
 
+		numerov::basis open_basis_file(const string &filename);
+
 		numerov::potential open(string &filename, u8 ver = 1);
 
 		void renormalized(f64 mass,

@@ -4,6 +4,28 @@
 static constexpr usize FILE_HEADER_OFFSET
 	= 2*sizeof(u32) + sizeof(u8) + 4*sizeof(f64) + sizeof(usize);
 
+numerov::basis numerov::open_basis_file(const string &filename)
+{
+	file::input input(filename.as_cstr());
+
+	u32 count = fgh::is_valid(input);
+
+	numerov::basis list(count);
+
+	fgh::load_basis(0, input, list[0]);
+
+	for (mut<u32> n = 1; n < count; ++n) {
+		fgh::load_basis(n, input, list[n]);
+
+		assert(list[n].n_min  == list[n - 1].n_min);
+		assert(list[n].r_min  == list[n - 1].r_min);
+		assert(list[n].r_max  == list[n - 1].r_max);
+		assert(list[n].r_step == list[n - 1].r_step);
+	}
+
+	return list;
+}
+
 numerov::potential numerov::open(string &filename, u8 fmt_ver)
 {
 	// TODO: It is missing the implementation of consuming files with Numerov
