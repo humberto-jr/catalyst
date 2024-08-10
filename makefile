@@ -336,9 +336,9 @@ atom+diatom_fgh_basis.out: $(DRIVER_DIR)/atom+diatom_fgh_basis.cc pes.o fgh.o li
 	$(CC) $(CFLAGS) $< -o $@ pes.o fgh.o liblapack.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
 	@echo
 
-atom+diatom_coupling_matrix.out: $(DRIVER_DIR)/atom+diatom_coupling_matrix.cc libmpi.o math.o pes.o fgh.o $(ESSENTIALS)
+atom+diatom_coupling_matrix.out: $(DRIVER_DIR)/atom+diatom_coupling_matrix.cc numerov.o libmpi.o math.o pes.o fgh.o liblapack.o $(ESSENTIALS)
 	@echo "$<:"
-	$(CC) $(CFLAGS) $< -o $@ libmpi.o math.o pes.o fgh.o $(LDFLAGS)
+	$(CC) $(CFLAGS) $< -o $@ numerov.o libmpi.o math.o pes.o fgh.o liblapack.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
 	@echo
 
 pes_view.out: $(DRIVER_DIR)/pes_view.cc pes.o math.o $(ESSENTIALS)

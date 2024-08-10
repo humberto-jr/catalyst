@@ -11,32 +11,6 @@
 
 constexpr u8 FORMAT_VERSION = 1;
 
-using scatt_basis = vec<fgh::basis>;
-
-scatt_basis load_scatt_basis(mpi::frontend &mpi)
-{
-	string bufname = mpi.input_keyword(key::basis_input_filename);
-
-	file::input buf(bufname);
-
-	u32 count = fgh::is_valid(buf);
-
-	scatt_basis list(count);
-
-	fgh::load_basis(0, buf, list[0]);
-
-	for (mut<u32> n = 1; n < count; ++n) {
-		fgh::load_basis(n, buf, list[n]);
-
-		assert(list[n].n_min  == list[n - 1].n_min);
-		assert(list[n].r_min  == list[n - 1].r_min);
-		assert(list[n].r_max  == list[n - 1].r_max);
-		assert(list[n].r_step == list[n - 1].r_step);
-	}
-
-	return list;
-}
-
 f64 simpson(const vec64 &multipole, const fgh::basis &basis_a, const fgh::basis &basis_b)
 {
 	mut<usize> n_max = basis_a.eigenvec.length() - 1;
@@ -131,7 +105,9 @@ int main(int argc, char *argv[])
 	// Scattering basis set:
 	//
 
-	const auto basis = load_scatt_basis(mpi);
+	string bufname = mpi.input_keyword(key::basis_input_filename);
+
+	const auto basis = numerov::open_basis_file(bufname);
 
 	vec64 multipole(basis[0].eigenvec.length());
 
@@ -143,7 +119,7 @@ int main(int argc, char *argv[])
 	// in the master's output at the end.
 	//
 
-	string bufname = mpi.input_keyword(key::coupling_output_filename);
+	bufname = mpi.input_keyword(key::coupling_output_filename);
 
 	if (mpi.rank() != mpi::MASTER_PROCESS_RANK) {
 		bufname.append(".mpi", mpi.rank());

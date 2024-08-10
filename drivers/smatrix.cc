@@ -15,28 +15,6 @@ struct job {
 	mut<f64> tot_energy;
 };
 
-numerov::basis load_scatt_basis(const string &filename)
-{
-	file::input input(filename.as_cstr());
-
-	u32 count = fgh::is_valid(input);
-
-	numerov::basis list(count);
-
-	fgh::load_basis(0, input, list[0]);
-
-	for (mut<u32> n = 1; n < count; ++n) {
-		fgh::load_basis(n, input, list[n]);
-
-		assert(list[n].n_min  == list[n - 1].n_min);
-		assert(list[n].r_min  == list[n - 1].r_min);
-		assert(list[n].r_max  == list[n - 1].r_max);
-		assert(list[n].r_step == list[n - 1].r_step);
-	}
-
-	return list;
-}
-
 int main()
 {
 	lapack::frontend lapack;
@@ -58,7 +36,7 @@ int main()
 
 	bufname = input::keyword(key::smatrix_input_filename);
 
-	numerov::solution solution = numerov::open_ratio_file(bufname);
+	auto solution = numerov::open_ratio_file(bufname);
 
 	u32 channel_count = as_u32(solution[0].rows());
 
@@ -68,7 +46,7 @@ int main()
 
 	bufname = input::keyword(key::basis_input_filename);
 
-	const numerov::basis basis = load_scatt_basis(bufname);
+	const auto basis = numerov::open_basis_file(bufname);
 
 	//
 	// Collision energy:
