@@ -41,12 +41,6 @@ f64 simpson(const vec64 &multipole, const fgh::basis &basis_a, const fgh::basis 
 	return fact*step*sum;
 }
 
-f64 centrifugal_term(u32 l, f64 mass, f64 R)
-{
-	u32 fact = l*(l + 1);
-	return as_f64(fact)/(2.0*mass*R*R);
-}
-
 int main(int argc, char *argv[])
 {
 	mpi::frontend mpi(&argc, &argv);
@@ -187,10 +181,6 @@ int main(int argc, char *argv[])
 				u32 ja = basis[ch_a].j;
 				u32 la = basis[ch_a].l;
 
-				if (lambda == lambda_min) {
-					result(ch_a, ch_a) += basis[ch_a].eigenval + centrifugal_term(la, mass, R);
-				}
-
 				for (mut<usize> ch_b = ch_a; ch_b < result.cols(); ++ch_b) {
 					u32 Jb = basis[ch_b].J;
 					u32 jb = basis[ch_b].j;
@@ -198,6 +188,10 @@ int main(int argc, char *argv[])
 
 					if (Ja != Jb) {
 						continue;
+					}
+
+					if ((lambda == lambda_min) && (ch_a == ch_b)) {
+						result(ch_a, ch_a) += basis[ch_a].eigenval + numerov::centrifugal_term(la, mass, R);
 					}
 
 					f64 f = math::percival_seaton_coeff(Ja, ja, jb, la, lb, lambda);
