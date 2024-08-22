@@ -62,7 +62,7 @@
 
 			f64 legendre_multipole_term(const char arrang, u32 lambda, f64 r, f64 R) const;
 
-			void legendre_multipole_term(const char arrang, u32 lambda, u32 n_min, f64 r_min, f64 r_step, f64 R, vec64 &result) const;
+			void legendre_multipole_term(const char arrang, u32 lambda, u32 n_min, f64 r_min, f64 r_step, f64 R, vec<f64> &result) const;
 
 			~frontend();
 
