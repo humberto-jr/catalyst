@@ -1,7 +1,7 @@
 #include "fgh.h"
 #include "math.h"
 
-void fgh::matrix(f64 mass, f64 step, const vec<f64> &potential, mat64 &result)
+void fgh::matrix(f64 mass, f64 step, const vec<f64> &potential, mat<f64> &result)
 {
 	// References:
 	// [1] Dulieu et al., J. Chem. Phys. 103, 1 (1995)
@@ -31,7 +31,7 @@ void fgh::matrix(f64 mass, f64 step, const vec<f64> &potential, mat64 &result)
 	}
 }
 
-void fgh::matrix(f64 mass, f64 step, const vec<mat64> &potential, mat64 &result)
+void fgh::matrix(f64 mass, f64 step, const vec<mat<f64>> &potential, mat<f64> &result)
 {
 	// References:
 	// [1] O. Dulieu et al., J. Chem. Phys. 103, 1 (1995)
