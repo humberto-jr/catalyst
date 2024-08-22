@@ -10,7 +10,7 @@
 
 		static constexpr usize BASIS_FILE_HEADER = sizeof(MAGIC_NUMBER) + sizeof(FORMAT_VERSION) + 2*sizeof(u32) + 3*sizeof(f64);
 
-		void matrix(f64 mass, f64 step, const vec64 &potential, mat64 &result);
+		void matrix(f64 mass, f64 step, const vec<f64> &potential, mat64 &result);
 
 		void matrix(f64 mass, f64 step, const vec<mat64> &potential, mat64 &result);
 
@@ -27,7 +27,7 @@
 			mut<f64> r_max;
 			mut<f64> r_step;
 			mut<f64> eigenval;
-			vec64 eigenvec;
+			vec<f64> eigenvec;
 
 			inline basis(usize count = 0):
 				J(0), v(0), j(0), l(0), p(0), comp(0), n_min(0), norm(1.0), r_min(0.0), r_max(0.0), r_step(0.0), eigenval(0.0), eigenvec(count)
