@@ -11,7 +11,7 @@ inline gsl_interp_accel* as_gsl_state(void *state)
 	return static_cast<gsl_interp_accel*>(state);
 }
 
-spline::spline(vec64 &x, vec64 &f):
+spline::spline(vec<f64> &x, vec<f64> &f):
 	x(x.move()), f(f.move()), data(nullptr), state(gsl_interp_accel_alloc())
 {
 	if (this->state == nullptr) {
@@ -25,12 +25,12 @@ spline::spline(spline &&other):
 	other.data = other.state = nullptr;
 }
 
-const vec64& spline::abscissa()
+const vec<f64>& spline::abscissa()
 {
 	return this->x;
 }
 
-const vec64& spline::ordinate()
+const vec<f64>& spline::ordinate()
 {
 	return this->f;
 }

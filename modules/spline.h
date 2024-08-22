@@ -4,13 +4,13 @@
 
 	class spline {
 		public:
-		spline(vec64 &x, vec64 &f);
+		spline(vec<f64> &x, vec<f64> &f);
 
 		spline(spline &&other);
 
-		const vec64& abscissa();
+		const vec<f64>& abscissa();
 
-		const vec64& ordinate();
+		const vec<f64>& ordinate();
 
 		void use_akima();
 
@@ -27,8 +27,8 @@
 		~spline();
 
 		private:
-		vec64 x;
-		vec64 f;
+		vec<f64> x;
+		vec<f64> f;
 		void *data;
 		void *state;
 	};
