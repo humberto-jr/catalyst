@@ -165,7 +165,7 @@ f64 math::gaunt_coeff(s32 q, s32 ja, s32 jb, s32 lambda)
 	return phase*std::sqrt(as_f64(prod))*j0*jq;
 }
 
-f64 simpson(f64 step, vec64 &integrand)
+f64 simpson(f64 step, vec<f64> &integrand)
 {
 	mut<usize> n_max = integrand.length() - 1;
 

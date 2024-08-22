@@ -149,7 +149,7 @@
 
 		f64 gaunt_coeff(s32 q, s32 ja, s32 jb, s32 lambda);
 
-		f64 simpson(f64 step, vec64 &integrand);
+		f64 simpson(f64 step, vec<f64> &integrand);
 
 		f64 gauss_legendre(f64 a, f64 b, u8 order, void *params, integrand f);
 
