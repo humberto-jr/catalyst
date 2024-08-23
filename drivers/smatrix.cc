@@ -3,6 +3,9 @@
 #include "modules/input.h"
 #include "modules/file.h"
 #include "modules/fgh.h"
+
+// Internals
+#include "filename.h"
 #include "key.h"
 
 constexpr u8 PAD = 24;
@@ -23,7 +26,7 @@ int main()
 	// S-matrix output:
 	//
 
-	string bufname = input::keyword(key::smatrix_output_filename, "smatrix.bin");
+	string bufname = input::keyword(key::smatrix_output_filename, filename::smatrix);
 
 	file::output smatrix(bufname);
 
@@ -34,7 +37,7 @@ int main()
 	// Numerov ratio matrices:
 	//
 
-	bufname = input::keyword(key::smatrix_input_filename);
+	bufname = input::keyword(key::smatrix_input_filename, filename::ratio_matrix);
 
 	auto solution = numerov::open_ratio_file(bufname);
 
@@ -44,7 +47,7 @@ int main()
 	// Scattering basis set:
 	//
 
-	bufname = input::keyword(key::basis_input_filename);
+	bufname = input::keyword(key::basis_input_filename, filename::fgh_basis);
 
 	const auto basis = numerov::open_basis_file(bufname);
 
