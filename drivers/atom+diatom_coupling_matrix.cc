@@ -7,6 +7,9 @@
 #include "modules/file.h"
 #include "modules/pes.h"
 #include "modules/fgh.h"
+
+// Internals
+#include "filename.h"
 #include "key.h"
 
 constexpr u8 FORMAT_VERSION = 1;
@@ -99,7 +102,7 @@ int main(int argc, char *argv[])
 	// Scattering basis set:
 	//
 
-	string bufname = mpi.input_keyword(key::basis_input_filename);
+	string bufname = mpi.input_keyword(key::basis_input_filename, filename::fgh_basis);
 
 	const auto basis = numerov::open_basis_file(bufname);
 
@@ -113,7 +116,7 @@ int main(int argc, char *argv[])
 	// in the master's output at the end.
 	//
 
-	bufname = mpi.input_keyword(key::coupling_output_filename);
+	bufname = mpi.input_keyword(key::coupling_output_filename, filename::coupling_matrix);
 
 	if (mpi.rank() != mpi::MASTER_PROCESS_RANK) {
 		bufname.append(".mpi", mpi.rank());
