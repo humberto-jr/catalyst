@@ -4,6 +4,9 @@
 #include "modules/file.h"
 #include "modules/pes.h"
 #include "modules/fgh.h"
+
+// Internals
+#include "filename.h"
 #include "key.h"
 
 constexpr u32 PLACEHOLDER = 0;
@@ -92,7 +95,7 @@ int main()
 	// Output:
 	//
 
-	const string bufname = input::keyword(key::basis_output_filename);
+	const string bufname = input::keyword(key::basis_output_filename, filename::fgh_basis);
 
 	file::output basis(bufname.as_cstr());
 
