@@ -129,13 +129,13 @@ int main()
 
 	mut<u32> count = 0;
 
-	vec64 potential(r_count);
+	vec<f64> potential(r_count);
 	potential = 0.0;
 
-	vec64 eigenval(r_count);
+	vec<f64> eigenval(r_count);
 	eigenval = 0.0;
 
-	mat64 hamiltonian(r_count, r_count);
+	mat<f64> hamiltonian(r_count, r_count);
 	hamiltonian = 0.0;
 
 	for (mut<u32> j = j_min; j <= j_max; j += j_step) {

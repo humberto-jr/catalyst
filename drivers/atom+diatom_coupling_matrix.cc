@@ -14,7 +14,7 @@
 
 constexpr u8 FORMAT_VERSION = 1;
 
-f64 simpson(const vec64 &multipole, const fgh::basis &basis_a, const fgh::basis &basis_b)
+f64 simpson(const vec<f64> &multipole, const fgh::basis &basis_a, const fgh::basis &basis_b)
 {
 	mut<usize> n_max = basis_a.eigenvec.length() - 1;
 
@@ -106,9 +106,9 @@ int main(int argc, char *argv[])
 
 	const auto basis = numerov::open_basis_file(bufname);
 
-	vec64 multipole(basis[0].eigenvec.length());
+	vec<f64> multipole(basis[0].eigenvec.length());
 
-	mat64 result(basis.length(), basis.length());
+	mat<f64> result(basis.length(), basis.length());
 
 	//
 	// Output: Open on the master process only. Other processes will write to
