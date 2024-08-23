@@ -346,9 +346,9 @@ pes_view.out: $(DRIVER_DIR)/pes_view.cc pes.o math.o $(ESSENTIALS)
 	$(CC) $(CFLAGS) $< -o $@ pes.o math.o $(LDFLAGS)
 	@echo
 
-numerov.out: $(DRIVER_DIR)/numerov.cc numerov.o liblapack.o libmpi.o math.o $(ESSENTIALS)
+numerov.out: $(DRIVER_DIR)/numerov.cc numerov.o fgh.o liblapack.o libmpi.o math.o $(ESSENTIALS)
 	@echo "$<:"
-	$(CC) $(CFLAGS) $< -o $@ numerov.o liblapack.o libmpi.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
+	$(CC) $(CFLAGS) $< -o $@ numerov.o fgh.o liblapack.o libmpi.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
 	@echo
 
 smatrix.out: $(DRIVER_DIR)/smatrix.cc fgh.o numerov.o liblapack.o libmpi.o math.o $(ESSENTIALS)

@@ -6,6 +6,9 @@
 #include "modules/timer.h"
 #include "modules/math.h"
 #include "modules/file.h"
+
+// Internals
+#include "filename.h"
 #include "key.h"
 
 constexpr u8 FORMAT_VERSION = 2;
@@ -37,7 +40,7 @@ int main(int argc, char *argv[])
 	// Coupling potential:
 	//
 
-	string potname = mpi.input_keyword(key::coupling_input_filename);
+	string potname = mpi.input_keyword(key::coupling_input_filename, filename::coupling_matrix);
 
 	numerov::potential coupling = numerov::open(potname);
 
@@ -87,7 +90,7 @@ int main(int argc, char *argv[])
 	// Numerov solutions: Only the master process will open the output file later.
 	//
 
-	string bufname = mpi.input_keyword(key::numerov_output_filename);
+	string bufname = mpi.input_keyword(key::numerov_output_filename, filename::ratio_matrix);
 
 	//
 	// Summary:
