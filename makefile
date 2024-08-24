@@ -273,7 +273,7 @@ PHONY += all modules drivers tools tests
 
 all: modules drivers
 modules: libmpi.o liblapack.o math.o fgh.o pes.o spline.o numerov.o
-drivers: atom+diatom_fgh_basis.out atom+diatom_coupling_matrix.out pes_view.out
+drivers: atom+diatom_fgh_basis.out atom+diatom_coupling_matrix.out numerov.out smatrix.out pes_view.out
 tools: fgh_basis_view.out sphe_harmonics.out
 tests: mpi_ring.out gemm_timer.out mpi_print.out mpi_tasks.out numerov_benchmark.out
 
@@ -382,9 +382,9 @@ mpi_tasks.out: $(TEST_DIR)/mpi_tasks.cc libmpi.o $(ESSENTIALS)
 	$(CC) $(CFLAGS) $< -o $@ libmpi.o $(LDFLAGS)
 	@echo
 
-numerov_benchmark.out: $(TEST_DIR)/numerov_benchmark.cc liblapack.o numerov.o pes.o math.o $(ESSENTIALS)
+numerov_benchmark.out: $(TEST_DIR)/numerov_benchmark.cc liblapack.o numerov.o pes.o math.o fgh.o $(ESSENTIALS)
 	@echo "$<:"
-	$(CC) $(CFLAGS) $< -o $@ liblapack.o numerov.o pes.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
+	$(CC) $(CFLAGS) $< -o $@ liblapack.o numerov.o pes.o math.o fgh.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
 	@echo
 
 #
@@ -411,6 +411,8 @@ PHONY += gsl lapacke magma openmpi
 
 LIB_DIR = libs
 
+MAGMA_SRC = magma-2.8.0
+
 gsl: $(LIB_DIR)/gsl-2.7.1.tar.gz check_gsl_dir
 	tar -zxvf $<
 	cd gsl-2.7.1/; ./configure CC=$(CC) --prefix=$(GSL_DIR); make; make install
@@ -426,11 +428,11 @@ lapacke: $(LIB_DIR)/lapack-3.12.0.tar.gz check_lapacke_dir
 	cd lapack-3.12.0; cp lib*.a $(LAPACKE_DIR)/lib/; cp LAPACKE/include/*.h $(LAPACKE_DIR)/include/
 	rm -rf lapack-3.12.0
 
-magma: $(LIB_DIR)/magma-2.5.1-alpha1.tar.gz check_magma_dir
+magma: $(LIB_DIR)/$(MAGMA_SRC).tar.gz check_mkl_dir check_cuda_dir check_magma_dir
 	tar -zxvf $<
-	cp magma-2.5.1-alpha1/make.inc-examples/make.inc.mkl-$(CC) magma-2.5.1-alpha1/make.inc
-	cd magma-2.5.1-alpha1/; export CUDADIR=$(CUDA_DIR); export GPU_TARGET="Kepler Maxwell Pascal"; make; make install prefix=$(MAGMA_DIR);
-	rm -rf magma-2.5.1-alpha1
+	cp $(MAGMA_SRC)/make.inc-examples/make.inc.mkl-icc $(MAGMA_SRC)/make.inc
+	cd $(MAGMA_SRC)/; export CUDADIR=$(CUDA_PATH); export GPU_TARGET="Maxwell Pascal"; make; make install prefix=$(MAGMA_DIR);
+	rm -rf $(MAGMA_SRC)
 
 openmpi: $(LIB_DIR)/openmpi-5.0.3.tar.bz2
 	bzip2 -dk $<
