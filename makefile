@@ -412,11 +412,8 @@ PHONY += gsl lapacke magma openmpi
 LIB_DIR = libs
 
 GSL_SRC = gsl-2.7.1
-
 MAGMA_SRC = magma-2.8.0
-
 LAPACKE_SRC = lapack-3.12.0
-
 OPENMPI_SRC = openmpi-5.0.3
 
 gsl: $(LIB_DIR)/$(GSL_SRC).tar.gz check_gsl_dir
@@ -428,8 +425,8 @@ lapacke: $(LIB_DIR)/$(LAPACKE_SRC).tar.gz check_lapacke_dir
 	tar -xvf $<
 	mkdir $(LAPACKE_DIR)/lib; mkdir $(LAPACKE_DIR)/include
 	cp $(LAPACKE_SRC)/make.inc.example $(LAPACKE_SRC)/make.inc
-	cd $(LAPACKE_SRC)/BLAS/SRC; make $(BLAS_CONFIG)
-	cd $(LAPACKE_SRC); make $(LAPACK_CONFIG); make lapackelib
+	cd $(LAPACKE_SRC)/BLAS/SRC/; make $(BLAS_CONFIG)
+	cd $(LAPACKE_SRC)/; make $(LAPACK_CONFIG); make lapackelib
 	cp $(LAPACKE_SRC)/lib*.a $(LAPACKE_DIR)/lib/; cp $(LAPACKE_SRC)/LAPACKE/include/*.h $(LAPACKE_DIR)/include/
 	rm -rf $(LAPACKE_SRC)
 
@@ -442,7 +439,7 @@ magma: $(LIB_DIR)/$(MAGMA_SRC).tar.gz check_mkl_dir check_cuda_dir check_magma_d
 openmpi: $(LIB_DIR)/$(OPENMPI_SRC).tar.bz2
 	bzip2 -dk $<
 	mv $(LIB_DIR)/$(OPENMPI_SRC).tar .; tar -xvf $(OPENMPI_SRC).tar
-	cd $(OPENMPI_SRC); ./configure --prefix=$(OPENMPI_DIR); make; make install
+	cd $(OPENMPI_SRC)/; ./configure --prefix=$(OPENMPI_DIR); make; make install
 	rm -rf $(OPENMPI_SRC).tar $(OPENMPI_SRC)
 
 #
