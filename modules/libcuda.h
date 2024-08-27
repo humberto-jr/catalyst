@@ -17,11 +17,11 @@
 	  }                                                                                  \
 	}
 
-	#define CHECK_CUBLAS_ERROR(name, code)                                                                               \
-	{                                                                                                                    \
-	  if ((code) != CUBLAS_STATUS_SUCCESS) {                                                                             \
-	    print::error(WHERE, (name), " failed with error code ", cublasGetStatusName(code); cublasGetStatusString(code)); \
-	  }                                                                                                                  \
+	#define CHECK_CUBLAS_ERROR(name, code)                                                                                     \
+	{                                                                                                                          \
+	  if ((code) != CUBLAS_STATUS_SUCCESS) {                                                                                   \
+	    print::error(WHERE, (name), " failed with error code ", cublasGetStatusName(code), "; ", cublasGetStatusString(code)); \
+	  }                                                                                                                        \
 	}
 
 	namespace cuda {
@@ -152,6 +152,23 @@
 		};
 
 		namespace blas {
+			class frontend {
+				public:
+				ALL frontend()
+				{
+					auto info = cublasCreate(&this->handle);
+					CHECK_CUBLAS_ERROR("cublasCreate()", info)
+				}
+
+				ALL ~frontend()
+				{
+					auto info = cublasDestroy(this->handle);
+					CHECK_CUBLAS_ERROR("cublasDestroy()", info)
+				}
+
+				private:
+				cublasHandle_t handle;
+			};
 		}
 	}
 
