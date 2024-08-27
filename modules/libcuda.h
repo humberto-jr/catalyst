@@ -1,4 +1,4 @@
-#if !defined(LIBCUDA_HEADER) && defined(USE_CUDA)
+#if !defined(LIBCUDA_HEADER)
 	#define LIBCUDA_HEADER
 	#include "essentials.h"
 	#include <cuda_runtime.h>
