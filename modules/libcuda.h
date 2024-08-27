@@ -2,6 +2,7 @@
 	#define LIBCUDA_HEADER
 	#include "essentials.h"
 	#include <cuda_runtime.h>
+	#include <cublas_v2.h>
 
 	// NOTE: This header is to be included only during compilations with the nvcc
 	// compiler and when the USE_CUDA macro is set. However, it comprises safe
@@ -14,6 +15,13 @@
 	  if ((code) != cudaSuccess) {                                                       \
 	    print::error(WHERE, (name), " failed with error code ", cudaGetErrorName(code)); \
 	  }                                                                                  \
+	}
+
+	#define CHECK_CUBLAS_ERROR(name, code)                                                                               \
+	{                                                                                                                    \
+	  if ((code) != CUBLAS_STATUS_SUCCESS) {                                                                             \
+	    print::error(WHERE, (name), " failed with error code ", cublasGetStatusName(code); cublasGetStatusString(code)); \
+	  }                                                                                                                  \
 	}
 
 	namespace cuda {
@@ -142,8 +150,12 @@
 			mut<T> *buf;
 			cudaStream_t stream;
 		};
+
+		namespace blas {
+		}
 	}
 
 	#undef ALL
 	#undef CHECK_CUDA_ERROR
+	#undef CHECK_CUBLAS_ERROR
 #endif
