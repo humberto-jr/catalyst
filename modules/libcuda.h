@@ -164,20 +164,38 @@
 		namespace blas {
 			class frontend {
 				public:
-				GPU frontend()
+				GPU frontend(): thread_count(1u)
 				{
-					auto info = cublasCreate(&this->handle);
+					auto info = cublasCreate(&this->handle[0]);
 					CHECK_CUBLAS_ERROR("cublasCreate()", info)
+				}
+
+				CPU frontend(u32 max_thread): thread_count(max_thread)
+				{
+					#pragma omp master
+					for (mut<u32> thread = 0; thread < max_thread; ++thread) {
+						auto info = cublasCreate(&this->handle[thread]);
+						CHECK_CUBLAS_ERROR("cublasCreate()", info)
+					}
 				}
 
 				ALL ~frontend()
 				{
-					auto info = cublasDestroy(this->handle);
-					CHECK_CUBLAS_ERROR("cublasDestroy()", info)
+					#if defined(__CUDA_ARCH__)
+						auto info = cublasDestroy(this->handle[0]);
+						CHECK_CUBLAS_ERROR("cublasDestroy()", info)
+					#else
+						#pragma omp master
+						for (mut<u32> thread = 0; thread < this->thread_count; ++thread) {
+							auto info = cublasDestroy(this->handle[thread]);
+							CHECK_CUBLAS_ERROR("cublasDestroy()", info)
+						}
+					#endif
 				}
 
 				private:
-				cublasHandle_t handle;
+				u32 thread_count;
+				cublasHandle_t handle[MAX_HOST_THREAD_COUNT];
 			};
 		}
 	}
