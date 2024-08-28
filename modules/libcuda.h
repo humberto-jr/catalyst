@@ -24,6 +24,10 @@
 	  }                                                                                                                        \
 	}
 
+	namespace cuda::blas {
+		class frontend;
+	}
+
 	namespace cuda {
 		template<typename T>
 		ALL static mut<T>* malloc(usize count = 1)
@@ -50,7 +54,8 @@
 		template<typename T>
 		class dev {
 			public:
-			ALL inline dev(usize count = 1): len(count), buf(cuda::malloc<T>(count)), stream(0)
+			ALL inline dev(usize count = 1):
+				len(count), buf(cuda::malloc<T>(count)), stream(0), operation(CUBLAS_OP_N)
 			{
 				auto info = cudaStreamCreate(&this->stream);
 				CHECK_CUDA_ERROR("cudaStreamCreate()", info)
@@ -149,6 +154,9 @@
 			usize len;
 			mut<T> *buf;
 			cudaStream_t stream;
+			cublasOperation_t operation;
+
+			friend class cuda::blas::frontend;
 		};
 
 		namespace blas {
