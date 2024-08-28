@@ -164,7 +164,7 @@
 		namespace blas {
 			class frontend {
 				public:
-				GPU frontend(): thread_count(1u)
+				GPU frontend(): thread_count(1)
 				{
 					auto info = cublasCreate(&this->handle[0]);
 					CHECK_CUBLAS_ERROR("cublasCreate()", info)
@@ -176,6 +176,52 @@
 					for (mut<u32> thread = 0; thread < max_thread; ++thread) {
 						auto info = cublasCreate(&this->handle[thread]);
 						CHECK_CUBLAS_ERROR("cublasCreate()", info)
+					}
+				}
+
+				template<typename T>
+				ALL void gemm(usize m, usize n, usize k, const dev<T> &a, usize lda, const dev<T> &b, usize ldb, dev<T> &c, usize ldc, const T alpha = 1.0, const T beta = 0.0)
+				{
+					#if defined(__CUDA_ARCH__)
+						u32 thread = 0u;
+						auto info = cublasSetPointerMode(this->handle[thread], CUBLAS_POINTER_MODE_DEVICE);
+					#else
+						u32 thread = thread_id();
+						auto info = cublasSetPointerMode(this->handle[thread], CUBLAS_POINTER_MODE_HOST);
+					#endif
+
+					CHECK_CUBLAS_ERROR("cublasSetPointerMode()", info)
+
+					// NOTE: The GEMM operation will be made on the stream of the buffer c. Thus, after calling this
+					// function and before accessing the content of c, one must synchronize it first to make sure
+					// results are ready.
+					info = cublasSetStream(this->handle[thread], c.stream);
+
+					CHECK_CUBLAS_ERROR("cublasSetStream()", info)
+
+					// NOTE: Old asynchronous operations may be ongoing on the buffers a, b, and c. Let's wait those
+					// finish before calling cuBLAS.
+					a.wait();
+					b.wait();
+					c.wait();
+
+					if constexpr(is_f32<T>()) {
+						info = cublasSgemm(this->handle[thread], a.operation, b.operation, as_s32(m), as_s32(n), as_s32(k),
+						                   &alpha, a.buf, as_s32(lda), b.buf, as_s32(ldb), &beta, c.buf, as_s32(ldc));
+
+						CHECK_CUBLAS_ERROR("cublasSgemm()", info)
+					} else if constexpr(is_f64<T>()) {
+						info = cublasDgemm(this->handle[thread], a.operation, b.operation, as_s32(m), as_s32(n), as_s32(k),
+						                   &alpha, a.buf, as_s32(lda), b.buf, as_s32(ldb), &beta, c.buf, as_s32(ldc));
+
+						CHECK_CUBLAS_ERROR("cublasDgemm()", info)
+					} else if constexpr(is_c64<T>()) {
+						info = cublasZgemm(this->handle[thread], a.operation, b.operation, as_s32(m), as_s32(n), as_s32(k),
+						                   &alpha, a.buf, as_s32(lda), b.buf, as_s32(ldb), &beta, c.buf, as_s32(ldc));
+
+						CHECK_CUBLAS_ERROR("cublasZgemm()", info)
+					} else {
+						print::error(WHERE, "Invalid generic type T = ", type_name<T>(), "; expected T = f32 or f64 or c64");
 					}
 				}
 
