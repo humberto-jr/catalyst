@@ -8,6 +8,8 @@
 	// compiler and when the USE_CUDA macro is set. However, it comprises safe
 	// wrappers over the CUDA API for use, preferably, from host and device code.
 
+	#define CPU __host__
+	#define GPU __device__
 	#define ALL __host__ __device__
 
 	#define CHECK_CUDA_ERROR(name, code)                                                 \
@@ -180,6 +182,8 @@
 		}
 	}
 
+	#undef CPU
+	#undef GPU
 	#undef ALL
 	#undef CHECK_CUDA_ERROR
 	#undef CHECK_CUBLAS_ERROR
