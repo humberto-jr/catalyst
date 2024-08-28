@@ -164,7 +164,7 @@
 		namespace blas {
 			class frontend {
 				public:
-				ALL frontend()
+				GPU frontend()
 				{
 					auto info = cublasCreate(&this->handle);
 					CHECK_CUBLAS_ERROR("cublasCreate()", info)
