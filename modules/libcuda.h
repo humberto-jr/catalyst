@@ -136,7 +136,7 @@
 				CHECK_CUDA_ERROR("cudaMemcpyAsync()", info)
 			}
 
-			ALL void wait() const
+			ALL void synchronize() const
 			{
 				auto info = cudaStreamSynchronize(this->stream);
 
@@ -164,7 +164,7 @@
 		namespace blas {
 			class frontend {
 				public:
-				GPU frontend(): thread_count(1)
+				GPU frontend(): thread_count(1u)
 				{
 					auto info = cublasCreate(&this->handle[0]);
 					CHECK_CUBLAS_ERROR("cublasCreate()", info)
@@ -201,9 +201,9 @@
 
 					// NOTE: Old asynchronous operations may be ongoing on the buffers a, b, and c. Let's wait those
 					// finish before calling cuBLAS.
-					a.wait();
-					b.wait();
-					c.wait();
+					a.synchronize();
+					b.synchronize();
+					c.synchronize();
 
 					if constexpr(is_f32<T>()) {
 						info = cublasSgemm(this->handle[thread], a.operation, b.operation, as_s32(m), as_s32(n), as_s32(k),
