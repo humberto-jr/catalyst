@@ -90,9 +90,10 @@ NVCC = nvcc
 NVFLAGS = -std=c++17 --Werror all-warnings --threads 0 -DUSE_CUDA
 
 ifeq ($(USE_CUDA), yes)
+	CFLAGS += -DUSE_CUDA
 	CHECKLIST += check_cuda_dir
 	LINEAR_ALGEBRA_INC = -I$(CUDA_PATH)/include
-	LINEAR_ALGEBRA_LIB = -L$(CUDA_PATH)/lib64
+	LINEAR_ALGEBRA_LIB = -lcublas -L$(CUDA_PATH)/lib64
 endif
 
 #
