@@ -220,13 +220,18 @@
 						                   &alpha, a.buf, as_s32(lda), b.buf, as_s32(ldb), &beta, c.buf, as_s32(ldc));
 
 						CHECK_CUBLAS_ERROR("cublasDgemm()", info)
+					} else if constexpr(is_c32<T>()) {
+						info = cublasCgemm(this->handle[thread], a.operation, b.operation, as_s32(m), as_s32(n), as_s32(k),
+						                   &alpha, a.buf, as_s32(lda), b.buf, as_s32(ldb), &beta, c.buf, as_s32(ldc));
+
+						CHECK_CUBLAS_ERROR("cublasCgemm()", info)
 					} else if constexpr(is_c64<T>()) {
 						info = cublasZgemm(this->handle[thread], a.operation, b.operation, as_s32(m), as_s32(n), as_s32(k),
 						                   &alpha, a.buf, as_s32(lda), b.buf, as_s32(ldb), &beta, c.buf, as_s32(ldc));
 
 						CHECK_CUBLAS_ERROR("cublasZgemm()", info)
 					} else {
-						print::error(WHERE, "Invalid generic type T = ", type_name<T>(), "; expected T = f32 or f64 or c64");
+						print::error(WHERE, "Invalid generic type T = ", type_name<T>(), "; expected T = f32 or f64 or c32 or c64");
 					}
 				}
 
