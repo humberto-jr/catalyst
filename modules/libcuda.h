@@ -100,7 +100,7 @@
 				CHECK_CUDA_ERROR("cudaMemcpyAsync()", info)
 			}
 
-			ALL void async_memcpy_to(mut<T> &dest)
+			ALL void async_memcpy_to(mut<T> &dest) const
 			{
 				usize count = std::min(sizeof(T), this->size());
 
@@ -109,7 +109,7 @@
 				CHECK_CUDA_ERROR("cudaMemcpyAsync()", info)
 			}
 
-			ALL void async_memcpy_to(vec<T> &dest)
+			ALL void async_memcpy_to(vec<T> &dest) const
 			{
 				usize count = std::min(dest.size(), this->size());
 
@@ -118,7 +118,7 @@
 				CHECK_CUDA_ERROR("cudaMemcpyAsync()", info)
 			}
 
-			ALL void async_memcpy_to(mat<T> &dest)
+			ALL void async_memcpy_to(mat<T> &dest) const
 			{
 				usize count = std::min(dest.size(), this->size());
 
@@ -127,7 +127,7 @@
 				CHECK_CUDA_ERROR("cudaMemcpyAsync()", info)
 			}
 
-			ALL void async_memcpy_to(dev<T> &dest)
+			ALL void async_memcpy_to(dev<T> &dest) const
 			{
 				usize count = std::min(dest.size(), this->size());
 
