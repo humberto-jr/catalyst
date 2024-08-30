@@ -143,6 +143,22 @@
 				CHECK_CUDA_ERROR("cudaStreamSynchronize()", info)
 			}
 
+			ALL inline void as_non_transposed()
+			{
+				this->operation = CUBLAS_OP_N;
+			}
+
+			ALL inline void as_transposed()
+			{
+				this->operation = CUBLAS_OP_T;
+			}
+
+			ALL inline void as_conjugate_transposed()
+			{
+				static_assert(is_c32<T>() || is_c64<T>());
+				this->operation = CUBLAS_OP_C;
+			}
+
 			GPU inline mut<T>& operator[](usize n) const
 			{
 				return this->buf[n];
