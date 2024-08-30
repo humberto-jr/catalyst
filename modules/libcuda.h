@@ -143,6 +143,11 @@
 				CHECK_CUDA_ERROR("cudaStreamSynchronize()", info)
 			}
 
+			GPU inline mut<T>& operator[](usize n) const
+			{
+				return this->buf[n];
+			}
+
 			ALL ~dev()
 			{
 				auto info = cudaStreamDestroy(this->stream);
