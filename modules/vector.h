@@ -152,7 +152,4 @@
 
 	template<typename T = f64>
 	using vec = vector<T>;
-
-	using vec32 = vector<f32>;
-	using vec64 = vector<f64>;
 #endif

@@ -169,7 +169,4 @@
 
 	template<typename T = f64>
 	using mat = matrix<T>;
-
-	using mat32 = matrix<f32>;
-	using mat64 = matrix<f64>;
 #endif
