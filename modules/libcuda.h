@@ -53,6 +53,13 @@
 			dev_ptr = nullptr;
 		}
 
+		CPU inline void device_memory(mut<usize> &freed, mut<usize> &total)
+		{
+			// NOTE: Results are returned in bytes.
+			auto info = cudaMemGetInfo(&freed, &total);
+			CHECK_CUDA_ERROR("cudaMemGetInfo()", info)
+		}
+
 		template<typename T>
 		class dev {
 			public:
