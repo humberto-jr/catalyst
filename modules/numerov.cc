@@ -1,4 +1,5 @@
 #include "numerov.h"
+#include "libblas.h"
 #include "math.h"
 
 static constexpr usize FILE_HEADER_OFFSET
@@ -244,13 +245,13 @@ usize numerov::build_react_matrix(f64 mass,
 	// Step 2: Compute the (-rn + n) matrix.
 	//
 
-	lapack.dgemm(ratio, n, rn, -1.0, 1.0);
+	blas::gemm<f64>('n', 'n', ratio, n, rn, -1.0, 1.0);
 
 	//
 	// Step 3: Compute the (rj - j) matrix.
 	//
 
-	lapack.dgemm(ratio, j, rj, 1.0, -1.0);
+	blas::gemm<f64>('n', 'n', ratio, j, rj, 1.0, -1.0);
 
 	//
 	// Step 4: Solve the system of linear equations (-rn + n)K = (rj - j) for K.
@@ -283,7 +284,7 @@ void numerov::build_scatt_matrix(const mat<f64> &k,
 
 	mat<f64> workspace(ch_count, ch_count);
 
-	lapack.dgemm(k, k, workspace);
+	blas::gemm<f64>('n', 'n', k, k, workspace);
 
 	//
 	// Step 2: Build the (I + K^2) and 2K matrices with re(S) = I temporarily.
@@ -314,5 +315,5 @@ void numerov::build_scatt_matrix(const mat<f64> &k,
 	// Step 4: Solve re(S) = I - (K)im(S) = -I + (K)im(S).
 	//
 
-	lapack.dgemm(k, im_s, re_s, 1.0, -1.0);
+	blas::gemm<f64>('n', 'n', k, im_s, re_s, 1.0, -1.0);
 }
