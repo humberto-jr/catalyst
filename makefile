@@ -368,9 +368,13 @@ mpi_ring.out: $(TEST_DIR)/mpi_ring.cc libmpi.o $(ESSENTIALS)
 	$(CC) $(CFLAGS) $< -o $@ libmpi.o $(LDFLAGS)
 	@echo
 
-gemm_timer.out: $(TEST_DIR)/gemm_timer.cc liblapack.o $(ESSENTIALS)
+gemm_timer.out: $(TEST_DIR)/gemm_timer.cc $(ESSENTIALS)
 	@echo "$<:"
-	$(CC) $(CFLAGS) $< -o $@ liblapack.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
+ifeq ($(USE_CUDA), yes)
+	$(NVCC) $(NVFLAGS) $< -o $@ $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
+else
+	$(CC) $(CFLAGS) $(LINEAR_ALGEBRA_INC) $< -o $@ $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
+endif
 	@echo
 
 mpi_print.out: $(TEST_DIR)/mpi_print.cc libmpi.o $(ESSENTIALS)
