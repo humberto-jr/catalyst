@@ -30,6 +30,29 @@
 
 		static constexpr blas::backend BACKEND = BLAS_BACKEND_NAME;
 
+		static CBLAS_TRANSPOSE backend_transpose_enum(const char op)
+		{
+			switch (op) {
+				case 'n':
+				case 'N':
+				return CblasNoTrans;
+
+				case 't':
+				case 'T':
+				return CblasTrans;
+
+				case 'c':
+				case 'C':
+				return CblasConjTrans;
+
+				default:
+				print::error(WHERE, "Invalid CBLAS transpose operation ", op);
+			}
+
+			// NOTE: Unreachable.
+			return CblasNoTrans;
+		}
+
 		template<typename T>
 		static void gemv(char transa,
 		                 usize m, usize n,
@@ -40,9 +63,7 @@
 			assert(x != nullptr);
 			assert(y != nullptr);
 
-			const auto op_a = ((transa == 't') || (transa == 'T')?
-					CblasTrans : ((transa == 'c') || (transa == 'C')? CblasConjTrans : CblasNoTrans)
-			);
+			const auto op_a = blas::backend_transpose_enum(transa);
 
 			if constexpr(is_f32<T>()) {
 				cblas_sgemv(CblasRowMajor, op_a, as_s32(m), as_s32(n),
@@ -89,13 +110,8 @@
 			assert(b != nullptr);
 			assert(c != nullptr);
 
-			const auto op_a = ((transa == 't') || (transa == 'T')?
-				CblasTrans : ((transa == 'c') || (transa == 'C')? CblasConjTrans : CblasNoTrans)
-			);
-
-			const auto op_b = ((transb == 't') || (transb == 'T')?
-				CblasTrans : ((transb == 'c') || (transb == 'C')? CblasConjTrans : CblasNoTrans)
-			);
+			const auto op_a = blas::backend_transpose_enum(transa);
+			const auto op_b = blas::backend_transpose_enum(transb);
 
 			if constexpr(is_f32<T>()) {
 				cblas_sgemm(CblasRowMajor, op_a, op_b, as_s32(m), as_s32(n), as_s32(k),
