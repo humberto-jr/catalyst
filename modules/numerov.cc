@@ -39,7 +39,7 @@ numerov::potential numerov::open(string &filename, u8 fmt_ver)
 	buf.read(tag);
 
 	if ((tag != numerov::MAGIC_NUMBER) || buf.end()) {
-		print::error(WHERE, buf.filename.as_cstr(), " does not correspond to a numerov potential file");
+		print::error(WHERE, buf.filename.as_cstr(), " does not correspond to a Numerov file");
 	}
 
 	mut<u8> ver = 0;
@@ -72,6 +72,54 @@ numerov::potential numerov::open(string &filename, u8 fmt_ver)
 	return {n_min, R_min, R_max, R_step, mass, coupling, buf};
 }
 
+numerov::solution numerov::open_ratio_file(string &filename, u8 fmt_ver)
+{
+	file::input input(filename);
+
+	mut<u32> tag = 0;
+	input.read(tag);
+
+	if ((tag != numerov::MAGIC_NUMBER) || input.end()) {
+		print::error(WHERE, input.filename.as_cstr(), " does not correspond to a Numerov file");
+	}
+
+	mut<u8> ver = 0;
+	input.read(ver);
+
+	if ((ver != fmt_ver) || input.end()) {
+		print::error(WHERE, input.filename.as_cstr(), " does not have a valid format version");
+	}
+
+	mut<f64> R_max = 0.0;
+	input.read(R_max);
+
+	mut<f64> R_step = 0.0;
+	input.read(R_step);
+
+	mut<f64> mass = 0.0;
+	input.read(mass);
+
+	mut<usize> ch_count = 0;
+	input.read(ch_count);
+
+	mut<f64> E_min = 0.0;
+	input.read(E_min);
+
+	mut<f64> E_max = 0.0;
+	input.read(E_max);
+
+	mut<f64> E_step = 0.0;
+	input.read(E_step);
+
+	mat<f64> ratio(ch_count, ch_count);
+
+	if (input.end()) {
+		print::error(WHERE, input.filename.as_cstr(), " has no valid solutions");
+	}
+
+	return {mass, R_max, R_step, E_min, E_max, E_step, input, ratio};
+}
+
 const mat<f64>& numerov::potential::operator[](u32 n)
 {
 	usize offset = sizeof(u32) + sizeof(f64) + this->coupling.size();
@@ -91,6 +139,28 @@ const mat<f64>& numerov::potential::operator[](u32 n)
 	this->input.read(this->coupling);
 
 	return this->coupling;
+}
+
+const mat<f64>& numerov::solution::operator[](u32 n)
+{
+	constexpr usize RATIO_HEADER_OFFSET
+		= sizeof(numerov::MAGIC_NUMBER) + sizeof(numerov::FORMAT_VERSION) + 6*sizeof(f64) + sizeof(usize);
+
+	usize stride = sizeof(u32) + sizeof(f64) + this->ratio.size();
+
+	this->input.seek_set(RATIO_HEADER_OFFSET + n*stride);
+
+	mut<u32> n_saved = 0;
+	this->input.read(n_saved);
+
+	if (n_saved != n) {
+		print::error(WHERE, "Expected n = ", n, ", but received n = ", n_saved, " when reading from ", this->input.filename.as_cstr());
+	}
+
+	this->input.read(this->energy);
+	this->input.read(this->ratio);
+
+	return this->ratio;
 }
 
 void numerov::renormalized(f64 mass,

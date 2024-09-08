@@ -38,9 +38,33 @@
 			file::input input;
 		};
 
+		struct solution {
+			public:
+			f64 mass;
+			f64 R_max;
+			f64 R_step;
+			f64 E_min;
+			f64 E_max;
+			f64 E_step;
+			mut<f64> energy;
+			file::input input;
+
+			inline solution(f64 mass, f64 R_max, f64 R_step, f64 E_min, f64 E_max, f64 E_step, file::input &input, mat<f64> &ratio):
+				mass(mass), R_max(R_max), R_step(R_step), E_min(E_min), E_max(E_max), E_step(E_step), energy(0.0), input(input), ratio(ratio.move())
+			{
+			}
+
+			const mat<f64>& operator[](u32 n);
+
+			private:
+			mat<f64> ratio;
+		};
+
 		numerov::basis open_basis_file(const string &filename);
 
-		numerov::potential open(string &filename, u8 ver = 1);
+		numerov::potential open(string &filename, u8 fmt_ver = 1);
+
+		numerov::solution open_ratio_file(string &filename, u8 fmt_ver = 2);
 
 		void renormalized(f64 mass,
 		                  f64 step,
