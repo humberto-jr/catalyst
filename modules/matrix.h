@@ -155,6 +155,32 @@
 			return this->block_view(0, this->rows() - 1, m, m);
 		}
 
+		void row_copy(usize n, vec<T> &row) const
+		{
+			usize count = this->cols();
+
+			if (row.length() < count) {
+				row.resize(count);
+			}
+
+			for (mut<usize> m = 0; m < count; ++m) {
+				row[m] = (*this)(n, m);
+			}
+		}
+
+		void col_copy(usize m, vec<T> &col) const
+		{
+			usize count = this->rows();
+
+			if (col.length() < count) {
+				col.resize(count);
+			}
+
+			for (mut<usize> n = 0; n < count; ++n) {
+				col[n] = (*this)(n, m);
+			}
+		}
+
 		private:
 		friend class lapack::frontend;
 
