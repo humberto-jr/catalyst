@@ -124,14 +124,14 @@ u32 fgh::is_valid(file::input &buf)
 	mut<u32> tag = 0;
 	buf.read(tag);
 
-	if (tag != fgh::MAGIC_NUMBER) {
+	if ((tag != fgh::MAGIC_NUMBER) || buf.end()) {
 		print::error(WHERE, buf.filename.as_cstr(), " does not correspond to a FGH basis file");
 	}
 
 	mut<u8> ver = 0;
 	buf.read(ver);
 
-	if (ver != fgh::FORMAT_VERSION) {
+	if ((ver != fgh::FORMAT_VERSION) || buf.end()) {
 		print::error(WHERE, buf.filename.as_cstr(), " does not have a valid format version");
 	}
 
