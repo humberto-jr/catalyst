@@ -158,5 +158,11 @@
 
 		[[maybe_unused]]
 		static constexpr c_str numerov_output_filename = "numerov_ratio_output\0";
+
+		[[maybe_unused]]
+		static constexpr c_str smatrix_input_filename = "numerov_ratio_input\0";
+
+		[[maybe_unused]]
+		static constexpr c_str smatrix_output_filename = "smatrix_output\0";
 	}
 #endif
