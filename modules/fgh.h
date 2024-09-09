@@ -8,11 +8,13 @@
 
 		static constexpr u32 MAGIC_NUMBER = 464748u;
 
-		static constexpr usize BASIS_FILE_HEADER = sizeof(MAGIC_NUMBER) + sizeof(FORMAT_VERSION) + 2*sizeof(u32) + 3*sizeof(f64);
+		static constexpr usize BASIS_FILE_HEADER = sizeof(fgh::MAGIC_NUMBER) + sizeof(fgh::FORMAT_VERSION) + 2*sizeof(u32) + 3*sizeof(f64);
 
 		void matrix(f64 mass, f64 step, const vec<f64> &potential, mat<f64> &result);
 
 		void matrix(f64 mass, f64 step, const vec<mat<f64>> &potential, mat<f64> &result);
+
+		f64 norm(f64 step, const vec<f64> &eigenvec);
 
 		struct basis {
 			mut<u32> J;
@@ -34,11 +36,11 @@
 			{
 			}
 
-			inline void resize()
+			void resize()
 			{
 				usize count = as_usize((this->r_max - this->r_min)/this->r_step);
 
-				if (count != this->eigenvec.length()) {
+				if (count > this->eigenvec.length()) {
 					this->eigenvec.resize(count);
 				}
 			}

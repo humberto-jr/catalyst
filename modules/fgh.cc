@@ -88,6 +88,35 @@ void fgh::matrix(f64 mass, f64 step, const vec<mat<f64>> &potential, mat<f64> &r
 	}
 }
 
+f64 fgh::norm(f64 step, const vec<f64> &eigenvec)
+{
+	mut<usize> n_max = eigenvec.length() - 1;
+
+	while (n_max%3 != 0) {
+		--n_max;
+	}
+
+	assert(n_max > 2);
+
+	constexpr f64 FACT = 3.0/8.0;
+
+	mut<f64> sum = eigenvec[0]*eigenvec[0];
+
+	for (mut<usize> n = 1; n < (n_max - 3); n += 3) {
+		sum += 3.0*eigenvec[n + 0]*eigenvec[n + 0]
+		     + 3.0*eigenvec[n + 1]*eigenvec[n + 1]
+		     + 2.0*eigenvec[n + 2]*eigenvec[n + 2];
+	}
+
+	sum += 3.0*eigenvec[n_max - 1]*eigenvec[n_max - 1];
+
+	sum += eigenvec[n_max]*eigenvec[n_max];
+
+	sum = FACT*step*sum;
+
+	return 1.0/std::sqrt(sum);
+}
+
 u32 fgh::is_valid(file::input &buf)
 {
 	buf.seek_set();
