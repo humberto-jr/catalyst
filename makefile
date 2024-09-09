@@ -414,7 +414,7 @@ sphe_harmonics.out: $(TOOLS_DIR)/sphe_harmonics.cc math.o $(ESSENTIALS)
 
 PHONY += gsl lapacke magma openmpi
 
-LIB_DIR = libs
+LIB_DIR = vendors
 
 GSL_SRC = gsl-2.7.1
 MAGMA_SRC = magma-2.8.0
