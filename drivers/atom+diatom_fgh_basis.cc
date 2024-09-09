@@ -135,6 +135,9 @@ int main()
 	vec<f64> eigenval(r_count);
 	eigenval = 0.0;
 
+	vec<f64> eigenvec(r_count);
+	eigenvec = 0.0;
+
 	mat<f64> hamiltonian(r_count, r_count);
 	hamiltonian = 0.0;
 
@@ -155,9 +158,16 @@ int main()
 		lapack.dsyev(hamiltonian, eigenval);
 
 		for (mut<u32> v = v_min; v <= v_max; v += v_step) {
-			auto eigenvec = (lapack::using_magma()? hamiltonian.row_view(v) : hamiltonian.col_view(v));
+			// NOTE: The MAGMA backend library uses the column-major layout, thus
+			// the FGH eigenvector is a row of the Hamiltonian, and a column otherwise.
 
-			f64 norm = fgh::norm(v, r_step, eigenvec);
+			if (lapack::using_magma()) {
+				hamiltonian.row_copy(v, eigenvec);
+			} else {
+				hamiltonian.col_copy(v, eigenvec);
+			}
+
+			f64 norm = fgh::norm(r_step, eigenvec);
 
 			for (mut<u32> J = J_min; J <= J_max; J += J_step) {
 				s32 l_min = as_s32(J - j);
