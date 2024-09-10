@@ -25,6 +25,11 @@
 			return (this->buf.length() > 0);
 		}
 
+		inline usize length() const
+		{
+			return this->buf.length();
+		}
+
 		inline usize rows() const
 		{
 			return this->buf.length()/this->max_col;
