@@ -40,7 +40,7 @@
 			return this->buf.size();
 		}
 
-		inline void operator=(const T rhs)
+		inline void operator=(const T &rhs)
 		{
 			this->buf = rhs;
 		}
@@ -99,7 +99,7 @@
 				return sizeof(T)*this->rows()*this->cols();
 			}
 
-			void operator=(const T rhs)
+			void operator=(const T &rhs)
 			{
 				for (mut<usize> n = 0; n < this->rows(); ++n)
 					for (mut<usize> m = 0; m < this->cols(); ++m)
