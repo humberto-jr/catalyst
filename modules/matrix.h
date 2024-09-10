@@ -20,11 +20,6 @@
 			other.max_col = 0;
 		}
 
-		inline bool is_valid() const
-		{
-			return (this->buf.length() > 0);
-		}
-
 		inline usize length() const
 		{
 			return this->buf.length();
@@ -134,7 +129,7 @@
 			{
 				assert(row_end >= row_start);
 				assert(col_end >= col_start);
-				assert(owner.is_valid());
+				assert(owner.length() > 0);
 			}
 
 			// NOTE: We bind the constructor of views to a method of the parent matrix
