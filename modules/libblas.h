@@ -150,15 +150,15 @@
 			usize ldc = m;
 
 			if (not_a) {
-				assert(a.rows()*a.cols() >= lda*k);
+				assert(a.length() >= lda*k);
 			} else {
-				assert(a.rows()*a.cols() >= lda*m);
+				assert(a.length() >= lda*m);
 			}
 
 			if (not_b) {
-				assert(b.rows()*b.cols() >= ldb*n);
+				assert(b.length() >= ldb*n);
 			} else {
-				assert(b.rows()*b.cols() >= ldb*k);
+				assert(b.length() >= ldb*k);
 			}
 
 			blas::gemm(transa, transb, m, n, k,
