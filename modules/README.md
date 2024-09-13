@@ -18,4 +18,8 @@ A collection of lightweight modules that wraps the boilerplate code required for
 
 **matrix.h**: Defines `mat<T>`, a lightweight matrix abstraction built on top of `vec<T>`. This module does not include linear algebra operations just yet.
 
-**essentials.h**: For convenience, it includes the previous header files and the `omp.h` from the [OpenMP](https://www.openmp.org/) library for threading usage. It also defines the global `MAX_HOST_THREAD_COUNT` constant and the `thread_count()` and `thread_id()` runtime functions.
+**essentials.h**: For convenience, it includes the previous header files and the `omp.h` from the [OpenMP](https://www.openmp.org/) library (OMP) for threading usage. It also defines the global `MAX_HOST_THREAD_COUNT` constant and the `thread_count()` and `thread_id()` runtime functions.
+
+**libgsl.h**: Includes all relevant [GSL](https://www.gnu.org/software/gsl/) header files used throughout the codebase. More headers are added on demand.
+
+**libmpi.h**: Provides the `mpi` namespace, some helper functions, and the `mpi::frontend` type, which wraps MPI-related internal states and functionalities of a given [Message Passing Interface](https://www.mpi-forum.org/) backend library. It uses C++ function overloading and type inference to alleviate the use of the original MPI API. If an MPI backend is not used, the API provided by this module becomes a collection of dummy no-op calls. Thus, higher-level codes won't need to be changed.
