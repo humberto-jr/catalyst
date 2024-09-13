@@ -23,3 +23,5 @@ A collection of lightweight modules that wraps the boilerplate code required for
 **libgsl.h**: Includes all relevant [GSL](https://www.gnu.org/software/gsl/) header files used throughout the codebase. More headers are added on demand.
 
 **libmpi.h**: Provides the `mpi` namespace, some helper functions, and the `mpi::frontend` type, which wraps MPI-related internal states and functionalities of a given [Message Passing Interface](https://www.mpi-forum.org/) backend library. It uses C++ function overloading and type inference to alleviate the use of the original MPI API. If an MPI backend is not used, the API provided by this module becomes a collection of dummy no-op calls. Thus, higher-level codes won't need to be changed.
+
+**nist.h**: Provides the `nist` namespace, and serves as a database for all relevant [NIST fundamental physical constants](https://pml.nist.gov/cuu/Constants/Table/allascii.txt), [NIST atomic weights and isotopic compositions](https://physics.nist.gov/cgi-bin/Compositions/stand_alone.pl?ele=&all=all&ascii=ascii2&isotype=all), alongside various helper functions and enumerations that can be used at runtime.
