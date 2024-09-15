@@ -1,3 +1,4 @@
+#include "liblapack.h"
 #include "numerov.h"
 #include "libblas.h"
 #include "math.h"
@@ -169,8 +170,7 @@ void numerov::renormalized(f64 mass,
                            const mat<f64> &pot_energy,
                            mat<f64> &workspace,
                            mat<f64> &old_ratio,
-                           mat<f64> &new_ratio,
-                           lapack::frontend &lapack)
+                           mat<f64> &new_ratio)
 {
 	// NOTE: This routine implements the renormalized Numerov algorithm of Johnson,
 	// which propagates the ratio of the wavefunction from a previous grid point to
@@ -193,7 +193,7 @@ void numerov::renormalized(f64 mass,
 
 	for (mut<usize> ch = 0; ch < ch_count*ch_count; ++ch) {
 		if (old_ratio[ch] != 0.0) {
-			lapack.dsytri(old_ratio);
+			lapack::sytri(old_ratio);
 			break;
 		}
 	}
@@ -223,7 +223,7 @@ void numerov::renormalized(f64 mass,
 	// on exit, new_ratio holds U temporarily.
 	//
 
-	lapack.dgesv(workspace, new_ratio);
+	lapack::gesv(workspace, new_ratio);
 
 	//
 	// Step 4: Solve Eq. (22) for R = U - R'.
@@ -244,8 +244,7 @@ usize numerov::build_react_matrix(f64 mass,
                                   f64 R_max,
                                   f64 tot_energy,
                                   const mat<f64> &ratio,
-                                  const numerov::basis &level,
-                                  mat<f64> &k, lapack::frontend &lapack)
+                                  const numerov::basis &level, mat<f64> &k)
 {
 	// NOTE: This routine implements Johnson's algorithm to compute the augmented
 	// reaction matrix K, as in B.R. Johnson. J. Chem. Phys. 69, 4678 (1978). See
@@ -327,7 +326,7 @@ usize numerov::build_react_matrix(f64 mass,
 	// Step 4: Solve the system of linear equations (-rn + n)K = (rj - j) for K.
 	//
 
-	lapack.dgesv(rn, rj);
+	lapack::gesv(rn, rj);
 
 	k.swap(rj);
 
@@ -335,7 +334,7 @@ usize numerov::build_react_matrix(f64 mass,
 }
 
 void numerov::build_scatt_matrix(const mat<f64> &k,
-                                 mat<f64> &re_s, mat<f64> &im_s, lapack::frontend &lapack)
+                                 mat<f64> &re_s, mat<f64> &im_s)
 {
 	// NOTE: This routine computes the scatt. matrix S from the open-open block of
 	// the reaction matrix K, as in B.R. Johnson. J. Com. Phys. 13, 445-449 (1973).
@@ -379,7 +378,7 @@ void numerov::build_scatt_matrix(const mat<f64> &k,
 	// Step 3: Solve the system of linear equations (I + K^2)im(S) = 2K for im(S).
 	//
 
-	lapack.dgesv(workspace, im_s);
+	lapack::gesv(workspace, im_s);
 
 	//
 	// Step 4: Solve re(S) = I - (K)im(S) = -I + (K)im(S).

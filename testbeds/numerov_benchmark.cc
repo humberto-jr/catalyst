@@ -1,5 +1,4 @@
 #include "modules/essentials.h"
-#include "modules/liblapack.h"
 #include "modules/numerov.h"
 #include "modules/nist.h"
 #include "modules/pes.h"
@@ -14,7 +13,7 @@ void call_olson_smith_model(u32 l, f64 mass, f64 R, mat<f64> &v)
 	v(1, 1) = pes::olson_smith_pra1971(1, 1, R) + numerov::centrifugal_term(l, mass, R);
 }
 
-f64 propagate(lapack::frontend &lapack, u32 l)
+f64 propagate(u32 l)
 {
 	//
 	// Collision energy and reduced mass:
@@ -63,7 +62,7 @@ f64 propagate(lapack::frontend &lapack, u32 l)
 
 		ratio.swap(old_ratio);
 
-		numerov::renormalized(mass, R_step, tot_energy, pot_energy, workspace, old_ratio, ratio, lapack);
+		numerov::renormalized(mass, R_step, tot_energy, pot_energy, workspace, old_ratio, ratio);
 	}
 
 	//
@@ -72,11 +71,11 @@ f64 propagate(lapack::frontend &lapack, u32 l)
 
 	mat<f64> k(2, 2), re_s(2, 2), im_s(2, 2);
 
-	usize count = numerov::build_react_matrix(mass, R_step, R_max, tot_energy, ratio, level, k, lapack);
+	usize count = numerov::build_react_matrix(mass, R_step, R_max, tot_energy, ratio, level, k);
 
 	assert(count == 2);
 
-	numerov::build_scatt_matrix(k, re_s, im_s, lapack);
+	numerov::build_scatt_matrix(k, re_s, im_s);
 
 	//
 	// Probability of transition 1->2:
@@ -89,28 +88,26 @@ f64 propagate(lapack::frontend &lapack, u32 l)
 
 int main(int argc, char *argv[])
 {
-	lapack::frontend lapack;
-
 	print::line("# Test of Johnson's Numerov implementation");
 	print::line("# Ref. problem: 1->2 transition probability during He^+ + Ne collisions at 70.9 eV [J. Com. Phys. 13, 445-449 (1973)]");
 	print::line('#');
 	print::line("#  l   Ref. (table 1)                 Numerov");
 	print::line("# -------------------------------------------");
 
-	print::line<PAD>(0,   ' ', as_f32(0.279E-3), ' ', propagate(lapack, 0));
-	print::line<PAD>(10,  ' ', as_f32(0.164E-2), ' ', propagate(lapack, 10));
-	print::line<PAD>(20,  ' ', as_f32(0.110E-1), ' ', propagate(lapack, 20));
-	print::line<PAD>(200, ' ', as_f32(0.215E-1), ' ', propagate(lapack, 200));
-	print::line<PAD>(202, ' ', as_f32(0.552E-1), ' ', propagate(lapack, 202));
-	print::line<PAD>(205, ' ', as_f32(0.900E-1), ' ', propagate(lapack, 205));
-	print::line<PAD>(209, ' ', as_f32(0.553E-1), ' ', propagate(lapack, 209));
-	print::line<PAD>(214, ' ', as_f32(0.487E-3), ' ', propagate(lapack, 214));
-	print::line<PAD>(290, ' ', as_f32(0.167E-4), ' ', propagate(lapack, 290));
-	print::line<PAD>(300, ' ', as_f32(0.146),    ' ', propagate(lapack, 300));
-	print::line<PAD>(310, ' ', as_f32(0.202),    ' ', propagate(lapack, 310));
-	print::line<PAD>(320, ' ', as_f32(0.941E-1), ' ', propagate(lapack, 320));
-	print::line<PAD>(330, ' ', as_f32(0.226E-1), ' ', propagate(lapack, 330));
-	print::line<PAD>(350, ' ', as_f32(0.329E-3), ' ', propagate(lapack, 350));
+	print::line<PAD>(0,   ' ', as_f32(0.279E-3), ' ', propagate(0));
+	print::line<PAD>(10,  ' ', as_f32(0.164E-2), ' ', propagate(10));
+	print::line<PAD>(20,  ' ', as_f32(0.110E-1), ' ', propagate(20));
+	print::line<PAD>(200, ' ', as_f32(0.215E-1), ' ', propagate(200));
+	print::line<PAD>(202, ' ', as_f32(0.552E-1), ' ', propagate(202));
+	print::line<PAD>(205, ' ', as_f32(0.900E-1), ' ', propagate(205));
+	print::line<PAD>(209, ' ', as_f32(0.553E-1), ' ', propagate(209));
+	print::line<PAD>(214, ' ', as_f32(0.487E-3), ' ', propagate(214));
+	print::line<PAD>(290, ' ', as_f32(0.167E-4), ' ', propagate(290));
+	print::line<PAD>(300, ' ', as_f32(0.146),    ' ', propagate(300));
+	print::line<PAD>(310, ' ', as_f32(0.202),    ' ', propagate(310));
+	print::line<PAD>(320, ' ', as_f32(0.941E-1), ' ', propagate(320));
+	print::line<PAD>(330, ' ', as_f32(0.226E-1), ' ', propagate(330));
+	print::line<PAD>(350, ' ', as_f32(0.329E-3), ' ', propagate(350));
 
 	return EXIT_SUCCESS;
 }
