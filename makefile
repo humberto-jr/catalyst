@@ -273,7 +273,7 @@ endif
 PHONY += all modules drivers tools tests
 
 all: modules drivers
-modules: libmpi.o liblapack.o math.o fgh.o pes.o spline.o numerov.o
+modules: libmpi.o math.o fgh.o pes.o spline.o numerov.o
 drivers: atom+diatom_fgh_basis.out atom+diatom_coupling_matrix.out numerov.out smatrix.out pes_view.out
 tools: fgh_basis_view.out sphe_harmonics.out
 tests: mpi_ring.out gemm_timer.out mpi_print.out mpi_tasks.out numerov_benchmark.out
@@ -295,11 +295,6 @@ else
 	$(CC) $(CFLAGS) -c $<
 	@echo
 endif
-
-liblapack.o: $(MOD_DIR)/liblapack.cc $(ESSENTIALS)
-	@echo "$<:"
-	$(CC) $(CFLAGS) $(LINEAR_ALGEBRA_INC) -c $<
-	@echo
 
 math.o: $(MOD_DIR)/math.cc $(ESSENTIALS)
 	@echo "$<:"
@@ -323,7 +318,7 @@ spline.o: $(MOD_DIR)/spline.cc $(ESSENTIALS)
 
 numerov.o: $(MOD_DIR)/numerov.cc $(ESSENTIALS)
 	@echo "$<:"
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) $(LINEAR_ALGEBRA_INC) -c $<
 	@echo
 
 #
@@ -332,14 +327,14 @@ numerov.o: $(MOD_DIR)/numerov.cc $(ESSENTIALS)
 
 DRIVER_DIR = drivers
 
-atom+diatom_fgh_basis.out: $(DRIVER_DIR)/atom+diatom_fgh_basis.cc pes.o fgh.o liblapack.o math.o $(ESSENTIALS)
+atom+diatom_fgh_basis.out: $(DRIVER_DIR)/atom+diatom_fgh_basis.cc pes.o fgh.o math.o $(ESSENTIALS)
 	@echo "$<:"
-	$(CC) $(CFLAGS) $< -o $@ pes.o fgh.o liblapack.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
+	$(CC) $(CFLAGS) $(LINEAR_ALGEBRA_INC) $< -o $@ pes.o fgh.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
 	@echo
 
-atom+diatom_coupling_matrix.out: $(DRIVER_DIR)/atom+diatom_coupling_matrix.cc numerov.o libmpi.o math.o pes.o fgh.o liblapack.o $(ESSENTIALS)
+atom+diatom_coupling_matrix.out: $(DRIVER_DIR)/atom+diatom_coupling_matrix.cc numerov.o libmpi.o math.o pes.o fgh.o $(ESSENTIALS)
 	@echo "$<:"
-	$(CC) $(CFLAGS) $< -o $@ numerov.o libmpi.o math.o pes.o fgh.o liblapack.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
+	$(CC) $(CFLAGS) $< -o $@ numerov.o libmpi.o math.o pes.o fgh.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
 	@echo
 
 pes_view.out: $(DRIVER_DIR)/pes_view.cc pes.o math.o $(ESSENTIALS)
@@ -347,14 +342,14 @@ pes_view.out: $(DRIVER_DIR)/pes_view.cc pes.o math.o $(ESSENTIALS)
 	$(CC) $(CFLAGS) $< -o $@ pes.o math.o $(LDFLAGS)
 	@echo
 
-numerov.out: $(DRIVER_DIR)/numerov.cc numerov.o fgh.o liblapack.o libmpi.o math.o $(ESSENTIALS)
+numerov.out: $(DRIVER_DIR)/numerov.cc numerov.o fgh.o libmpi.o math.o $(ESSENTIALS)
 	@echo "$<:"
-	$(CC) $(CFLAGS) $< -o $@ numerov.o fgh.o liblapack.o libmpi.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
+	$(CC) $(CFLAGS) $< -o $@ numerov.o fgh.o libmpi.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
 	@echo
 
-smatrix.out: $(DRIVER_DIR)/smatrix.cc fgh.o numerov.o liblapack.o libmpi.o math.o $(ESSENTIALS)
+smatrix.out: $(DRIVER_DIR)/smatrix.cc fgh.o numerov.o libmpi.o math.o $(ESSENTIALS)
 	@echo "$<:"
-	$(CC) $(CFLAGS) $< -o $@ fgh.o numerov.o liblapack.o libmpi.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
+	$(CC) $(CFLAGS) $< -o $@ fgh.o numerov.o libmpi.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
 	@echo
 
 #
@@ -387,9 +382,9 @@ mpi_tasks.out: $(TEST_DIR)/mpi_tasks.cc libmpi.o $(ESSENTIALS)
 	$(CC) $(CFLAGS) $< -o $@ libmpi.o $(LDFLAGS)
 	@echo
 
-numerov_benchmark.out: $(TEST_DIR)/numerov_benchmark.cc liblapack.o numerov.o pes.o math.o fgh.o $(ESSENTIALS)
+numerov_benchmark.out: $(TEST_DIR)/numerov_benchmark.cc numerov.o pes.o math.o fgh.o $(ESSENTIALS)
 	@echo "$<:"
-	$(CC) $(CFLAGS) $< -o $@ liblapack.o numerov.o pes.o math.o fgh.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
+	$(CC) $(CFLAGS) $< -o $@ numerov.o pes.o math.o fgh.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
 	@echo
 
 #
