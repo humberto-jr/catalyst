@@ -12,6 +12,17 @@
 #include "filename.h"
 #include "key.h"
 
+// NOTE: Older GNU compilers appears to have used an OpenMP version in which constant objects
+// are shared by default and not required in the shared clause, even if default(none) is used.
+// Later versions seem to require. The behavior, however, was not consistent between GNU g++
+// and LLVM clang++. Here, we define the shared list in advance based on the compiler used.
+// Search for "_Pragma(OMP_PARALLEL_LOOP)" to see where this takes place below (only one loop).
+#if defined(USING_GNU_COMPILER) && (__GNUC__ < 9)
+	#define OMP_PARALLEL_LOOP "omp parallel for default(none) shared(lambda, multipole, result) schedule(static) if(use_omp)"
+#else
+	#define OMP_PARALLEL_LOOP "omp parallel for default(none) shared(mass, R, lambda_min, lambda, basis, multipole, result) schedule(static) if(use_omp)"
+#endif
+
 constexpr u8 FORMAT_VERSION = 1;
 
 f64 simpson(const vec<f64> &multipole, const fgh::basis &basis_a, const fgh::basis &basis_b)
@@ -178,7 +189,7 @@ int main(int argc, char *argv[])
 			// NOTE: Assuming that r_min and r_step are the same for all basis functions.
 			pes.legendre_multipole_term(arrang, lambda, basis[0].n_min, basis[0].r_min, basis[0].r_step, R, multipole);
 
-			#pragma omp parallel for default(none) shared(mass, R, lambda_min, lambda, basis, multipole, result) schedule(static) if(use_omp)
+			_Pragma(OMP_PARALLEL_LOOP)
 			for (mut<usize> ch_a = 0; ch_a < result.rows(); ++ch_a) {
 				u32 Ja = basis[ch_a].J;
 				u32 ja = basis[ch_a].j;
