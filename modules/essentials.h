@@ -1,5 +1,18 @@
 #if !defined(ESSENTIALS_HEADER)
 	#define ESSENTIALS_HEADER
+
+	#if defined(__GNUC__) && !defined(__llvm__) && !defined(__INTEL_COMPILER) && !defined(__CUDACC__)
+		#define USING_GNU_COMPILER
+	#elif defined(__llvm__) && !defined(__INTEL_COMPILER) && !defined(__CUDACC__)
+		#define USING_LLVM_COMPILER
+	#elif defined(__INTEL_COMPILER) && !defined(__CUDACC__)
+		#define USING_INTEL_COMPILER
+	#elif defined(__CUDACC__)
+		#define USING_NVIDIA_COMPILER
+	#else
+		#define USING_UNKNOWN_COMPILER
+	#endif
+
 	#include <omp.h>
 	#include "libc.h"
 	#include "types.h"
