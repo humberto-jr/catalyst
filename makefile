@@ -15,11 +15,11 @@ CHECKLIST = check_gsl_dir
 # Default compiler: GNU g++ is the default option when the CC variable is omitted.
 # The Intel icx compiler (previously icpc) uses the same flags as g++, thus the
 # makefile will use the same CFLAGS and LDFLAGS variables. The use of OpenMP is
-# implied. Valid values for CC are: g++, icx, icpc, clang, ibm-clang++ and pgcc.
+# implied. Valid values for CC are: g++, icx, icpc, clang++, ibm-clang++ and pgcc.
 #
 
 CC = g++
-LDFLAGS = -L$(GSL_DIR)/lib -lgsl -lgslcblas -lm
+LDFLAGS = -L$(GSL_DIR)/lib -lgsl -lgslcblas -ldl -lm
 CFLAGS = -std=c++17 -pedantic -Wall -Wconversion -fopenmp -O3 -I$(GSL_DIR)/include
 
 #
@@ -52,11 +52,11 @@ ifeq ($(CC), mpiCC)
 endif
 
 #
-# LLVM clang compiler: The same LDFLAGS of GNU g++ is used and CFLAGS is nearly
+# LLVM clang++ compiler: The same LDFLAGS of GNU g++ is used and CFLAGS is nearly
 # identical.
 #
 
-ifeq ($(CC), clang)
+ifeq ($(CC), clang++)
 	override CFLAGS = -std=c++17 -pedantic-errors -Wall -fopenmp=libomp -O3 -I$(GSL_DIR)/include
 endif
 
