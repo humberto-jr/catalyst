@@ -100,7 +100,9 @@ f64 pes::frontend::value(const char arrang, f64 r, f64 R, f64 theta) const
 
 	f64 th = math::as_rad(theta);
 
-	math::vec3 a, b, c;
+	math::vec3 a;
+	math::vec3 b;
+	math::vec3 c;
 
 	switch (arrang) {
 		case 'a': {
