@@ -1,5 +1,4 @@
 #include "modules/essentials.h"
-#include "modules/liblapack.h"
 #include "modules/numerov.h"
 #include "modules/libmpi.h"
 #include "modules/input.h"
@@ -33,8 +32,6 @@ struct job {
 int main(int argc, char *argv[])
 {
 	mpi::frontend mpi(&argc, &argv);
-
-	lapack::frontend lapack;
 
 	//
 	// Coupling potential:
@@ -140,7 +137,7 @@ int main(int argc, char *argv[])
 			numerov::renormalized(coupling.mass,
 			                      coupling.R_step,
 			                      task[count].tot_energy, pot_energy,
-			                      workspace, old_ratio, task[count].ratio, lapack);
+			                      workspace, old_ratio, task[count].ratio);
 			++count;
 
 			if (m == mpi.last_local_task()) {

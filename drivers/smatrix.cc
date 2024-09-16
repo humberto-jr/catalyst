@@ -20,8 +20,6 @@ struct job {
 
 int main()
 {
-	lapack::frontend lapack;
-
 	//
 	// S-matrix output:
 	//
@@ -92,13 +90,13 @@ int main()
 		                                               solution.R_step,
 		                                               solution.R_max,
 		                                               solution.energy,
-		                                               ratio, basis, k, lapack);
+		                                               ratio, basis, k);
 
 		mat<f64> re_s(open_count, open_count), im_s(open_count, open_count);
 
 		if (open_count > 0) {
 			k.resize(open_count, open_count);
-			numerov::build_scatt_matrix(k, re_s, im_s, lapack);
+			numerov::build_scatt_matrix(k, re_s, im_s);
 		}
 
 		task[n].k.swap(k);

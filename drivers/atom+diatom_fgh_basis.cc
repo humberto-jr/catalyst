@@ -13,8 +13,6 @@ constexpr u32 PLACEHOLDER = 0;
 
 int main()
 {
-	lapack::frontend lapack;
-
 	//
 	// Total angular momentum, J:
 	//
@@ -155,17 +153,10 @@ int main()
 
 		fgh::matrix(mass, r_step, potential, hamiltonian);
 
-		lapack.dsyev(hamiltonian, eigenval);
+		lapack::syev(hamiltonian, eigenval);
 
 		for (mut<u32> v = v_min; v <= v_max; v += v_step) {
-			// NOTE: The MAGMA backend library uses the column-major layout, thus
-			// the FGH eigenvector is a row of the Hamiltonian, and a column otherwise.
-
-			if (lapack::using_magma()) {
-				hamiltonian.row_copy(v, eigenvec);
-			} else {
-				hamiltonian.col_copy(v, eigenvec);
-			}
+			hamiltonian.col_copy(v, eigenvec);
 
 			f64 norm = fgh::norm(r_step, eigenvec);
 
