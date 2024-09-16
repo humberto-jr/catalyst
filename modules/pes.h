@@ -86,5 +86,5 @@
 		//
 
 		f64 olson_smith_pra1971(usize n, usize m, f64 x);
-	};
+	}
 #endif
