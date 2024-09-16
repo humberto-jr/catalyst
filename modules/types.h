@@ -385,7 +385,7 @@
 		}
 
 		if constexpr(is_f128<T>()) {
-			return "%*.18E";
+			return "%*.18Lf";
 		}
 
 		if constexpr(is_cstr<T>()) {
