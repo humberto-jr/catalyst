@@ -237,7 +237,7 @@
 			// NOTE: The matrix A is n-by-n and B is n-by-nrhs in the original LAPACK.
 			// Thus, we ignore the lda and ldb parameters, i.e., lda = ldb = n by default.
 			s32 lda = as_s32(n);
-			s32 ldb = lda;
+			[[maybe_unused]] s32 ldb = lda;
 
 			#if defined(USE_MKL) || defined(USE_LAPACKE)
 				// NOTE:
