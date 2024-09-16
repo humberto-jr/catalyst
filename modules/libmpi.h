@@ -291,7 +291,7 @@
 							continue;
 						}
 
-						print::fmt<LEN> new_content;
+						print::fmt<PAD, LEN> new_content;
 
 						this->receive(rank, new_content);
 
