@@ -346,6 +346,10 @@
 		} else {
 			return "\0";
 		}
+
+		// NOTE: The Intel icpc compiler requires
+		// yet another default return value here.
+		return "\0";
 	}
 
 	template<typename T>
