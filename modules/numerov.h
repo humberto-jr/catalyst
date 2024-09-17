@@ -25,6 +25,11 @@
 			{
 			}
 
+			inline potential(numerov::potential &&other):
+				n_min(other.n_min), R_min(other.R_min), R_max(other.R_max), R_step(other.R_step), mass(other.mass), coupling(other.coupling.move()), input(other.input)
+			{
+			}
+
 			const mat<f64>& operator[](u32 n);
 
 			inline c_str filename() const
@@ -52,6 +57,12 @@
 				mass(mass), R_max(R_max), R_step(R_step), E_min(E_min), E_max(E_max), E_step(E_step), energy(0.0), input(input), ratio(ratio.move())
 			{
 			}
+
+			inline solution(numerov::solution &&other):
+				mass(other.mass), R_max(other.R_max), R_step(other.R_step), E_min(other.E_min), E_max(other.E_max), E_step(other.E_step), energy(0.0), input(other.input), ratio(other.ratio.move())
+			{
+			}
+
 
 			const mat<f64>& operator[](u32 n);
 
