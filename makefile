@@ -276,7 +276,7 @@ PHONY += all modules drivers tools tests
 all: modules drivers
 modules: libmpi.o math.o fgh.o pes.o spline.o numerov.o
 drivers: atom+diatom_fgh_basis.out atom+diatom_coupling_matrix.out numerov.out smatrix.out pes_view.out
-tools: fgh_basis_view.out sphe_harmonics.out
+tools: fgh_basis_view.out sphe_harmonics.out sphe_bessel.out
 tests: mpi_ring.out gemm_timer.out mpi_print.out mpi_tasks.out numerov_benchmark.out
 
 #
@@ -400,6 +400,11 @@ fgh_basis_view.out: $(TOOLS_DIR)/fgh_basis_view.cc fgh.o $(ESSENTIALS)
 	@echo
 
 sphe_harmonics.out: $(TOOLS_DIR)/sphe_harmonics.cc math.o $(ESSENTIALS)
+	@echo "$<:"
+	$(CC) $(CFLAGS) $< -o $@ math.o $(LDFLAGS)
+	@echo
+
+sphe_bessel.out: $(TOOLS_DIR)/sphe_bessel.cc math.o $(ESSENTIALS)
 	@echo "$<:"
 	$(CC) $(CFLAGS) $< -o $@ math.o $(LDFLAGS)
 	@echo
