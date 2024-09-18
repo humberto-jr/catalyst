@@ -12,10 +12,11 @@ LINEAR_ALGEBRA = GSL
 CHECKLIST = check_gsl_dir
 
 #
-# Default compiler: GNU g++ is the default option when the CC variable is omitted.
-# The Intel icx compiler (previously icpc) uses the same flags as g++, thus the
-# makefile will use the same CFLAGS and LDFLAGS variables. The use of OpenMP is
-# implied. Valid values for CC are: g++, icx, icpc, clang++, ibm-clang++ and pgcc.
+# Default compiler: GNU g++ (8.3.0 or higher) is the default option when the CC
+# variable is omitted. The Intel icx compiler (previously icpc) uses the same
+# flags as g++, thus the makefile will use the same CFLAGS and LDFLAGS variables.
+# The use of OpenMP is implied. Valid values for CC are: g++, icx, icpc, clang++,
+# ibm-clang++ and pgc++.
 #
 
 CC = g++
@@ -52,8 +53,7 @@ ifeq ($(CC), mpiCC)
 endif
 
 #
-# LLVM clang++ compiler: The same LDFLAGS of GNU g++ is used and CFLAGS is nearly
-# identical.
+# LLVM clang++ compiler:
 #
 
 ifeq ($(CC), clang++)
@@ -70,11 +70,12 @@ ifeq ($(CC), ibm-clang++)
 endif
 
 #
-# PGI pgcc compiler: The same LDFLAGS of GNU g++ is used.
+# PGI pgc++ compiler:
 #
 
-ifeq ($(CC), pgcc)
-	override CFLAGS = -Xc -mp -O3 -I$(GSL_DIR)/include
+ifeq ($(CC), pgc++)
+	# NOTE: As of Sep. 2024, pgc++ has only partial support for C++17.
+	override CFLAGS = --c++17 -pedantic -Werror -fast -mp=bind -m64 -I$(GSL_DIR)/include
 endif
 
 #
