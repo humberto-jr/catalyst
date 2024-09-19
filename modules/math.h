@@ -37,6 +37,37 @@
 
 		using integrand = f64 (*)(f64 x, void *params);
 
+		class spline {
+			public:
+			spline(vec<f64> &x, vec<f64> &f);
+
+			spline(spline &&other);
+
+			const vec<f64>& abscissa();
+
+			const vec<f64>& ordinate();
+
+			void use_akima();
+
+			void use_cspline();
+
+			void use_steffen();
+
+			f64 operator()(f64 x) const;
+
+			f64 derivative(f64 x, u8 order = 1) const;
+
+			f64 integral(f64 a, f64 b) const;
+
+			~spline();
+
+			private:
+			vec<f64> x;
+			vec<f64> f;
+			void *data;
+			void *state;
+		};
+
 		template<typename T = mut<f64>>
 		struct vec3 {
 			T x, y, z;
@@ -151,7 +182,7 @@
 
 		f64 simpson(f64 step, vec<f64> &integrand);
 
-		f64 gauss_legendre(f64 a, f64 b, u8 order, void *params, integrand f);
+		f64 gauss_legendre(f64 a, f64 b, u8 order, void *params, math::integrand f);
 
 		static constexpr f64 factorial(u8 n)
 		{
