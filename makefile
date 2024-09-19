@@ -409,6 +409,26 @@ percival_seaton_coeff.out: $(TOOLS_DIR)/percival_seaton_coeff.cc math.o $(ESSENT
 	$(CC) $(CFLAGS) $< -o $@ math.o $(LDFLAGS)
 	@echo
 
+wigner_3j.out: $(TOOLS_DIR)/wigner_3j.cc math.o $(ESSENTIALS)
+	@echo "$<:"
+	$(CC) $(CFLAGS) $< -o $@ math.o $(LDFLAGS)
+	@echo
+
+wigner_6j.out: $(TOOLS_DIR)/wigner_6j.cc math.o $(ESSENTIALS)
+	@echo "$<:"
+	$(CC) $(CFLAGS) $< -o $@ math.o $(LDFLAGS)
+	@echo
+
+wigner_9j.out: $(TOOLS_DIR)/wigner_9j.cc math.o $(ESSENTIALS)
+	@echo "$<:"
+	$(CC) $(CFLAGS) $< -o $@ math.o $(LDFLAGS)
+	@echo
+
+legendre_poly.out: $(TOOLS_DIR)/legendre_poly.cc math.o $(ESSENTIALS)
+	@echo "$<:"
+	$(CC) $(CFLAGS) $< -o $@ math.o $(LDFLAGS)
+	@echo
+
 #
 # Rules to build and install external libraries:
 #
