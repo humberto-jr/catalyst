@@ -23,6 +23,8 @@ int main(int argc, char *argv[])
 	// Output:
 	//
 
+	// For details see:
+	// I. C. Percival and M. J. Seaton. Math. Proc. Camb. Philos. Soc. 53, 3, 654-662 (1975)
 	print::line<PAD>(J, ja, jb, la, lb, lambda, ' ', f);
 
 	return EXIT_SUCCESS;
