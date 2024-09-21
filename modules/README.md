@@ -28,7 +28,7 @@ A collection of lightweight modules that wraps the boilerplate code required for
 
 **input.h**: Provides the `input` namespace and the basic `input::keyword()` and `input::argument_line()` functions for the search of keywords/values in the `std::cin` and of flags/values in the `argv` list of input parameters, respectively.
 
-**math.h**: Provides the `math` namespace and various routines and types to handle special math functions, constants, quadratures, etc. It serves mostly as a frontend for [GSL](https://www.gnu.org/software/gsl/).
+**math.h**: Provides the `math` namespace and various routines and types to handle special math functions, constants, quadratures, interpolation etc. It serves mostly as a frontend for [GSL](https://www.gnu.org/software/gsl/).
 
 **file.h**: Provides the `file` namespace, some helper functions, and the main types `file::input` and `file::output` for simplified reading and writing to disk files, respectively.
 
@@ -40,4 +40,10 @@ A collection of lightweight modules that wraps the boilerplate code required for
 
 **fgh.h**: Provides the `fgh` namespace, various helper functions and types, and the main function `fgh::matrix()` to build single and multichannel matrix representations of the [Fourier grid Hamiltonian](https://doi.org/10.1063/1.456888) (FGH) method.
 
-**libblas.h**: Provides the `blas` namespace and a simpler, unified API to call functions of the legacy BLAS library from different implementors. Typical examples of backends are the [Intel Math Kernel Library](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html#gs.fg2j5m) (MKL) and [LAPACK](https://www.netlib.org/lapack/). The default case is the CBLAS version distributed alongside [GSL](https://www.gnu.org/software/gsl/). This module only regards host-side implementations of BLAS and a GPU-based version is provided in a separate module.
+**libblas.h**: Provides the `blas` namespace and a simpler, unified API to call functions of the legacy BLAS library from different implementors. Typical examples of backends are the [Intel Math Kernel Library](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html#gs.fg2j5m) (MKL) and [LAPACK](https://www.netlib.org/lapack/). The default case is the CBLAS version distributed alongside [GSL](https://www.gnu.org/software/gsl/). This module only regards host-side implementations of BLAS and a GPU-based version is provided in a separate module (see below).
+
+**liblapack.h**: Provides the `lapack` namespace, and serves the same purpose as the `libblas.h` module but for the legacy [LAPACK](https://www.netlib.org/lapack/) library. If no backend library is used, then a partial LAPACK API is emulated using the GSL linear algebra module.
+
+**libcuda.h**: Provides the `cuda` and `cuda::blas` namespaces alongside safe wrappers over the [CUDA](https://developer.nvidia.com/cuda-zone#) API. In particular, it defines the array-like type `dev<T>` which handles dynamically allocated buffers of type `T` in device memory and the `cuda::blas::frontend` type to manage BLAS functions executing on GPUs, using the [cuBLAS](https://developer.nvidia.com/cublas) backend library.
+
+**numerov.h**: Provides the `numerov` namespace and implements various algorithms based on the [renormalized Numerov method](http://dx.doi.org/10.1063/1.436421) to integrate single and multichannel Schrodinger equations, and to compute closely related quantities such as a reactance matrix, scattering matrix, and evaluation of bound states.
