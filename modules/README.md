@@ -14,7 +14,7 @@ A collection of lightweight modules that wraps the boilerplate code required for
 
 **vector.h**: Defines `vec<T>`, an overly simple and lightweight dynamically allocated vector of type `T`.
 
-**string.h**: Defines the primitive type `string` for dynamically allocated strings, in addition to various text formatting and management functions.
+**string.h**: Defines the primitive type `string` for dynamically allocated strings, in addition to various text formatting and management member functions.
 
 **matrix.h**: Defines `mat<T>`, a lightweight matrix abstraction built on top of `vec<T>`. This module does not include linear algebra operations just yet.
 
@@ -34,9 +34,9 @@ A collection of lightweight modules that wraps the boilerplate code required for
 
 **timer.h**: Defines the array-like type `timer<N>` to measure and store up to `N` elapsed time values between each consecutive calls of the member functions `timer::start()` and `timer::stop()`. In addition, it provides various helper member functions.
 
-**lib.h**: Defines the `lib` type for loading shared libraries (*.so) at runtime. Once instantiated, function pointers of type `T`, pointing to symbols from those libraries, can be retrieved using the `lib::find_symbol<T>()` member function.
+**lib.h**: Defines the `lib` type for loading shared libraries (`*.so`) at runtime. Once instantiated, function pointers of type `T`, pointing to symbols from those libraries, can be retrieved using the `lib::find_symbol<T>()` member function.
 
-**pes.h**: Provides the `pes` namespace and the `pes::frontend` type, which serves as a C++ abstraction over the user-defined potential energy surface (PES) routine. The user must implement the `void pes_startup()`, `f64 pes_value(f64 x[])`, and `void pes_shutdown()` functions, using whichever programming language is most convenient, and build them as a shared library, *.so. Then, the filename of the library can be used to instantiate an object of type `pes::frontend`. For a given set of internuclear distances in atomic units (Bohr), say `x`, the PES value must be returned also in atomic units (Hartree). The module provides various helper member functions to manipulate the PES. Since PESs are traditionally implemented using the Fortran programming language, a [Fortran 90 wrapper](../templates/pes_wrapper.f90) for the used-defined routine is provided in the `catalyst/templates` directory.
+**pes.h**: Provides the `pes` namespace and the `pes::frontend` type, which serves as a C++ abstraction over the user-defined potential energy surface (PES) routine. The user must implement the `void pes_startup()`, `f64 pes_value(f64 x[])`, and `void pes_shutdown()` functions, using whichever programming language is most convenient, and build them as a shared library, `*.so`. Then, the filename of the library can be used to instantiate an object of type `pes::frontend`. For a given set of internuclear distances in atomic units (Bohr), say `x`, the PES value must be returned also in atomic units (Hartree). The `pes::frontend` provides various helper member functions to manipulate the PES. Since PESs are traditionally implemented using the Fortran programming language, a [Fortran 90 wrapper](../templates/pes_wrapper.f90) for the used-defined routine is provided in the `catalyst/templates` directory.
 
 **fgh.h**: Provides the `fgh` namespace, various helper functions and types, and the main function `fgh::matrix()` to build single and multichannel matrix representations of the [Fourier grid Hamiltonian](https://doi.org/10.1063/1.456888) (FGH) method.
 
@@ -46,4 +46,4 @@ A collection of lightweight modules that wraps the boilerplate code required for
 
 **libcuda.h**: Provides the `cuda` and `cuda::blas` namespaces alongside safe wrappers over the [CUDA](https://developer.nvidia.com/cuda-zone#) API. In particular, it defines the array-like type `dev<T>` which handles dynamically allocated buffers of type `T` in device memory and the `cuda::blas::frontend` type to manage BLAS functions executing on GPUs, using the [cuBLAS](https://developer.nvidia.com/cublas) backend library.
 
-**numerov.h**: Provides the `numerov` namespace and implements various algorithms based on the [renormalized Numerov method](http://dx.doi.org/10.1063/1.436421) to integrate single and multichannel Schrodinger equations, and to compute closely related quantities such as a reactance matrix, scattering matrix, and evaluation of bound states.
+**numerov.h**: Provides the `numerov` namespace and implements various algorithms and types based on the [renormalized Numerov method](http://dx.doi.org/10.1063/1.436421) to integrate single and multichannel Schrodinger equations, and to compute closely related quantities such as reactance matrix, scattering matrix, and evaluation of bound states.
