@@ -407,6 +407,26 @@
 		return "";
 	}
 
+	template<typename T>
+	static inline void type_zeroed(T *object, usize count = 1u)
+	{
+		std::memset(as_void(object), 0, sizeof(T)*count);
+	}
+
+	template<typename T>
+	static inline void type_zeroed(T &object)
+	{
+		type_zeroed(&object, 1u);
+	}
+
+	template<typename T>
+	static inline T type_zeroed()
+	{
+		T object;
+		type_zeroed(&object, 1u);
+		return object;
+	}
+
 	//
 	// Limits:
 	//
