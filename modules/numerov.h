@@ -63,11 +63,53 @@
 			{
 			}
 
-
 			const mat<f64>& operator[](u32 n);
 
 			private:
 			mat<f64> ratio;
+		};
+
+		struct smatrix_entry {
+			mut<usize> size;
+			mut<u32> channel_count;
+
+			mut<f64> mass;
+
+			mut<u32> j_in;
+			mut<u32> v_in;
+			mut<u32> J_in;
+			mut<u32> l_in;
+			mut<s32> p_in;
+			mut<u32> comp_in;
+			mut<f64> eigenval_in;
+
+			mut<u32> j_out;
+			mut<u32> v_out;
+			mut<u32> J_out;
+			mut<u32> l_out;
+			mut<s32> p_out;
+			mut<u32> comp_out;
+			mut<f64> eigenval_out;
+
+			vec<f64> total_energy;
+			vec<c64> value;
+		};
+
+		class smatrix {
+			public:
+			smatrix(c_str filename, u8 fmt_ver = 3);
+
+			c_str filename() const;
+
+			u32 channel_count() const;
+
+			u32 energy_count() const;
+
+			const smatrix_entry* operator()(u32 channel_a, u32 channel_b);
+
+			private:
+			file::input input;
+			smatrix_entry entry;
 		};
 
 		numerov::basis open_basis_file(const string &filename);

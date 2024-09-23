@@ -3,6 +3,36 @@
 #include "libblas.h"
 #include "math.h"
 
+#define CHECK_FILE_END(input)                                                                \
+{                                                                                            \
+  if ((input).end()) {                                                                       \
+    print::error(WHERE, "Unexpected end of file when reading ", (input).filename.as_cstr()); \
+  }                                                                                          \
+}
+
+#define CHECK_FILE_HEADER(input, fmt_ver)                                                            \
+{                                                                                                    \
+  mut<decltype(numerov::MAGIC_NUMBER)> tag = -1;                                                     \
+                                                                                                     \
+  (input).read(tag);                                                                                 \
+                                                                                                     \
+  CHECK_FILE_END(input)                                                                              \
+                                                                                                     \
+  if (tag != numerov::MAGIC_NUMBER) {                                                                \
+    print::error(WHERE, (input).filename.as_cstr(), " is not a Numerov file");                       \
+  }                                                                                                  \
+                                                                                                     \
+  mut<decltype(numerov::FORMAT_VERSION)> ver = -1;                                                   \
+                                                                                                     \
+  (input).read(ver);                                                                                 \
+                                                                                                     \
+  CHECK_FILE_END(input)                                                                              \
+                                                                                                     \
+  if ((ver != (fmt_ver)) || (ver > numerov::FORMAT_VERSION)) {                                       \
+    print::error(WHERE, (input).filename.as_cstr(), " does not have a valid format version: ", ver); \
+  }                                                                                                  \
+}
+
 static constexpr usize FILE_HEADER_OFFSET
 	= 2*sizeof(u32) + sizeof(u8) + 4*sizeof(f64) + sizeof(usize);
 
