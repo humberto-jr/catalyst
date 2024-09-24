@@ -429,6 +429,11 @@ legendre_poly.out: $(TOOLS_DIR)/legendre_poly.cc math.o $(ESSENTIALS)
 	$(CC) $(CFLAGS) $< -o $@ math.o $(LDFLAGS)
 	@echo
 
+smatrix_view.out: $(TOOLS_DIR)/smatrix_view.cc fgh.o numerov.o math.o $(ESSENTIALS)
+	@echo "$<:"
+	$(CC) $(CFLAGS) $< -o $@ fgh.o numerov.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
+	@echo
+
 #
 # Rules to build and install external libraries:
 #
