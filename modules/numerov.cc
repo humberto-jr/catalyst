@@ -19,7 +19,7 @@
   CHECK_FILE_END(input)                                                                              \
                                                                                                      \
   if (tag != numerov::MAGIC_NUMBER) {                                                                \
-    print::error(WHERE, (input).filename.as_cstr(), " is not a Numerov file");                       \
+    print::error(WHERE, (input).filename.as_cstr(), " is not a Numerov file (tag = ", tag, ')');     \
   }                                                                                                  \
                                                                                                      \
   mut<decltype(numerov::FORMAT_VERSION)> ver = -1;                                                   \
@@ -193,6 +193,119 @@ const mat<f64>& numerov::solution::operator[](u32 n)
 
 	return this->ratio;
 }
+
+//
+// numerov::smatrix:
+//
+
+static constexpr usize SMATRIX_HEADER_OFFSET
+	= sizeof(numerov::FORMAT_VERSION) + sizeof(numerov::MAGIC_NUMBER) + 2*sizeof(u32) + sizeof(f64);
+
+numerov::smatrix::smatrix(c_str filename, u8 fmt_ver):
+	input(filename), entry(type_zeroed<numerov::smatrix_entry>())
+{
+	CHECK_FILE_HEADER(this->input, fmt_ver);
+
+	this->input.read(this->entry.channel_count);
+
+	mut<u32> energy_count = 0;
+	this->input.read(energy_count);
+
+	this->input.read(this->entry.mass);
+
+	CHECK_FILE_END(this->input)
+
+	this->entry.total_energy.resize(energy_count);
+	this->entry.value.resize(energy_count);
+
+	// NOTE: For every pair of channels, ab, there must be this number of bytes
+	// written in the input file. That is, the size of a numerov::smatrix_entry
+	// object (without the 'size' and 'channel_count' members) plus three extra
+	// integers stored for internal checks (channels and energy indices, all u32).
+	this->entry.size = 12*sizeof(u32) + 2*sizeof(s32) + 2*sizeof(f64) + energy_count*(sizeof(u32) + 3*sizeof(f64));
+}
+
+c_str numerov::smatrix::filename() const
+{
+	return this->input.filename.as_cstr();
+}
+
+f64 numerov::smatrix::reduced_mass() const
+{
+	return this->entry.mass;
+}
+
+u32 numerov::smatrix::channel_count() const
+{
+	return this->entry.channel_count;
+}
+
+u32 numerov::smatrix::energy_count() const
+{
+	return as_u32(this->entry.value.length());
+}
+
+const numerov::smatrix_entry* numerov::smatrix::operator()(u32 channel_a, u32 channel_b)
+{
+	CHECK_FILE_END(this->input)
+
+	// NOTE: Using a row-major layout, where each element is this->entry.size bytes long.
+	usize stride = (channel_a*this->entry.channel_count + channel_b)*this->entry.size;
+
+	this->input.seek_set(SMATRIX_HEADER_OFFSET + stride);
+
+	mut<u32> saved_a = u32_max;
+	this->input.read(saved_a);
+
+	mut<u32> saved_b = u32_max;
+	this->input.read(saved_b);
+
+	CHECK_FILE_END(this->input)
+
+	assert(saved_a == channel_a);
+	assert(saved_b == channel_b);
+
+	this->input.read(this->entry.j_in);
+	this->input.read(this->entry.v_in);
+	this->input.read(this->entry.J_in);
+	this->input.read(this->entry.l_in);
+	this->input.read(this->entry.p_in);
+	this->input.read(this->entry.comp_in);
+	this->input.read(this->entry.eigenval_in);
+
+	this->input.read(this->entry.j_out);
+	this->input.read(this->entry.v_out);
+	this->input.read(this->entry.J_out);
+	this->input.read(this->entry.l_out);
+	this->input.read(this->entry.p_out);
+	this->input.read(this->entry.comp_out);
+	this->input.read(this->entry.eigenval_out);
+
+	for (mut<u32> n = 0; n < this->entry.value.length(); ++n) {
+		mut<u32> saved_n = u32_max;
+		this->input.read(saved_n);
+
+		CHECK_FILE_END(this->input)
+
+		assert(saved_n == n);
+
+		this->input.read(this->entry.total_energy[n]);
+
+		mut<f64> re_s = 0.0;
+		this->input.read(re_s);
+
+		mut<f64> im_s = 0.0;
+		this->input.read(im_s);
+
+		this->entry.value[n] = c64(re_s, im_s);
+	}
+
+	return &this->entry;
+}
+
+//
+// Public API:
+//
 
 void numerov::renormalized(f64 mass,
                            f64 step,
