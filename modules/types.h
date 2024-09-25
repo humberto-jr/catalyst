@@ -116,16 +116,31 @@
 		return static_cast<f32>(x);
 	}
 
+	static inline f32 as_f32(c_str x)
+	{
+		return std::strtof(x, nullptr);
+	}
+
 	template<typename T>
 	static constexpr f64 as_f64(const T x)
 	{
 		return static_cast<f64>(x);
 	}
 
+	static inline f64 as_f64(c_str x)
+	{
+		return std::strtod(x, nullptr);
+	}
+
 	template<typename T>
 	static constexpr f128 as_f128(const T x)
 	{
 		return static_cast<f128>(x);
+	}
+
+	static inline f128 as_f128(c_str x)
+	{
+		return std::strtold(x, nullptr);
 	}
 
 	template<typename T>
