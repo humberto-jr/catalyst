@@ -154,7 +154,10 @@ int main()
 				smatrix.write(n);
 				smatrix.write(task[n].total_energy);
 
-				if ((total_energy < eigenval_a) || (total_energy < eigenval_b)) {
+				if ((total_energy > eigenval_a) && (total_energy > eigenval_b)) {
+					smatrix.write(task[n].re_s(channel_a, channel_b));
+					smatrix.write(task[n].im_s(channel_a, channel_b));
+				} else {
 					smatrix.write(0.0);
 					smatrix.write(0.0);
 					continue;
