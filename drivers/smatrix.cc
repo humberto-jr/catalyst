@@ -163,9 +163,6 @@ int main()
 					continue;
 				}
 
-				smatrix.write(task[n].re_s(channel_a, channel_b));
-				smatrix.write(task[n].im_s(channel_a, channel_b));
-
 				if (was_closed) {
 					print::line("# (",
 					            "Ch. = ", channel_a,
