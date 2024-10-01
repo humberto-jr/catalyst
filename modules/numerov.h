@@ -136,6 +136,9 @@
 		void build_scatt_matrix(const mat<f64> &k,
 		                        mat<f64> &re_s, mat<f64> &im_s);
 
+		void build_scatt_amplitude(const smatrix_entry &s,
+		                           s32 m_in, s32 m_out, f64 theta, f64 phi, vec<c64> &f);
+
 		inline static f64 centrifugal_term(f64 l, f64 mass, f64 x)
 		{
 			return l*(l + 1.0)/(2.0*mass*x*x);

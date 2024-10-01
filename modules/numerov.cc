@@ -529,3 +529,47 @@ void numerov::build_scatt_matrix(const mat<f64> &k,
 
 	blas::gemm<f64>('n', 'n', k, im_s, re_s, 1.0, -1.0);
 }
+
+void numerov::build_scatt_amplitude(const numerov::smatrix_entry &s,
+                                    s32 m_in, s32 m_out, f64 theta, f64 phi, vec<c64> &f)
+{
+	// NOTE: This routine computes the energy-dependent scatt. amplitude f as a
+	// function of the scatt. angles (theta, phi) for a given S-matrix element
+	// and projection, m (m'), of the rot. angular momentum state j (j'). For
+	// details, see Eq. (19) and (20) of R. T. Pack. J. Chem. Phys. 60, 633–639
+	// (1974). The results per energy are added to the current values of f.
+
+	assert(s.J_in == s.J_out);
+
+	assert(m_in >= -as_s32(s.j_in));
+	assert(m_in <=  as_s32(s.j_in));
+
+	assert(m_out >= -as_s32(s.j_out));
+	assert(m_out <=  as_s32(s.j_out));
+
+	assert(s.value.length() == f.length());
+
+	f64 l_mult = as_f64(2*s.l_in + 1);
+
+	c64 i_pow = std::pow(math::IMAGINARY_UNIT, s.l_in - s.l_out + 1);
+
+	c64 y = math::sphe_harmonics(s.l_out, m_in - m_out, theta, phi);
+
+	f64 c_in = math::clebsch_gordan_coeff(s.j_in, s.l_in, s.J_in, m_in, 0, m_in);
+
+	f64 c_out = math::clebsch_gordan_coeff(s.j_out, s.l_out, s.J_in, m_out, m_in - m_out, m_in);
+
+	f64 I = ((s.v_in == s.v_out) && (s.j_in == s.j_out) && (s.l_in == s.l_out)? 1.0 : 0.0);
+
+	for (mut<u32> n = 0; n < f.length(); ++n) {
+		if ((s.total_energy[n] > s.eigenval_in) && (s.total_energy[n] > s.eigenval_out)) {
+			f64 wavenum_in = std::sqrt(2.0*s.mass*(s.total_energy[n] - s.eigenval_in));
+
+			f64 wavenum_out = std::sqrt(2.0*s.mass*(s.total_energy[n] - s.eigenval_out));
+
+			f64 fact = std::sqrt(math::PI*l_mult/(wavenum_in*wavenum_out));
+
+			f[n] += fact*i_pow*c_in*c_out*y*(I - s.value[n]);
+		}
+	}
+}
