@@ -304,6 +304,75 @@ const numerov::smatrix_entry* numerov::smatrix::operator()(u32 channel_a, u32 ch
 }
 
 //
+// numerov::scatt_amplitude:
+//
+
+numerov::scatt_amplitude::scatt_amplitude(u32 j_in, u32 j_out, u32 theta_count, u32 energy_count):
+	entry((2*j_in + 1)*(2*j_out + 1))
+{
+	mut<u32> mm_index = 0;
+
+	for (mut<s32> m_in = -as_s32(j_in); m_in <= as_s32(j_in); ++m_in) {
+		for (mut<s32> m_out = -as_s32(j_out); m_out <= as_s32(j_out); ++m_out) {
+			vec<vec<c64>> theta_list(theta_count);
+
+			this->entry[mm_index].m_in = m_in;
+			this->entry[mm_index].m_out = m_out;
+			this->entry[mm_index].value.swap(theta_list);
+
+			for (mut<u32> theta_index = 0; theta_index < theta_count; ++theta_index) {
+				vec<c64> energy_list(energy_count);
+
+				this->entry[mm_index].value[theta_index].swap(energy_list);
+			}
+
+			mm_index += 1;
+		}
+	}
+}
+
+u32 numerov::scatt_amplitude::mm_count() const
+{
+	return as_u32(this->entry.length());
+}
+
+u32 numerov::scatt_amplitude::theta_count() const
+{
+	return as_u32(this->entry[0].value.length());
+}
+
+u32 numerov::scatt_amplitude::energy_count() const
+{
+	return as_u32(this->entry[0].value[0].length());
+}
+
+c64 numerov::scatt_amplitude::mm_sum(u32 theta_index, u32 energy_index) const
+{
+	mut<c64> sum = c64(0.0, 0.0);
+
+	for (mut<u32> mm_index = 0; mm_index < this->mm_count(); ++mm_index) {
+		sum += this->entry[mm_index].value[theta_index][energy_index];
+	}
+
+	return sum;
+}
+
+numerov::scatt_amplitude_entry& numerov::scatt_amplitude::operator()(u32 mm_index) const
+{
+	return this->entry[mm_index];
+}
+
+vec<c64>& numerov::scatt_amplitude::operator()(u32 mm_index, u32 theta_index) const
+{
+	return this->entry[mm_index].value[theta_index];
+}
+
+c64& numerov::scatt_amplitude::operator()(u32 mm_index, u32 theta_index, u32 energy_index) const
+{
+	return this->entry[mm_index].value[theta_index][energy_index];
+}
+
+//
 // Public API:
 //
 

@@ -112,6 +112,34 @@
 			smatrix_entry entry;
 		};
 
+		struct scatt_amplitude_entry {
+			mut<s32> m_in;
+			mut<s32> m_out;
+			vec<vec<c64>> value;
+		};
+
+		class scatt_amplitude {
+			public:
+			scatt_amplitude(u32 j_in, u32 j_out, u32 theta_count, u32 energy_count);
+
+			u32 mm_count() const;
+
+			u32 theta_count() const;
+
+			u32 energy_count() const;
+
+			c64 mm_sum(u32 theta_index, u32 energy_index) const;
+
+			scatt_amplitude_entry& operator()(u32 mm_index) const;
+
+			vec<c64>& operator()(u32 mm_index, u32 theta_index) const;
+
+			c64& operator()(u32 mm_index, u32 theta_index, u32 energy_index) const;
+
+			private:
+			vec<scatt_amplitude_entry> entry;
+		};
+
 		numerov::basis open_basis_file(const string &filename);
 
 		numerov::potential open(string &filename, u8 fmt_ver = 1);
