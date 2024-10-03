@@ -327,8 +327,11 @@ f64 math::gaunt_coeff(s32 q, s32 ja, s32 jb, s32 lambda)
 // Quadratures:
 //
 
-f64 math::simpson(f64 step, vec<f64> &integrand)
+template<typename T>
+static T simpson_driver(const T step, const vec<T> &integrand)
 {
+	constexpr T fact = static_cast<T>(3.0/8.0);
+
 	mut<usize> n_max = integrand.length() - 1;
 
 	while (n_max%3 != 0) {
@@ -337,15 +340,47 @@ f64 math::simpson(f64 step, vec<f64> &integrand)
 
 	assert(n_max > 2);
 
-	mut<f64> sum = integrand[0];
+	mut<T> sum = integrand[0];
 
 	for (mut<usize> n = 1; n < (n_max - 3); n += 3) {
-		sum += 3.0*integrand[n] + 3.0*integrand[n + 1] + 2.0*integrand[n + 2];
+		sum += static_cast<T>(3.0)*integrand[n + 0]
+		     + static_cast<T>(3.0)*integrand[n + 1]
+		     + static_cast<T>(2.0)*integrand[n + 2];
 	}
 
-	sum += 3.0*integrand[n_max - 1] + integrand[n_max];
+	sum += static_cast<T>(3.0)*integrand[n_max - 1] + integrand[n_max];
 
-	return 3.0*step*sum/8.0;
+	return fact*step*sum;
+}
+
+f32 math::simpson(f32 step, const vec<f32> &integrand)
+{
+	return simpson_driver<f32>(step, integrand);
+}
+
+f64 math::simpson(f64 step, const vec<f64> &integrand)
+{
+	return simpson_driver<f64>(step, integrand);
+}
+
+f128 math::simpson(f128 step, const vec<f128> &integrand)
+{
+	return simpson_driver<f128>(step, integrand);
+}
+
+c32 math::simpson(c32 step, const vec<c32> &integrand)
+{
+	return simpson_driver<c32>(step, integrand);
+}
+
+c64 math::simpson(c64 step, const vec<c64> &integrand)
+{
+	return simpson_driver<c64>(step, integrand);
+}
+
+c128 math::simpson(c128 step, const vec<c128> &integrand)
+{
+	return simpson_driver<c128>(step, integrand);
 }
 
 static constexpr f128 gauss_legendre_weight_2nd[] = {

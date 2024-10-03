@@ -180,7 +180,17 @@
 
 		f64 gaunt_coeff(s32 q, s32 ja, s32 jb, s32 lambda);
 
-		f64 simpson(f64 step, vec<f64> &integrand);
+		f32 simpson(f32 step, const vec<f32> &integrand);
+
+		f64 simpson(f64 step, const vec<f64> &integrand);
+
+		f128 simpson(f128 step, const vec<f128> &integrand);
+
+		c32 simpson(c32 step, const vec<c32> &integrand);
+
+		c64 simpson(c64 step, const vec<c64> &integrand);
+
+		c128 simpson(c128 step, const vec<c128> &integrand);
 
 		f64 gauss_legendre(f64 a, f64 b, u8 order, void *params, math::integrand f);
 
