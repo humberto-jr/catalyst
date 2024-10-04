@@ -642,3 +642,60 @@ void numerov::build_scatt_amplitude(const numerov::smatrix_entry &s,
 		}
 	}
 }
+
+void numerov::build_cross_section(const numerov::scatt_amplitude &f, u32 j_in,
+                                  const vec<f64> &wavenum_in, const vec<f64> &wavenum_out,
+                                  mat<c64> &f_sum, mat<f64> &dif_sigma, vec<f64> &int_sigma)
+{
+	// NOTE: This routine computes the differential and integral cross-sections,
+	// sigma, from a given scatt. amplitude, f, and the incoming and outgoing
+	// wavenumbers. For details, see Eq. (21) and (22) of R. T. Pack. J. Chem.
+	// Phys. 60, 633–639 (1974).
+
+	constexpr f64 THETA_MIN = 0.0;
+	constexpr f64 THETA_MAX = math::PI;
+
+	// NOTE: Assuming there are N+1 theta points, which includes both 0 and 180
+	// degrees (pi). The theta step size, however, only depends on N.
+	u32 theta_count = f.theta_count() - 1u;
+
+	u32 energy_count = f.energy_count();
+
+	assert((theta_count + 1u) == f_sum.rows());
+
+	assert(energy_count == f_sum.cols());
+
+	assert(f_sum.rows() == dif_sigma.rows());
+
+	assert(f_sum.cols() == dif_sigma.cols());
+
+	assert(f_sum.cols() == int_sigma.length());
+
+	f64 j_mult = as_f64(2*j_in + 1);
+
+	vec<f64> integrand(theta_count + 1u);
+
+	f64 theta_step = (THETA_MAX - THETA_MIN)/as_f64(theta_count);
+
+	for (mut<u32> energy_index = 0; energy_index < energy_count; ++energy_index) {
+
+		f64 fact = wavenum_out[energy_index]/(j_mult*wavenum_in[energy_index]);
+
+		for (mut<u32> theta_index = 0; theta_index <= theta_count; ++theta_index) {
+			f64 theta = THETA_MIN + as_f64(theta_index)*theta_step;
+
+			f_sum(theta_index, energy_index) = f.mm_sum(theta_index, energy_index);
+
+			c64 fxf = f_sum(theta_index, energy_index)*f_sum(theta_index, energy_index);
+
+			// Eq. (21)
+			dif_sigma(theta_index, energy_index) = fact*std::abs(fxf);
+
+			// Eq. (22)
+			integrand[theta_index] = std::sin(theta)*dif_sigma(theta_index, energy_index);
+		}
+
+		// NOTE: The result of Eq. (22), where 2pi is the value of the integral over phi.
+		int_sigma[energy_index] = 2.0*math::PI*math::simpson(theta_step, integrand);
+	}
+}

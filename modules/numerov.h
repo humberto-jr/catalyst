@@ -167,6 +167,10 @@
 		void build_scatt_amplitude(const smatrix_entry &s,
 		                           s32 m_in, s32 m_out, f64 theta, f64 phi, vec<c64> &f);
 
+		void build_cross_section(const numerov::scatt_amplitude &f, u32 j_in,
+		                         const vec<f64> &wavenum_in, const vec<f64> &wavenum_out,
+		                         mat<c64> &f_sum, mat<f64> &dif_sigma, vec<f64> &int_sigma);
+
 		inline static f64 centrifugal_term(f64 l, f64 mass, f64 x)
 		{
 			return l*(l + 1.0)/(2.0*mass*x*x);
