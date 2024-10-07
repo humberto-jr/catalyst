@@ -622,11 +622,19 @@ void numerov::build_scatt_amplitude(const numerov::smatrix_entry &s,
 
 	c64 i_pow = std::pow(math::IMAGINARY_UNIT, s.l_in - s.l_out + 1);
 
-	c64 y = math::sphe_harmonics(s.l_out, m_in - m_out, theta, phi);
-
 	f64 c_in = math::clebsch_gordan_coeff(s.j_in, s.l_in, s.J_in, m_in, 0, m_in);
 
 	f64 c_out = math::clebsch_gordan_coeff(s.j_out, s.l_out, s.J_in, m_out, m_in - m_out, m_in);
+
+	if ((c_in == 0.0) || (c_out == 0.0)) {
+		return;
+	}
+
+	c64 y = math::sphe_harmonics(s.l_out, m_in - m_out, theta, phi);
+
+	if (y == c64(0.0, 0.0)) {
+		return;
+	}
 
 	f64 I = ((s.v_in == s.v_out) && (s.j_in == s.j_out) && (s.l_in == s.l_out)? 1.0 : 0.0);
 
