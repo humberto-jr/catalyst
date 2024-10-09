@@ -508,9 +508,15 @@
 			return (this->min == rhs.min) && (this->max == rhs.max) && (this->step == rhs.step);
 		}
 
-		constexpr T count() const
+		usize count() const
 		{
-			return ((this->max - this->min) + static_cast<T>(1))/this->step;
+			T count = (this->max - this->min)/this->step;
+
+			if constexpr(is_floating_point<T>()) {
+				return as_usize(count) + 1u;
+			} else {
+				return (this->is_divided_evenly()? as_usize(count) : as_usize(count) + 1u);
+			}
 		}
 	};
 #endif
