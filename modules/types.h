@@ -503,11 +503,6 @@
 			return std::remainder(this->max - this->min, this->step) == static_cast<T>(0);
 		}
 
-		constexpr bool operator==(const range<T> &rhs)
-		{
-			return (this->min == rhs.min) && (this->max == rhs.max) && (this->step == rhs.step);
-		}
-
 		usize count() const
 		{
 			T count = (this->max - this->min)/this->step;
@@ -517,6 +512,16 @@
 			} else {
 				return (this->is_divided_evenly()? as_usize(count) : as_usize(count) + 1u);
 			}
+		}
+
+		constexpr bool operator==(const range<T> &rhs) const
+		{
+			return (this->min == rhs.min) && (this->max == rhs.max) && (this->step == rhs.step);
+		}
+
+		constexpr T operator[](usize n) const
+		{
+			return this->min + static_cast<T>(n)*this->step;
 		}
 	};
 #endif
