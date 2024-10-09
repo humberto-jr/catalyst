@@ -497,6 +497,12 @@
 		{
 		}
 
+		inline bool is_divided_evenly() const
+		{
+			// NOTE: As of C++17, std::remainder() is not a constexpr function.
+			return std::remainder(this->max - this->min, this->step) == static_cast<T>(0);
+		}
+
 		constexpr bool operator==(const range<T> &rhs)
 		{
 			return (this->min == rhs.min) && (this->max == rhs.max) && (this->step == rhs.step);
