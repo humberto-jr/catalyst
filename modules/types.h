@@ -308,6 +308,36 @@
 	}
 
 	template<typename T>
+	static constexpr bool is_integer()
+	{
+		return (
+		        is_u8<T>()
+		     || is_u16<T>()
+		     || is_u32<T>()
+		     || is_u64<T>()
+		     || is_usize<T>()
+		     || is_s8<T>()
+		     || is_s16<T>()
+		     || is_s32<T>()
+		     || is_s64<T>()
+		     || is_char<T>()
+		);
+	}
+
+	template<typename T>
+	static constexpr bool is_floating_point()
+	{
+		return (
+		        is_f32<T>()
+		     || is_f64<T>()
+		     || is_f128<T>()
+		     || is_c32<T>()
+		     || is_c64<T>()
+		     || is_c128<T>()
+		);
+	}
+
+	template<typename T>
 	static constexpr bool is_mut()
 	{
 		return is_primitive<T>() && (std::is_const<T>::value == false);
