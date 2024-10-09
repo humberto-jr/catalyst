@@ -41,32 +41,6 @@
 	using mut = typename std::remove_const<T>::type;
 
 	//
-	// Auxiliary basic types:
-	//
-
-	template<typename T = usize>
-	struct range {
-		mut<T> min;
-		mut<T> max;
-		mut<T> step;
-
-		inline range(T start = static_cast<T>(0), T end = static_cast<T>(0), T step = static_cast<T>(1)):
-			min(start), max(end), step(step)
-		{
-		}
-
-		inline bool operator==(const range<T> &rhs)
-		{
-			return (this->min == rhs.min) && (this->max == rhs.max) && (this->step == rhs.step);
-		}
-
-		inline T count() const
-		{
-			return ((this->max - this->min) + static_cast<T>(1))/this->step;
-		}
-	};
-
-	//
 	// Utils:
 	//
 
@@ -507,4 +481,30 @@
 
 	static constexpr f128 f128_min = std::numeric_limits<f128>::min();
 	static constexpr f128 f128_max = std::numeric_limits<f128>::max();
+
+	//
+	// Auxiliary basic types:
+	//
+
+	template<typename T = usize>
+	struct range {
+		mut<T> min;
+		mut<T> max;
+		mut<T> step;
+
+		inline range(T start = static_cast<T>(0), T end = static_cast<T>(0), T step = static_cast<T>(1)):
+			min(start), max(end), step(step)
+		{
+		}
+
+		inline bool operator==(const range<T> &rhs)
+		{
+			return (this->min == rhs.min) && (this->max == rhs.max) && (this->step == rhs.step);
+		}
+
+		inline T count() const
+		{
+			return ((this->max - this->min) + static_cast<T>(1))/this->step;
+		}
+	};
 #endif
