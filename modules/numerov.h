@@ -101,6 +101,8 @@
 
 			c_str filename() const;
 
+			f64 reduced_mass() const;
+
 			u32 channel_count() const;
 
 			u32 energy_count() const;
