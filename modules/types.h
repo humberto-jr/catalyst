@@ -523,5 +523,47 @@
 		{
 			return this->min + static_cast<T>(n)*this->step;
 		}
+
+		// NOTE: The range<T>::iterator below only exists so that the compiler can
+		// generate range-based for-loops from a range<T>. It is not intended for
+		// manual use outside this context.
+
+		struct iterator {
+			mut<T> value;
+			const range<T> &owner;
+
+			constexpr iterator(const range<T> &owner): value(owner.min), owner(owner)
+			{
+			}
+
+			constexpr bool operator!=(const T rhs) const
+			{
+				// NOTE: The actual operation does not correspond to the operator in
+				// order to enforce that the compiler generates finite range-based
+				// for-loops when T is an integer with step greater than 1 and also
+				// floating-points. Here, rhs must be the output of range<T>::end().
+				return (this->value < rhs);
+			}
+
+			constexpr T operator*() const
+			{
+				return this->value;
+			}
+
+			constexpr void operator++()
+			{
+				this->value += this->owner.step;
+			}
+		};
+
+		constexpr range::iterator begin() const
+		{
+			return range::iterator(*this);
+		}
+
+		constexpr T end() const
+		{
+			return this->max;
+		}
 	};
 #endif
