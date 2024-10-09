@@ -492,17 +492,17 @@
 		mut<T> max;
 		mut<T> step;
 
-		inline range(T start = static_cast<T>(0), T end = static_cast<T>(0), T step = static_cast<T>(1)):
+		constexpr range(T start = static_cast<T>(0), T end = static_cast<T>(0), T step = static_cast<T>(1)):
 			min(start), max(end), step(step)
 		{
 		}
 
-		inline bool operator==(const range<T> &rhs)
+		constexpr bool operator==(const range<T> &rhs)
 		{
 			return (this->min == rhs.min) && (this->max == rhs.max) && (this->step == rhs.step);
 		}
 
-		inline T count() const
+		constexpr T count() const
 		{
 			return ((this->max - this->min) + static_cast<T>(1))/this->step;
 		}
