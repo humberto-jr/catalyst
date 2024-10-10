@@ -549,6 +549,11 @@
 			}
 		}
 
+		constexpr range<T> as_range_inclusive() const
+		{
+			return range<T>(this->min, this->max + this->step, this->step);
+		}
+
 		constexpr bool operator==(const range<T> &rhs) const
 		{
 			return (this->min == rhs.min) && (this->max == rhs.max) && (this->step == rhs.step);
@@ -573,7 +578,7 @@
 
 			constexpr bool operator!=(const T rhs) const
 			{
-				// NOTE: The actual operation does not correspond to the operator in
+				// NOTE: The actual operation does not correspond the operator in
 				// order to enforce that the compiler generates finite range-based
 				// for-loops when T is an integer with step greater than 1 and also
 				// floating-points. Here, rhs must be the output of range<T>::end().
