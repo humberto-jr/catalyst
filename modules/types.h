@@ -525,6 +525,7 @@
 		constexpr range(T start = static_cast<T>(0), T end = static_cast<T>(0), T step = static_cast<T>(1)):
 			min(start), max(end), step(step)
 		{
+			assert(this->step != static_cast<T>(0));
 		}
 
 		inline bool is_divided_evenly() const
@@ -536,6 +537,10 @@
 		usize count() const
 		{
 			T count = (this->max - this->min)/this->step;
+
+			if (count == static_cast<T>(0)) {
+				return 0u;
+			}
 
 			if constexpr(is_floating_point<T>()) {
 				return as_usize(count) + 1u;
