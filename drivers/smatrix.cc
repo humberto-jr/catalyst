@@ -11,10 +11,10 @@
 constexpr u8 PAD = 24;
 constexpr u8 FORMAT_VERSION = 3;
 
-struct job {
-	mat<f64> k;
-	mat<f64> re_s;
-	mat<f64> im_s;
+struct Job {
+	Mat<f64> k;
+	Mat<f64> re_s;
+	Mat<f64> im_s;
 	mut<f64> total_energy;
 };
 
@@ -24,9 +24,9 @@ int main()
 	// S-matrix output:
 	//
 
-	string bufname = input::keyword(key::smatrix_output_filename, filename::smatrix);
+	String bufname = input::keyword(key::smatrix_output_filename, filename::smatrix);
 
-	file::output smatrix(bufname);
+	file::Output smatrix(bufname);
 
 	//
 	// Numerov ratio matrices:
@@ -76,12 +76,12 @@ int main()
 	// Step 1: Compute the augmented K-matrix and S-matrix for every energy.
 	//
 
-	vec<job> task(energy_count);
+	Vec<Job> task(energy_count);
 
 	for (mut<u32> n = 0; n < energy_count; ++n) {
-		const mat<f64> &ratio = solution[n];
+		const Mat<f64> &ratio = solution[n];
 
-		mat<f64> k(channel_count, channel_count);
+		Mat<f64> k(channel_count, channel_count);
 
 		usize open_count = numerov::build_react_matrix(solution.mass,
 		                                               solution.R_step,
@@ -89,7 +89,7 @@ int main()
 		                                               solution.energy,
 		                                               ratio, basis, k);
 
-		mat<f64> re_s(open_count, open_count), im_s(open_count, open_count);
+		Mat<f64> re_s(open_count, open_count), im_s(open_count, open_count);
 
 		if (open_count > 0) {
 			k.resize(open_count, open_count);

@@ -12,16 +12,16 @@
 
 constexpr u8 FORMAT_VERSION = 2;
 
-struct job {
+struct Job {
 	mut<u32> index;
-	mat<f64> ratio;
+	Mat<f64> ratio;
 	mut<f64> tot_energy;
 
-	inline job(usize channel_count): index(0), ratio(channel_count, channel_count), tot_energy(0.0)
+	inline Job(usize channel_count): index(0), ratio(channel_count, channel_count), tot_energy(0.0)
 	{
 	}
 
-	void operator=(job &&other)
+	void operator=(Job &&other)
 	{
 		this->index = other.index;
 		this->ratio.swap(other.ratio);
@@ -31,15 +31,15 @@ struct job {
 
 int main(int argc, char *argv[])
 {
-	mpi::frontend mpi(&argc, &argv);
+	mpi::Frontend mpi(&argc, &argv);
 
 	//
 	// Coupling potential:
 	//
 
-	string potname = mpi.input_keyword(key::coupling_input_filename, filename::coupling_matrix);
+	String potname = mpi.input_keyword(key::coupling_input_filename, filename::coupling_matrix);
 
-	numerov::potential coupling = numerov::open(potname);
+	numerov::Potential coupling = numerov::open(potname);
 
 	u32 R_count = as_u32((coupling.R_max - coupling.R_min)/coupling.R_step);
 
@@ -67,15 +67,15 @@ int main(int argc, char *argv[])
 
 	mut<usize> memory_used = 0;
 
-	vec<job> task(chunk_count);
+	Vec<Job> task(chunk_count);
 
 	for (mut<u32> n = 0; n < chunk_count; ++n) {
-		task[n] = job(channel_count);
+		task[n] = Job(channel_count);
 		memory_used += task[n].ratio.size();
 	}
 
-	mat<f64> old_ratio(channel_count, channel_count);
-	mat<f64> workspace(channel_count, channel_count);
+	Mat<f64> old_ratio(channel_count, channel_count);
+	Mat<f64> workspace(channel_count, channel_count);
 
 	// NOTE: This amounts to three extra matrices: The old_ratio, the workspace,
 	// and the potential matrix. Some processes may have an extra step (matrix),
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 	// Numerov solutions: Only the master process will open the output file later.
 	//
 
-	string bufname = mpi.input_keyword(key::numerov_output_filename, filename::ratio_matrix);
+	String bufname = mpi.input_keyword(key::numerov_output_filename, filename::ratio_matrix);
 
 	//
 	// Summary:
@@ -112,10 +112,10 @@ int main(int argc, char *argv[])
 	//
 
 	for (mut<u32> n = 0; n < R_count; ++n) {
-		timer<2> clock;
+		Timer<2> clock;
 
 		clock.start();
-		const mat<f64>& pot_energy = coupling[n];
+		const Mat<f64>& pot_energy = coupling[n];
 		clock.stop();
 
 		// NOTE: The m-th energy index used below is relative to each process,
@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
 	//
 
 	if (mpi.rank() == mpi::MASTER_PROCESS_RANK) {
-		file::output solution(bufname);
+		file::Output solution(bufname);
 
 		solution.write(numerov::MAGIC_NUMBER);
 		solution.write(FORMAT_VERSION);

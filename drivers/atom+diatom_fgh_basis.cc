@@ -75,17 +75,17 @@ int main()
 		print::error(WHERE, "Invalid arrangement ", arrang);
 	}
 
-	const auto atom_a = input::keyword(key::atom_a, nist::isotope::atom_unknown);
-	const auto atom_b = input::keyword(key::atom_b, nist::isotope::atom_unknown);
-	const auto atom_c = input::keyword(key::atom_c, nist::isotope::atom_unknown);
+	const auto atom_a = input::keyword(key::atom_a, nist::Isotope::atom_unknown);
+	const auto atom_b = input::keyword(key::atom_b, nist::Isotope::atom_unknown);
+	const auto atom_c = input::keyword(key::atom_c, nist::Isotope::atom_unknown);
 
 	//
 	// PES:
 	//
 
-	const string pesname = input::keyword(key::extern_pes_filename);
+	const String pesname = input::keyword(key::extern_pes_filename);
 
-	pes::frontend pes(pesname, atom_a, atom_b, atom_c);
+	pes::Frontend pes(pesname, atom_a, atom_b, atom_c);
 
 	f64 mass = (arrang == 'a'? pes.mass_bc() : (arrang == 'b'? pes.mass_ac() : pes.mass_ab()));
 
@@ -93,9 +93,9 @@ int main()
 	// Output:
 	//
 
-	const string bufname = input::keyword(key::basis_output_filename, filename::fgh_basis);
+	const String bufname = input::keyword(key::basis_output_filename, filename::fgh_basis);
 
-	file::output basis(bufname.as_cstr());
+	file::Output basis(bufname.as_cstr());
 
 	basis.write(fgh::MAGIC_NUMBER);
 	basis.write(fgh::FORMAT_VERSION);
@@ -113,7 +113,7 @@ int main()
 	print::line("# Atom a: ", pes.atom_a());
 	print::line("# Atom b: ", pes.atom_b());
 	print::line("# Atom c: ", pes.atom_c());
-	print::line("# Arrangement: ", arrang);
+	print::line("# ArRangement: ", arrang);
 	print::line("# Output file: ", bufname.as_cstr());
 	print::line("# PES shared library: ", pes.filename());
 	print::line("# Diatomic reduc. mass: ", mass, " a.u.");
@@ -127,16 +127,16 @@ int main()
 
 	mut<u32> count = 0;
 
-	vec<f64> potential(r_count);
+	Vec<f64> potential(r_count);
 	potential = 0.0;
 
-	vec<f64> eigenval(r_count);
+	Vec<f64> eigenval(r_count);
 	eigenval = 0.0;
 
-	vec<f64> eigenvec(r_count);
+	Vec<f64> eigenvec(r_count);
 	eigenvec = 0.0;
 
-	mat<f64> hamiltonian(r_count, r_count);
+	Mat<f64> hamiltonian(r_count, r_count);
 	hamiltonian = 0.0;
 
 	for (mut<u32> j = j_min; j <= j_max; j += j_step) {

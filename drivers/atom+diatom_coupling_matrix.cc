@@ -25,7 +25,7 @@
 
 constexpr u8 FORMAT_VERSION = 1;
 
-f64 simpson(const vec<f64> &multipole, const fgh::basis &basis_a, const fgh::basis &basis_b)
+f64 simpson(const Vec<f64> &multipole, const fgh::Basis &basis_a, const fgh::Basis &basis_b)
 {
 	mut<usize> n_max = basis_a.eigenvec.length() - 1;
 
@@ -57,7 +57,7 @@ f64 simpson(const vec<f64> &multipole, const fgh::basis &basis_a, const fgh::bas
 
 int main(int argc, char *argv[])
 {
-	mpi::frontend mpi(&argc, &argv);
+	mpi::Frontend mpi(&argc, &argv);
 
 	//
 	// Scattering grid:
@@ -95,17 +95,17 @@ int main(int argc, char *argv[])
 		print::error(WHERE, "Invalid arrangement ", arrang);
 	}
 
-	const auto atom_a = mpi.input_keyword(key::atom_a, nist::isotope::atom_unknown);
-	const auto atom_b = mpi.input_keyword(key::atom_b, nist::isotope::atom_unknown);
-	const auto atom_c = mpi.input_keyword(key::atom_c, nist::isotope::atom_unknown);
+	const auto atom_a = mpi.input_keyword(key::atom_a, nist::Isotope::atom_unknown);
+	const auto atom_b = mpi.input_keyword(key::atom_b, nist::Isotope::atom_unknown);
+	const auto atom_c = mpi.input_keyword(key::atom_c, nist::Isotope::atom_unknown);
 
 	//
 	// PES:
 	//
 
-	const string pesname = mpi.input_keyword(key::extern_pes_filename);
+	const String pesname = mpi.input_keyword(key::extern_pes_filename);
 
-	pes::frontend pes(pesname, atom_a, atom_b, atom_c);
+	pes::Frontend pes(pesname, atom_a, atom_b, atom_c);
 
 	f64 mass = pes.mass_abc(arrang);
 
@@ -113,13 +113,13 @@ int main(int argc, char *argv[])
 	// Scattering basis set:
 	//
 
-	string bufname = mpi.input_keyword(key::basis_input_filename, filename::fgh_basis);
+	String bufname = mpi.input_keyword(key::basis_input_filename, filename::fgh_basis);
 
 	const auto basis = numerov::open_basis_file(bufname);
 
-	vec<f64> multipole(basis[0].eigenvec.length());
+	Vec<f64> multipole(basis[0].eigenvec.length());
 
-	mat<f64> result(basis.length(), basis.length());
+	Mat<f64> result(basis.length(), basis.length());
 
 	//
 	// Output: Open on the master process only. Other processes will write to
@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
 		bufname.append(".mpi", mpi.rank());
 	}
 
-	file::output coupling(bufname.as_cstr());
+	file::Output coupling(bufname.as_cstr());
 
 	//
 	// OpenMP:
@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
 
 		result = 0.0;
 
-		timer<1> clock;
+		Timer<1> clock;
 		clock.start();
 
 		for (mut<u32> lambda = lambda_min; lambda <= lambda_max; lambda += lambda_step) {
@@ -255,7 +255,7 @@ int main(int argc, char *argv[])
 			bufname.clear();
 			bufname.append(coupling.filename.as_cstr(), ".mpi", rank);
 
-			file::input buf(bufname.as_cstr());
+			file::Input buf(bufname.as_cstr());
 
 			while (buf.end() == false) {
 				mut<u32> n = 0;

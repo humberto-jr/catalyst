@@ -75,17 +75,17 @@ int main()
 
 	const char arrang = as_char(96 + input::keyword(key::arrangement, 1, 3, 1));
 
-	const auto atom_a = input::keyword(key::atom_a, nist::isotope::atom_unknown);
-	const auto atom_b = input::keyword(key::atom_b, nist::isotope::atom_unknown);
-	const auto atom_c = input::keyword(key::atom_c, nist::isotope::atom_unknown);
+	const auto atom_a = input::keyword(key::atom_a, nist::Isotope::atom_unknown);
+	const auto atom_b = input::keyword(key::atom_b, nist::Isotope::atom_unknown);
+	const auto atom_c = input::keyword(key::atom_c, nist::Isotope::atom_unknown);
 
 	//
 	// PES:
 	//
 
-	const string pesname = input::keyword(key::extern_pes_filename);
+	const String pesname = input::keyword(key::extern_pes_filename);
 
-	pes::frontend pes(pesname, atom_a, atom_b, atom_c);
+	pes::Frontend pes(pesname, atom_a, atom_b, atom_c);
 
 	//
 	// Energy scale and shift:
@@ -103,7 +103,7 @@ int main()
 	print::line("# Atom a: ", pes.atom_a());
 	print::line("# Atom b: ", pes.atom_b());
 	print::line("# Atom c: ", pes.atom_c());
-	print::line("# Arrangement: ", arrang);
+	print::line("# ArRangement: ", arrang);
 	print::line("# Shift: ", shift);
 	print::line("# Scale: ", scale);
 	print::line("# PES shared library: ", pes.filename());
