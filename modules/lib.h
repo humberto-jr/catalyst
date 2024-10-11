@@ -59,7 +59,7 @@
 		}
 
 		private:
-		string file;
+		String file;
 		void *handle;
 	};
 #endif

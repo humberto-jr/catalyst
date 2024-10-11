@@ -2,7 +2,7 @@
 #include "libgsl.h"
 
 //
-// math::spline:
+// math::Spline:
 //
 
 static inline gsl_interp* as_gsl_data(void *data)
@@ -15,7 +15,7 @@ static inline gsl_interp_accel* as_gsl_state(void *state)
 	return static_cast<gsl_interp_accel*>(state);
 }
 
-math::spline::spline(vec<f64> &x, vec<f64> &f):
+math::Spline::Spline(Vec<f64> &x, Vec<f64> &f):
 	x(x.move()), f(f.move()), data(nullptr), state(gsl_interp_accel_alloc())
 {
 	if (this->state == nullptr) {
@@ -23,23 +23,23 @@ math::spline::spline(vec<f64> &x, vec<f64> &f):
 	}
 }
 
-math::spline::spline(spline &&other):
+math::Spline::Spline(math::Spline &&other):
 	x(other.x.move()), f(other.f.move()), data(other.data), state(other.state)
 {
 	other.data = other.state = nullptr;
 }
 
-const vec<f64>& math::spline::abscissa()
+const Vec<f64>& math::Spline::abscissa()
 {
 	return this->x;
 }
 
-const vec<f64>& math::spline::ordinate()
+const Vec<f64>& math::Spline::ordinate()
 {
 	return this->f;
 }
 
-void math::spline::use_akima()
+void math::Spline::use_akima()
 {
 	auto data = gsl_interp_alloc(gsl_interp_akima, this->x.length());
 
@@ -62,7 +62,7 @@ void math::spline::use_akima()
 	this->state = as_void(state);
 }
 
-void math::spline::use_cspline()
+void math::Spline::use_cspline()
 {
 	auto data = gsl_interp_alloc(gsl_interp_cspline, this->x.length());
 
@@ -85,7 +85,7 @@ void math::spline::use_cspline()
 	this->state = as_void(state);
 }
 
-void math::spline::use_steffen()
+void math::Spline::use_steffen()
 {
 	auto data = gsl_interp_alloc(gsl_interp_steffen, this->x.length());
 
@@ -108,7 +108,7 @@ void math::spline::use_steffen()
 	this->state = as_void(state);
 }
 
-f64 math::spline::operator()(f64 x) const
+f64 math::Spline::operator()(f64 x) const
 {
 	auto data = as_gsl_data(this->data);
 	auto state = as_gsl_state(this->state);
@@ -116,7 +116,7 @@ f64 math::spline::operator()(f64 x) const
 	return gsl_interp_eval(data, &this->x[0], &this->f[0], x, state);
 }
 
-f64 math::spline::derivative(f64 x, u8 order) const
+f64 math::Spline::derivative(f64 x, u8 order) const
 {
 	auto data = as_gsl_data(this->data);
 	auto state = as_gsl_state(this->state);
@@ -132,7 +132,7 @@ f64 math::spline::derivative(f64 x, u8 order) const
 	return 0.0;
 }
 
-f64 math::spline::integral(f64 a, f64 b) const
+f64 math::Spline::integral(f64 a, f64 b) const
 {
 	auto data = as_gsl_data(this->data);
 	auto state = as_gsl_state(this->state);
@@ -140,7 +140,7 @@ f64 math::spline::integral(f64 a, f64 b) const
 	return gsl_interp_eval_integ(data, &this->x[0], &this->f[0], a, b, state);
 }
 
-math::spline::~spline()
+math::Spline::~Spline()
 {
 	auto state = as_gsl_state(this->state);
 
@@ -328,7 +328,7 @@ f64 math::gaunt_coeff(s32 q, s32 ja, s32 jb, s32 lambda)
 //
 
 template<typename T>
-static T simpson_driver(const T step, const vec<T> &integrand)
+static T simpson_driver(const T step, const Vec<T> &integrand)
 {
 	constexpr T fact = static_cast<T>(3.0/8.0);
 
@@ -353,32 +353,32 @@ static T simpson_driver(const T step, const vec<T> &integrand)
 	return fact*step*sum;
 }
 
-f32 math::simpson(f32 step, const vec<f32> &integrand)
+f32 math::simpson(f32 step, const Vec<f32> &integrand)
 {
 	return simpson_driver<f32>(step, integrand);
 }
 
-f64 math::simpson(f64 step, const vec<f64> &integrand)
+f64 math::simpson(f64 step, const Vec<f64> &integrand)
 {
 	return simpson_driver<f64>(step, integrand);
 }
 
-f128 math::simpson(f128 step, const vec<f128> &integrand)
+f128 math::simpson(f128 step, const Vec<f128> &integrand)
 {
 	return simpson_driver<f128>(step, integrand);
 }
 
-c32 math::simpson(c32 step, const vec<c32> &integrand)
+c32 math::simpson(c32 step, const Vec<c32> &integrand)
 {
 	return simpson_driver<c32>(step, integrand);
 }
 
-c64 math::simpson(c64 step, const vec<c64> &integrand)
+c64 math::simpson(c64 step, const Vec<c64> &integrand)
 {
 	return simpson_driver<c64>(step, integrand);
 }
 
-c128 math::simpson(c128 step, const vec<c128> &integrand)
+c128 math::simpson(c128 step, const Vec<c128> &integrand)
 {
 	return simpson_driver<c128>(step, integrand);
 }

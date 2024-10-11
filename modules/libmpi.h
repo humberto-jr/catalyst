@@ -15,9 +15,9 @@
 
 		void about();
 
-		class frontend {
+		class Frontend {
 			public:
-			frontend(mut<s32> *argc, char **argv[]);
+			Frontend(mut<s32> *argc, char **argv[]);
 
 			inline u32 world_size() const
 			{
@@ -125,40 +125,40 @@
 
 			void send(u32 rank, f128 data) const;
 
-			void send(u32 rank, const vec<u8> &data) const;
+			void send(u32 rank, const Vec<u8> &data) const;
 
-			void send(u32 rank, const vec<u16> &data) const;
+			void send(u32 rank, const Vec<u16> &data) const;
 
-			void send(u32 rank, const vec<u32> &data) const;
+			void send(u32 rank, const Vec<u32> &data) const;
 
-			void send(u32 rank, const vec<u64> &data) const;
+			void send(u32 rank, const Vec<u64> &data) const;
 
-			void send(u32 rank, const vec<s8> &data) const;
+			void send(u32 rank, const Vec<s8> &data) const;
 
-			void send(u32 rank, const vec<s16> &data) const;
+			void send(u32 rank, const Vec<s16> &data) const;
 
-			void send(u32 rank, const vec<s32> &data) const;
+			void send(u32 rank, const Vec<s32> &data) const;
 
-			void send(u32 rank, const vec<s64> &data) const;
+			void send(u32 rank, const Vec<s64> &data) const;
 
-			void send(u32 rank, const vec<char> &data) const;
+			void send(u32 rank, const Vec<char> &data) const;
 
-			void send(u32 rank, const vec<f32> &data) const;
+			void send(u32 rank, const Vec<f32> &data) const;
 
-			void send(u32 rank, const vec<f64> &data) const;
+			void send(u32 rank, const Vec<f64> &data) const;
 
-			void send(u32 rank, const vec<f128> &data) const;
+			void send(u32 rank, const Vec<f128> &data) const;
 
-			void send(u32 rank, const string &data) const;
+			void send(u32 rank, const String &data) const;
 
 			template<u8 PAD, usize LEN>
-			void send(u32 rank, const print::fmt<PAD, LEN> &data) const
+			void send(u32 rank, const print::Fmt<PAD, LEN> &data) const
 			{
 				this->send(rank, as_u32(data.len), &data.buf[0]);
 			}
 
 			template<typename T>
-			void send(u32 rank, const mat<T> &data) const
+			void send(u32 rank, const Mat<T> &data) const
 			{
 				this->send(rank, as_u32(data.rows()*data.cols()), &data[0]);
 			}
@@ -211,40 +211,40 @@
 
 			void receive(u32 rank, mut<f128> &data) const;
 
-			u32 receive(u32 rank, vec<u8> &data) const;
+			u32 receive(u32 rank, Vec<u8> &data) const;
 
-			u32 receive(u32 rank, vec<u16> &data) const;
+			u32 receive(u32 rank, Vec<u16> &data) const;
 
-			u32 receive(u32 rank, vec<u32> &data) const;
+			u32 receive(u32 rank, Vec<u32> &data) const;
 
-			u32 receive(u32 rank, vec<u64> &data) const;
+			u32 receive(u32 rank, Vec<u64> &data) const;
 
-			u32 receive(u32 rank, vec<s8> &data) const;
+			u32 receive(u32 rank, Vec<s8> &data) const;
 
-			u32 receive(u32 rank, vec<s16> &data) const;
+			u32 receive(u32 rank, Vec<s16> &data) const;
 
-			u32 receive(u32 rank, vec<s32> &data) const;
+			u32 receive(u32 rank, Vec<s32> &data) const;
 
-			u32 receive(u32 rank, vec<s64> &data) const;
+			u32 receive(u32 rank, Vec<s64> &data) const;
 
-			u32 receive(u32 rank, vec<char> &data) const;
+			u32 receive(u32 rank, Vec<char> &data) const;
 
-			u32 receive(u32 rank, vec<f32> &data) const;
+			u32 receive(u32 rank, Vec<f32> &data) const;
 
-			u32 receive(u32 rank, vec<f64> &data) const;
+			u32 receive(u32 rank, Vec<f64> &data) const;
 
-			u32 receive(u32 rank, vec<f128> &data) const;
+			u32 receive(u32 rank, Vec<f128> &data) const;
 
-			void receive(u32 rank, string &data) const;
+			void receive(u32 rank, String &data) const;
 
 			template<u8 PAD, usize LEN>
-			void receive(u32 rank, print::fmt<PAD, LEN> &data) const
+			void receive(u32 rank, print::Fmt<PAD, LEN> &data) const
 			{
 				data.len = as_usize(this->receive(rank, LEN, &data.buf[0]));
 			}
 
 			template<typename T>
-			void receive(u32 rank, mat<T> &data) const
+			void receive(u32 rank, Mat<T> &data) const
 			{
 				auto info = this->receive(rank, as_u32(data.rows()*data.cols()), &data[0]);
 				assert(as_usize(info) == data.rows()*data.cols());
@@ -281,7 +281,7 @@
 			void wait() const;
 
 			template<u8 PAD, usize LEN>
-			void print_line(const print::fmt<PAD, LEN> &content)
+			void print_line(const print::Fmt<PAD, LEN> &content)
 			{
 				if (this->rank() == MASTER_PROCESS_RANK) {
 					content.flush();
@@ -291,7 +291,7 @@
 							continue;
 						}
 
-						print::fmt<PAD, LEN> new_content;
+						print::Fmt<PAD, LEN> new_content;
 
 						this->receive(rank, new_content);
 
@@ -305,23 +305,23 @@
 			}
 
 			template<u8 PAD, usize LEN, typename T>
-			void print_line(const print::fmt<PAD, LEN> &prev, T last)
+			void print_line(const print::Fmt<PAD, LEN> &prev, T last)
 			{
-				print::fmt<PAD, LEN> end(last);
+				print::Fmt<PAD, LEN> end(last);
 				this->print_line(prev + end);
 			}
 
 			template<u8 PAD, usize LEN, typename T, typename... Ts>
-			void print_line(const print::fmt<PAD, LEN> &prev, T first, Ts... remainder)
+			void print_line(const print::Fmt<PAD, LEN> &prev, T first, Ts... remainder)
 			{
-				print::fmt<PAD, LEN> next(first);
+				print::Fmt<PAD, LEN> next(first);
 				this->print_line(prev + next, remainder...);
 			}
 
 			template<u8 PAD = 1, typename T, typename... Ts>
 			void print_line(T first, Ts... remainder)
 			{
-				print::fmt<PAD> start(first);
+				print::Fmt<PAD> start(first);
 				this->print_line(start, remainder...);
 			}
 
@@ -343,9 +343,9 @@
 				return val;
 			}
 
-			string input_keyword(c_str key, c_str dummy = "\0")
+			String input_keyword(c_str key, c_str dummy = "\0")
 			{
-				string val;
+				String val;
 
 				if (this->rank() == MASTER_PROCESS_RANK) {
 					val += input::keyword(key, dummy).as_cstr();
@@ -375,9 +375,9 @@
 				return as_bool(val);
 			}
 
-			nist::isotope input_keyword(c_str key, nist::isotope dummy)
+			nist::Isotope input_keyword(c_str key, nist::Isotope dummy)
 			{
-				mut<u16> val = static_cast<u16>(nist::isotope::atom_unknown);
+				mut<u16> val = static_cast<u16>(nist::Isotope::atom_unknown);
 
 				if (this->rank() == MASTER_PROCESS_RANK) {
 					val = static_cast<u16>(input::keyword(key, dummy));
@@ -385,10 +385,10 @@
 
 				this->broadcast(MASTER_PROCESS_RANK, 1, &val);
 
-				return static_cast<nist::isotope>(val);
+				return static_cast<nist::Isotope>(val);
 			}
 
-			~frontend();
+			~Frontend();
 
 			private:
 			// NOTE: Signed ints are used for rank and comm_size in order

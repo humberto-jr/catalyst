@@ -15,32 +15,32 @@
 		#define DEFAULT_FMT_PADDING 1
 	#endif
 
-	using str = vec<char>;
+	using str = Vec<char>;
 
 	// NOTE: A forward declaration is used below to avoid including file.h and mpi.h
-	// here, since these are not part of the essentials.h header. Both file::input
-	// and mpi::frontend requires privileges to write the internal buffer of a string.
+	// here, since these are not part of the essentials.h header. Both file::Input
+	// and mpi::Frontend requires privileges to write the internal buffer of a string.
 
 	namespace file {
-		class input;
+		class Input;
 	}
 
 	namespace mpi {
-		class frontend;
+		class Frontend;
 	}
 
-	class string {
+	class String {
 		public:
-		inline string(usize capacity = DEFAULT_STRING_LENGTH): buf(capacity + 1), end(0), begin(0)
+		inline String(usize capacity = DEFAULT_STRING_LENGTH): buf(capacity + 1), end(0), begin(0)
 		{
 		}
 
-		inline string(string &&other): buf(other.buf.move()), end(other.end), begin(other.begin)
+		inline String(String &&other): buf(other.buf.move()), end(other.end), begin(other.begin)
 		{
 			other.end = other.begin = 0;
 		}
 
-		inline string(c_str other): buf(DEFAULT_STRING_LENGTH + 1), end(0), begin(0)
+		inline String(c_str other): buf(DEFAULT_STRING_LENGTH + 1), end(0), begin(0)
 		{
 			*this += other;
 		}
@@ -65,9 +65,9 @@
 			return &this->buf[this->begin];
 		}
 
-		inline string move()
+		inline String move()
 		{
-			return string(*this);
+			return String(*this);
 		}
 
 		void left_trim()
@@ -192,7 +192,7 @@
 			this->append(rhs.real(), "  ", rhs.imag());
 		}
 
-		inline void operator+=(string &rhs)
+		inline void operator+=(String &rhs)
 		{
 			this->append(rhs.as_cstr());
 		}
@@ -293,7 +293,7 @@
 			this->append(rhs.real(), "  ", rhs.imag());
 		}
 
-		void operator=(string &rhs)
+		void operator=(String &rhs)
 		{
 			this->end = rhs.end;
 			this->begin = rhs.begin;
@@ -301,7 +301,7 @@
 			rhs.clear();
 		}
 
-		void operator=(string &&rhs)
+		void operator=(String &&rhs)
 		{
 			this->end = rhs.end;
 			this->begin = rhs.begin;
@@ -362,12 +362,12 @@
 		}
 
 		// NOTE: See the note on the private copy-constructor of vector.
-		inline string(string &other): buf(other.buf.move()), end(other.end), begin(other.begin)
+		inline String(String &other): buf(other.buf.move()), end(other.end), begin(other.begin)
 		{
 		}
 
-		friend class file::input;
-		friend class mpi::frontend;
+		friend class file::Input;
+		friend class mpi::Frontend;
 	};
 
 	#undef DEFAULT_STRING_LENGTH

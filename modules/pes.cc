@@ -2,10 +2,10 @@
 #include "math.h"
 
 //
-// pes::frontend:
+// pes::Frontend:
 //
 
-void pes::frontend::start_extern_pes(c_str filename)
+void pes::Frontend::start_extern_pes(c_str filename)
 {
 	this->call_extern_value = nullptr;
 	this->call_extern_startup = nullptr;
@@ -68,7 +68,7 @@ void pes::frontend::start_extern_pes(c_str filename)
 	}
 }
 
-pes::frontend::frontend(const string &filename, const nist::isotope a, const nist::isotope b, const nist::isotope c):
+pes::Frontend::Frontend(const String &filename, const nist::Isotope a, const nist::Isotope b, const nist::Isotope c):
 	extern_pes(lib(filename.as_cstr())), a(a), b(b), c(c), mass_a(0.0), mass_b(0.0), mass_c(0.0)
 {
 	// NOTE: Atomic masses are stored in atomic units.
@@ -78,7 +78,7 @@ pes::frontend::frontend(const string &filename, const nist::isotope a, const nis
 	this->start_extern_pes(filename.as_cstr());
 }
 
-f64 pes::frontend::mass_abc(const char arrang) const
+f64 pes::Frontend::mass_abc(const char arrang) const
 {
 	f64 mass_bc  = this->mass_b + this->mass_c;
 	f64 mass_ac  = this->mass_a + this->mass_c;
@@ -93,16 +93,16 @@ f64 pes::frontend::mass_abc(const char arrang) const
 	}
 }
 
-f64 pes::frontend::value(const char arrang, f64 r, f64 R, f64 theta) const
+f64 pes::Frontend::value(const char arrang, f64 r, f64 R, f64 theta) const
 {
 	// NOTE: bc = 0, ac = 1, ab = 2.
 	mut<f64> internuc[3] = {0.0, 0.0, 0.0};
 
 	f64 th = math::as_rad(theta);
 
-	math::vec3 a;
-	math::vec3 b;
-	math::vec3 c;
+	math::Vec3 a;
+	math::Vec3 b;
+	math::Vec3 c;
 
 	switch (arrang) {
 		case 'a': {
@@ -114,7 +114,7 @@ f64 pes::frontend::value(const char arrang, f64 r, f64 R, f64 theta) const
 			c.y = -b.y;
 			c.z =  0.0;
 
-			math::vec3 bc;
+			math::Vec3 bc;
 			bc.y = (b.y*this->mass_b + c.y*this->mass_c)/(this->mass_b + this->mass_c);
 
 			a.x = bc.x;
@@ -136,7 +136,7 @@ f64 pes::frontend::value(const char arrang, f64 r, f64 R, f64 theta) const
 			c.y = -a.y;
 			c.z =  0.0;
 
-			math::vec3 ac;
+			math::Vec3 ac;
 			ac.y = (a.y*this->mass_a + c.y*this->mass_c)/(this->mass_a + this->mass_c);
 
 			b.x = ac.x;
@@ -158,7 +158,7 @@ f64 pes::frontend::value(const char arrang, f64 r, f64 R, f64 theta) const
 			b.y = -a.y;
 			b.z =  0.0;
 
-			math::vec3 ab;
+			math::Vec3 ab;
 			ab.y = (a.y*this->mass_a + b.y*this->mass_b)/(this->mass_a + this->mass_b);
 
 			c.x = ab.x;
@@ -178,7 +178,7 @@ f64 pes::frontend::value(const char arrang, f64 r, f64 R, f64 theta) const
 	return this->call_extern_value(internuc);
 }
 
-f64 pes::frontend::diatom_bc(u32 j, f64 r) const
+f64 pes::Frontend::diatom_bc(u32 j, f64 r) const
 {
 	f64 m = this->mass_bc();
 	u32 b = j*(j + 1);
@@ -186,7 +186,7 @@ f64 pes::frontend::diatom_bc(u32 j, f64 r) const
 	return this->value('a', r) + as_f64(b)/(2.0*m*r*r);
 }
 
-f64 pes::frontend::diatom_ac(u32 j, f64 r) const
+f64 pes::Frontend::diatom_ac(u32 j, f64 r) const
 {
 	f64 m = this->mass_ac();
 	u32 b = j*(j + 1);
@@ -194,7 +194,7 @@ f64 pes::frontend::diatom_ac(u32 j, f64 r) const
 	return this->value('b', r) + as_f64(b)/(2.0*m*r*r);
 }
 
-f64 pes::frontend::diatom_ab(u32 j, f64 r) const
+f64 pes::Frontend::diatom_ab(u32 j, f64 r) const
 {
 	f64 m = this->mass_ab();
 	u32 b = j*(j + 1);
@@ -202,13 +202,13 @@ f64 pes::frontend::diatom_ab(u32 j, f64 r) const
 	return this->value('c', r) + as_f64(b)/(2.0*m*r*r);
 }
 
-f64 pes::frontend::legendre_multipole_term(const char arrang, u32 lambda, f64 r, f64 R) const
+f64 pes::Frontend::legendre_multipole_term(const char arrang, u32 lambda, f64 r, f64 R) const
 {
 	// References:
 	// [1] W. H. Miller, J. Chem. Phys., Vol. 50, Num. 1, 407-418 (1969)
 
 	struct legendre {
-		const pes::frontend &pes;
+		const pes::Frontend &pes;
 		const char arrang;
 		u32 lambda;
 		f64 r;
@@ -235,7 +235,7 @@ f64 pes::frontend::legendre_multipole_term(const char arrang, u32 lambda, f64 r,
 	return as_f64(2*lambda + 1)*result/2.0;
 }
 
-void pes::frontend::legendre_multipole_term(const char arrang, u32 lambda, u32 n_min, f64 r_min, f64 r_step, f64 R, vec<f64> &result) const
+void pes::Frontend::legendre_multipole_term(const char arrang, u32 lambda, u32 n_min, f64 r_min, f64 r_step, f64 R, Vec<f64> &result) const
 {
 	for (mut<usize> n = 0; n < result.length(); ++n) {
 		f64 r = r_min + as_f64(n_min + n)*r_step;
@@ -244,7 +244,7 @@ void pes::frontend::legendre_multipole_term(const char arrang, u32 lambda, u32 n
 	}
 }
 
-pes::frontend::~frontend()
+pes::Frontend::~Frontend()
 {
 	// NOTE: This is the last call to the external PES library. It may be thread-unsafe.
 	#pragma omp master

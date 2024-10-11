@@ -10,9 +10,9 @@
 
 		constexpr u32 MAGIC_NUMBER = 1701998454u;
 
-		using basis = vec<fgh::basis>;
+		using Basis = Vec<fgh::Basis>;
 
-		struct potential {
+		struct Potential {
 			public:
 			u32 n_min;
 			f64 R_min;
@@ -20,17 +20,17 @@
 			f64 R_step;
 			f64 mass;
 
-			inline potential(u32 n_min, f64 R_min, f64 R_max, f64 R_step, f64 mass, mat<f64> &coupling, file::input &input):
+			inline Potential(u32 n_min, f64 R_min, f64 R_max, f64 R_step, f64 mass, Mat<f64> &coupling, file::Input &input):
 				n_min(n_min), R_min(R_min), R_max(R_max), R_step(R_step), mass(mass), coupling(coupling.move()), input(input)
 			{
 			}
 
-			inline potential(numerov::potential &&other):
+			inline Potential(numerov::Potential &&other):
 				n_min(other.n_min), R_min(other.R_min), R_max(other.R_max), R_step(other.R_step), mass(other.mass), coupling(other.coupling.move()), input(other.input)
 			{
 			}
 
-			const mat<f64>& operator[](u32 n);
+			const Mat<f64>& operator[](u32 n);
 
 			inline c_str filename() const
 			{
@@ -38,11 +38,11 @@
 			}
 
 			private:
-			mat<f64> coupling;
-			file::input input;
+			Mat<f64> coupling;
+			file::Input input;
 		};
 
-		struct solution {
+		struct Solution {
 			public:
 			f64 mass;
 			f64 R_max;
@@ -51,25 +51,25 @@
 			f64 E_max;
 			f64 E_step;
 			mut<f64> energy;
-			file::input input;
+			file::Input input;
 
-			inline solution(f64 mass, f64 R_max, f64 R_step, f64 E_min, f64 E_max, f64 E_step, file::input &input, mat<f64> &ratio):
+			inline Solution(f64 mass, f64 R_max, f64 R_step, f64 E_min, f64 E_max, f64 E_step, file::Input &input, Mat<f64> &ratio):
 				mass(mass), R_max(R_max), R_step(R_step), E_min(E_min), E_max(E_max), E_step(E_step), energy(0.0), input(input), ratio(ratio.move())
 			{
 			}
 
-			inline solution(numerov::solution &&other):
+			inline Solution(numerov::Solution &&other):
 				mass(other.mass), R_max(other.R_max), R_step(other.R_step), E_min(other.E_min), E_max(other.E_max), E_step(other.E_step), energy(0.0), input(other.input), ratio(other.ratio.move())
 			{
 			}
 
-			const mat<f64>& operator[](u32 n);
+			const Mat<f64>& operator[](u32 n);
 
 			private:
-			mat<f64> ratio;
+			Mat<f64> ratio;
 		};
 
-		struct smatrix_entry {
+		struct ScattMatrixEntry {
 			mut<usize> size;
 			mut<u32> channel_count;
 
@@ -91,13 +91,13 @@
 			mut<u32> comp_out;
 			mut<f64> eigenval_out;
 
-			vec<f64> total_energy;
-			vec<c64> value;
+			Vec<f64> total_energy;
+			Vec<c64> value;
 		};
 
-		class smatrix {
+		class ScattMatrix {
 			public:
-			smatrix(c_str filename, u8 fmt_ver = 3);
+			ScattMatrix(c_str filename, u8 fmt_ver = 3);
 
 			c_str filename() const;
 
@@ -107,22 +107,22 @@
 
 			u32 energy_count() const;
 
-			const smatrix_entry* operator()(u32 channel_a, u32 channel_b);
+			const ScattMatrixEntry* operator()(u32 channel_a, u32 channel_b);
 
 			private:
-			file::input input;
-			smatrix_entry entry;
+			file::Input input;
+			ScattMatrixEntry entry;
 		};
 
-		struct scatt_amplitude_entry {
+		struct ScattAmplitudeEntry {
 			mut<s32> m_in;
 			mut<s32> m_out;
-			vec<vec<c64>> value;
+			Vec<Vec<c64>> value;
 		};
 
-		class scatt_amplitude {
+		class ScattAmplitude {
 			public:
-			scatt_amplitude(u32 j_in, u32 j_out, u32 theta_count, u32 energy_count);
+			ScattAmplitude(u32 j_in, u32 j_out, u32 theta_count, u32 energy_count);
 
 			u32 mm_count() const;
 
@@ -132,46 +132,46 @@
 
 			c64 mm_sum(u32 theta_index, u32 energy_index) const;
 
-			scatt_amplitude_entry& operator()(u32 mm_index) const;
+			ScattAmplitudeEntry& operator()(u32 mm_index) const;
 
-			vec<c64>& operator()(u32 mm_index, u32 theta_index) const;
+			Vec<c64>& operator()(u32 mm_index, u32 theta_index) const;
 
 			c64& operator()(u32 mm_index, u32 theta_index, u32 energy_index) const;
 
 			private:
-			vec<scatt_amplitude_entry> entry;
+			Vec<ScattAmplitudeEntry> entry;
 		};
 
-		numerov::basis open_basis_file(const string &filename);
+		numerov::Basis open_basis_file(const String &filename);
 
-		numerov::potential open(string &filename, u8 fmt_ver = 1);
+		numerov::Potential open(String &filename, u8 fmt_ver = 1);
 
-		numerov::solution open_ratio_file(string &filename, u8 fmt_ver = 2);
+		numerov::Solution open_ratio_file(String &filename, u8 fmt_ver = 2);
 
 		void renormalized(f64 mass,
 		                  f64 step,
 		                  f64 tot_energy,
-		                  const mat<f64> &pot_energy,
-		                  mat<f64> &workspace,
-		                  mat<f64> &old_ratio,
-		                  mat<f64> &new_ratio);
+		                  const Mat<f64> &pot_energy,
+		                  Mat<f64> &workspace,
+		                  Mat<f64> &old_ratio,
+		                  Mat<f64> &new_ratio);
 
 		usize build_react_matrix(f64 mass,
 		                         f64 step,
 		                         f64 R_max,
 		                         f64 tot_energy,
-		                         const mat<f64> &ratio,
-		                         const numerov::basis &level, mat<f64> &k);
+		                         const Mat<f64> &ratio,
+		                         const numerov::Basis &level, Mat<f64> &k);
 
-		void build_scatt_matrix(const mat<f64> &k,
-		                        mat<f64> &re_s, mat<f64> &im_s);
+		void build_scatt_matrix(const Mat<f64> &k,
+		                        Mat<f64> &re_s, Mat<f64> &im_s);
 
-		void build_scatt_amplitude(const smatrix_entry &s,
-		                           s32 m_in, s32 m_out, f64 theta, f64 phi, vec<c64> &f);
+		void build_scatt_amplitude(const ScattMatrixEntry &s,
+		                           s32 m_in, s32 m_out, f64 theta, f64 phi, Vec<c64> &f);
 
-		void build_cross_section(const numerov::scatt_amplitude &f, u32 j_in,
-		                         const vec<f64> &wavenum_in, const vec<f64> &wavenum_out,
-		                         mat<c64> &f_sum, mat<f64> &dif_sigma, vec<f64> &int_sigma);
+		void build_cross_section(const numerov::ScattAmplitude &f, u32 j_in,
+		                         const Vec<f64> &wavenum_in, const Vec<f64> &wavenum_out,
+		                         Mat<c64> &f_sum, Mat<f64> &dif_sigma, Vec<f64> &int_sigma);
 
 		inline static f64 centrifugal_term(f64 l, f64 mass, f64 x)
 		{

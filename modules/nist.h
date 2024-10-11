@@ -36,7 +36,7 @@
 
 		static constexpr f64 ATOMIC_MASS_TO_ATOMIC_UNIT = 1.0/(ELECTRON_MASS*KILOGRAM_TO_ATOMIC_MASS);
 
-		enum class isotope: u16 {
+		enum class Isotope: u16 {
 			atom_1H = 0,
 			atom_2H,
 			atom_3H,
@@ -3392,9 +3392,9 @@
 			atom_unknown
 		};
 
-		static constexpr usize MAX_ISOTOPE_COUNT = as_usize(isotope::atom_unknown);
+		static constexpr usize MAX_ISOTOPE_COUNT = as_usize(nist::Isotope::atom_unknown);
 
-		static constexpr c_str atomic_symbol(const isotope a)
+		static constexpr c_str atomic_symbol(const nist::Isotope a)
 		{
 			switch (as_u16(a)) {
 				case    0: return "1H\0";
@@ -6753,12 +6753,12 @@
 			}
 		}
 
-		static isotope isotope_enum(c_str symbol)
+		static nist::Isotope isotope_enum(c_str symbol)
 		{
-			for (mut<usize> n = 0; n < MAX_ISOTOPE_COUNT; ++n) {
-				auto result = static_cast<isotope>(n);
+			for (mut<usize> n = 0; n < nist::MAX_ISOTOPE_COUNT; ++n) {
+				auto result = static_cast<nist::Isotope>(n);
 
-				auto found = std::strcmp(atomic_symbol(result), symbol) == 0;
+				auto found = std::strcmp(nist::atomic_symbol(result), symbol) == 0;
 
 				if (found) {
 					return result;
@@ -6768,10 +6768,10 @@
 			print::error(WHERE, "Invalid atomic symbol ", symbol);
 
 			// NOTE: Unreachable.
-			return isotope::atom_unknown;
+			return nist::Isotope::atom_unknown;
 		}
 
-		static constexpr f64 atomic_mass(const isotope a)
+		static constexpr f64 atomic_mass(const nist::Isotope a)
 		{
 			switch (as_u16(a)) {
 				case    0: return 1.007825032239;   // 1H
@@ -10132,11 +10132,11 @@
 
 		static inline f64 atomic_mass(c_str symbol)
 		{
-			auto as_enum = isotope_enum(symbol);
-			return atomic_mass(as_enum);
+			auto as_enum = nist::isotope_enum(symbol);
+			return nist::atomic_mass(as_enum);
 		}
 
-		static constexpr u32 atomic_number(const isotope a)
+		static constexpr u32 atomic_number(const nist::Isotope a)
 		{
 			switch (as_u16(a)) {
 				case    0: return 1;    // 1H
@@ -13497,11 +13497,11 @@
 
 		static inline u32 atomic_number(c_str symbol)
 		{
-			auto as_enum = isotope_enum(symbol);
-			return atomic_number(as_enum);
+			auto as_enum = nist::isotope_enum(symbol);
+			return nist::atomic_number(as_enum);
 		}
 
-		enum class orbital: u8 {
+		enum class Orbital: u8 {
 			s = 0,   // l = 0, m =  0
 			pz,      // l = 1, m =  0
 			px,      // l = 1, m = -1
@@ -13521,6 +13521,6 @@
 			unknown
 		};
 
-		static constexpr usize MAX_ORBITAL_COUNT = as_usize(orbital::unknown);
+		static constexpr usize MAX_ORBITAL_COUNT = as_usize(nist::Orbital::unknown);
 	}
 #endif

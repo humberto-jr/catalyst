@@ -10,13 +10,13 @@
 
 		static constexpr usize BASIS_FILE_HEADER = sizeof(fgh::MAGIC_NUMBER) + sizeof(fgh::FORMAT_VERSION) + 2*sizeof(u32) + 3*sizeof(f64);
 
-		void matrix(f64 mass, f64 step, const vec<f64> &potential, mat<f64> &result);
+		void matrix(f64 mass, f64 step, const Vec<f64> &potential, Mat<f64> &result);
 
-		void matrix(f64 mass, f64 step, const vec<mat<f64>> &potential, mat<f64> &result);
+		void matrix(f64 mass, f64 step, const Vec<Mat<f64>> &potential, Mat<f64> &result);
 
-		f64 norm(f64 step, const vec<f64> &eigenvec);
+		f64 norm(f64 step, const Vec<f64> &eigenvec);
 
-		struct basis {
+		struct Basis {
 			mut<u32> J;
 			mut<u32> v;
 			mut<u32> j;
@@ -29,9 +29,9 @@
 			mut<f64> r_max;
 			mut<f64> r_step;
 			mut<f64> eigenval;
-			vec<f64> eigenvec;
+			Vec<f64> eigenvec;
 
-			inline basis(usize count = 0):
+			inline Basis(usize count = 0):
 				J(0), v(0), j(0), l(0), p(0), comp(0), n_min(0), norm(1.0), r_min(0.0), r_max(0.0), r_step(0.0), eigenval(0.0), eigenvec(count)
 			{
 			}
@@ -51,8 +51,8 @@
 			}
 		};
 
-		u32 is_valid(file::input &buf);
+		u32 is_valid(file::Input &buf);
 
-		void load_basis(u32 n, file::input &buf, basis &data);
+		void load_basis(u32 n, file::Input &buf, fgh::Basis &data);
 	}
 #endif

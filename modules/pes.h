@@ -11,9 +11,9 @@
 
 		using pfn_shutdown = void (*)();
 
-		class frontend {
+		class Frontend {
 			public:
-			frontend(const string &filename, const nist::isotope a, const nist::isotope b, const nist::isotope c);
+			Frontend(const String &filename, const nist::Isotope a, const nist::Isotope b, const nist::Isotope c);
 
 			inline c_str filename() const
 			{
@@ -62,15 +62,15 @@
 
 			f64 legendre_multipole_term(const char arrang, u32 lambda, f64 r, f64 R) const;
 
-			void legendre_multipole_term(const char arrang, u32 lambda, u32 n_min, f64 r_min, f64 r_step, f64 R, vec<f64> &result) const;
+			void legendre_multipole_term(const char arrang, u32 lambda, u32 n_min, f64 r_min, f64 r_step, f64 R, Vec<f64> &result) const;
 
-			~frontend();
+			~Frontend();
 
 			private:
 			lib extern_pes;
-			nist::isotope a;
-			nist::isotope b;
-			nist::isotope c;
+			nist::Isotope a;
+			nist::Isotope b;
+			nist::Isotope c;
 			mut<f64> mass_a;
 			mut<f64> mass_b;
 			mut<f64> mass_c;

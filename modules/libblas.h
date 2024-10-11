@@ -12,23 +12,23 @@
 
 	#if defined(USE_MKL)
 		#include <mkl.h>
-		#define BLAS_BACKEND_NAME blas::backend::mkl
+		#define BLAS_BACKEND_NAME blas::Backend::mkl
 	#elif defined(USE_LAPACKE)
 		#include <cblas.h>
-		#define BLAS_BACKEND_NAME blas::backend::lapack
+		#define BLAS_BACKEND_NAME blas::Backend::lapack
 	#else
 		#include "libgsl.h"
-		#define BLAS_BACKEND_NAME blas::backend::gsl
+		#define BLAS_BACKEND_NAME blas::Backend::gsl
 	#endif
 
 	namespace blas {
-		enum class backend: u8 {
+		enum class Backend: u8 {
 			gsl,
 			mkl,
 			lapack
 		};
 
-		static constexpr blas::backend BACKEND = BLAS_BACKEND_NAME;
+		static constexpr blas::Backend BACKEND = BLAS_BACKEND_NAME;
 
 		static CBLAS_TRANSPOSE backend_transpose_enum(const char op)
 		{
@@ -84,7 +84,7 @@
 
 		template<typename T>
 		static void gemv(const char transa,
-		                 const mat<T> &a, const vec<T> &x, vec<T> &y, const T alpha = 1.0, const T beta = 0.0)
+		                 const Mat<T> &a, const Vec<T> &x, Vec<T> &y, const T alpha = 1.0, const T beta = 0.0)
 		{
 			// NOTE: To read as if matrix A is not transposed.
 			const bool not_a = (transa == 'n') || (transa == 'N');
@@ -132,7 +132,7 @@
 
 		template<typename T>
 		static void gemm(const char transa, const char transb,
-		                 const mat<T> &a, const mat<T> &b, mat<T> &c, const T alpha = 1.0, const T beta = 0.0)
+		                 const Mat<T> &a, const Mat<T> &b, Mat<T> &c, const T alpha = 1.0, const T beta = 0.0)
 		{
 			// NOTE: Definitions of m, n, k, lda, ldb, and ldc can become somewhat confusing, thus the ones used
 			// below are taken from Section 2.7.1 of https://docs.nvidia.com/cuda/cublas/index.html#cublas-t-gemm

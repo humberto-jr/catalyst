@@ -104,15 +104,15 @@
 		}
 
 		template<usize LEN = MAX_INPUT_LENGTH>
-		static string keyword(c_str key, c_str dummy = "\0")
+		static String keyword(c_str key, c_str dummy = "\0")
 		{
 			c_str val = find_keyword_value<LEN>(key);
 
 			if (val[0] == '\0') {
-				return string(dummy);
+				return String(dummy);
 			}
 
-			return string(&val[0]);
+			return String(&val[0]);
 		}
 
 		template<usize LEN = MAX_INPUT_LENGTH>
@@ -130,7 +130,7 @@
 		}
 
 		template<usize LEN = MAX_INPUT_LENGTH>
-		static nist::isotope keyword(c_str key, nist::isotope dummy)
+		static nist::Isotope keyword(c_str key, nist::Isotope dummy)
 		{
 			c_str val = find_keyword_value<LEN>(key);
 
@@ -221,16 +221,16 @@
 		}
 
 		[[maybe_unused]]
-		static string argument_line(s32 argc, char* argv[], const char flag, u8 index, c_str dummy = "\0")
+		static String argument_line(s32 argc, char* argv[], const char flag, u8 index, c_str dummy = "\0")
 		{
 			auto pos = find_argument_position(argc, argv, flag, index);
 
 			if (pos.has_value()) {
 				usize n = pos.value();
 
-				return string(argv[n]);
+				return String(argv[n]);
 			} else {
-				return string(dummy);
+				return String(dummy);
 			}
 		}
 
@@ -241,7 +241,7 @@
 		}
 
 		[[maybe_unused]]
-		static nist::isotope argument_line(s32 argc, char* argv[], const char flag, u8 index, nist::isotope dummy)
+		static nist::Isotope argument_line(s32 argc, char* argv[], const char flag, u8 index, nist::Isotope dummy)
 		{
 			auto pos = find_argument_position(argc, argv, flag, index);
 

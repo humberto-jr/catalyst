@@ -1,7 +1,7 @@
 #include "fgh.h"
 #include "math.h"
 
-void fgh::matrix(f64 mass, f64 step, const vec<f64> &potential, mat<f64> &result)
+void fgh::matrix(f64 mass, f64 step, const Vec<f64> &potential, Mat<f64> &result)
 {
 	// References:
 	// [1] Dulieu et al., J. Chem. Phys. 103, 1 (1995)
@@ -31,7 +31,7 @@ void fgh::matrix(f64 mass, f64 step, const vec<f64> &potential, mat<f64> &result
 	}
 }
 
-void fgh::matrix(f64 mass, f64 step, const vec<mat<f64>> &potential, mat<f64> &result)
+void fgh::matrix(f64 mass, f64 step, const Vec<Mat<f64>> &potential, Mat<f64> &result)
 {
 	// References:
 	// [1] O. Dulieu et al., J. Chem. Phys. 103, 1 (1995)
@@ -88,7 +88,7 @@ void fgh::matrix(f64 mass, f64 step, const vec<mat<f64>> &potential, mat<f64> &r
 	}
 }
 
-f64 fgh::norm(f64 step, const vec<f64> &eigenvec)
+f64 fgh::norm(f64 step, const Vec<f64> &eigenvec)
 {
 	mut<usize> n_max = eigenvec.length() - 1;
 
@@ -117,7 +117,7 @@ f64 fgh::norm(f64 step, const vec<f64> &eigenvec)
 	return 1.0/std::sqrt(sum);
 }
 
-u32 fgh::is_valid(file::input &buf)
+u32 fgh::is_valid(file::Input &buf)
 {
 	buf.seek_set();
 
@@ -145,7 +145,7 @@ u32 fgh::is_valid(file::input &buf)
 	return count;
 }
 
-void fgh::load_basis(u32 n, file::input &buf, fgh::basis &basis)
+void fgh::load_basis(u32 n, file::Input &buf, fgh::Basis &basis)
 {
 	buf.seek_set(sizeof(fgh::MAGIC_NUMBER) + sizeof(fgh::FORMAT_VERSION) + sizeof(u32));
 
@@ -157,7 +157,7 @@ void fgh::load_basis(u32 n, file::input &buf, fgh::basis &basis)
 	basis.resize();
 
 	// NOTE: There is an extra u32 entry in each chunk of data for the basis indexing,
-	// which is not part of the struct fgh::basis (see saved_n below).
+	// which is not part of the struct fgh::Basis (see saved_n below).
 	usize offset = n*(6*sizeof(u32) + sizeof(s32) + 2*sizeof(f64) + basis.eigenvec.size());
 
 	buf.seek_set(fgh::BASIS_FILE_HEADER + offset);

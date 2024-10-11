@@ -517,12 +517,12 @@
 	//
 
 	template<typename T = usize>
-	struct range {
+	struct Range {
 		mut<T> min;
 		mut<T> max;
 		mut<T> step;
 
-		constexpr range(T start = static_cast<T>(0), T end = static_cast<T>(0), T step = static_cast<T>(1)):
+		constexpr Range(T start = static_cast<T>(0), T end = static_cast<T>(0), T step = static_cast<T>(1)):
 			min(start), max(end), step(step)
 		{
 			assert(this->step != static_cast<T>(0));
@@ -549,12 +549,12 @@
 			}
 		}
 
-		constexpr range<T> as_range_inclusive() const
+		constexpr Range<T> as_range_inclusive() const
 		{
-			return range<T>(this->min, this->max + this->step, this->step);
+			return Range<T>(this->min, this->max + this->step, this->step);
 		}
 
-		constexpr bool operator==(const range<T> &rhs) const
+		constexpr bool operator==(const Range<T> &rhs) const
 		{
 			return (this->min == rhs.min) && (this->max == rhs.max) && (this->step == rhs.step);
 		}
@@ -564,24 +564,24 @@
 			return this->min + static_cast<T>(n)*this->step;
 		}
 
-		// NOTE: The range<T>::iterator below only exists so that the compiler can
-		// generate range-based for-loops from a range<T>. It is not intended for
+		// NOTE: The Range<T>::Iterator below only exists so that the compiler can
+		// generate Range-based for-loops from a range<T>. It is not intended for
 		// manual use outside this context.
 
-		struct iterator {
+		struct Iterator {
 			mut<T> value;
-			const range<T> &owner;
+			const Range<T> &owner;
 
-			constexpr iterator(const range<T> &owner): value(owner.min), owner(owner)
+			constexpr Iterator(const Range<T> &owner): value(owner.min), owner(owner)
 			{
 			}
 
 			constexpr bool operator!=(const T rhs) const
 			{
 				// NOTE: The actual operation does not correspond the operator in
-				// order to enforce that the compiler generates finite range-based
+				// order to enforce that the compiler generates finite Range-based
 				// for-loops when T is an integer with step greater than 1 and also
-				// floating-points. Here, rhs must be the output of range<T>::end().
+				// floating-points. Here, rhs must be the output of Range<T>::end().
 				return (this->value < rhs);
 			}
 
@@ -596,9 +596,9 @@
 			}
 		};
 
-		constexpr range::iterator begin() const
+		constexpr Range<T>::Iterator begin() const
 		{
-			return range::iterator(*this);
+			return Range<T>::Iterator(*this);
 		}
 
 		constexpr T end() const

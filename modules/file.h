@@ -41,24 +41,24 @@
 		}
 
 		// NOTE: Overloaded versions of the write() and read() members for types
-		// vec<T>, mat<T> and mat<T>::view are used below, instead of templates,
+		// Vec<T>, Mat<T> and Mat<T>::View are used below, instead of templates,
 		// so that the caller won't need to specify the inner primitive type T.
 
-		class input {
+		class Input {
 			public:
-			const string filename;
+			const String filename;
 
-			inline input(c_str filename): filename(filename), stream(nullptr)
+			inline Input(c_str filename): filename(filename), stream(nullptr)
 			{
 				this->stream = file::open(this->filename.as_cstr(), "rb");
 			}
 
-			inline input(string &filename): filename(filename.move()), stream(nullptr)
+			inline Input(String &filename): filename(filename.move()), stream(nullptr)
 			{
 				this->stream = file::open(this->filename.as_cstr(), "rb");
 			}
 
-			inline input(input &other): filename(other.filename.as_cstr()), stream(nullptr)
+			inline Input(file::Input &other): filename(other.filename.as_cstr()), stream(nullptr)
 			{
 				this->stream = file::open(this->filename.as_cstr(), "rb");
 			}
@@ -147,135 +147,135 @@
 				this->read_raw<mut<f128>>(1, &data);
 			}
 
-			inline void read(vec<u8> &data)
+			inline void read(Vec<u8> &data)
 			{
 				this->read_raw<mut<u8>>(data.length(), &data[0]);
 			}
 
-			inline void read(vec<u16> &data)
+			inline void read(Vec<u16> &data)
 			{
 				this->read_raw<mut<u16>>(data.length(), &data[0]);
 			}
 
-			inline void read(vec<u32> &data)
+			inline void read(Vec<u32> &data)
 			{
 				this->read_raw<mut<u32>>(data.length(), &data[0]);
 			}
 
-			inline void read(vec<u64> &data)
+			inline void read(Vec<u64> &data)
 			{
 				this->read_raw<mut<u64>>(data.length(), &data[0]);
 			}
 
-			inline void read(vec<s8> &data)
+			inline void read(Vec<s8> &data)
 			{
 				this->read_raw<mut<s8>>(data.length(), &data[0]);
 			}
 
-			inline void read(vec<s16> &data)
+			inline void read(Vec<s16> &data)
 			{
 				this->read_raw<mut<s16>>(data.length(), &data[0]);
 			}
 
-			inline void read(vec<s32> &data)
+			inline void read(Vec<s32> &data)
 			{
 				this->read_raw<mut<s32>>(data.length(), &data[0]);
 			}
 
-			inline void read(vec<s64> &data)
+			inline void read(Vec<s64> &data)
 			{
 				this->read_raw<mut<s64>>(data.length(), &data[0]);
 			}
 
-			inline void read(vec<f64> &data)
+			inline void read(Vec<f64> &data)
 			{
 				this->read_raw<mut<f64>>(data.length(), &data[0]);
 			}
 
-			inline void read(vec<f32> &data)
+			inline void read(Vec<f32> &data)
 			{
 				this->read_raw<mut<f32>>(data.length(), &data[0]);
 			}
 
-			inline void read(vec<f128> &data)
+			inline void read(Vec<f128> &data)
 			{
 				this->read_raw<mut<f128>>(data.length(), &data[0]);
 			}
 
-			inline void read(string &data)
+			inline void read(String &data)
 			{
 				this->read_raw<char>(data.length(), data.as_ptr());
 			}
 
-			inline void read(mat<bool> &data)
+			inline void read(Mat<bool> &data)
 			{
 				this->read_raw<bool>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void read(mat<char> &data)
+			inline void read(Mat<char> &data)
 			{
 				this->read_raw<char>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void read(mat<u8> &data)
+			inline void read(Mat<u8> &data)
 			{
 				this->read_raw<mut<u8>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void read(mat<u16> &data)
+			inline void read(Mat<u16> &data)
 			{
 				this->read_raw<mut<u16>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void read(mat<u32> &data)
+			inline void read(Mat<u32> &data)
 			{
 				this->read_raw<mut<u32>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void read(mat<u64> &data)
+			inline void read(Mat<u64> &data)
 			{
 				this->read_raw<mut<u64>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void read(mat<s8> &data)
+			inline void read(Mat<s8> &data)
 			{
 				this->read_raw<mut<s8>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void read(mat<s16> &data)
+			inline void read(Mat<s16> &data)
 			{
 				this->read_raw<mut<s16>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void read(mat<s32> &data)
+			inline void read(Mat<s32> &data)
 			{
 				this->read_raw<mut<s32>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void read(mat<s64> &data)
+			inline void read(Mat<s64> &data)
 			{
 				this->read_raw<mut<s64>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void read(mat<f32> &data)
+			inline void read(Mat<f32> &data)
 			{
 				this->read_raw<mut<f32>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void read(mat<f64> &data)
+			inline void read(Mat<f64> &data)
 			{
 				this->read_raw<mut<f64>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void read(mat<f128> &data)
+			inline void read(Mat<f128> &data)
 			{
 				this->read_raw<mut<f128>>(data.rows()*data.cols(), &data[0]);
 			}
 
 			template<typename T>
-			void read_mat_view(typename mat<T>::view &data)
+			void read_mat_view(typename Mat<T>::View &data)
 			{
-				// NOTE: Elements of a mat<T>::view may not be stored contiguously
+				// NOTE: Elements of a Mat<T>::View may not be stored contiguously
 				// in memory. Therefore, a loop is needed.
 
 				for (mut<usize> n = 0; n < data.rows(); ++n)
@@ -283,72 +283,72 @@
 						this->read_raw<mut<T>>(1, &data(n, m));
 			}
 
-			inline void read(typename mat<bool>::view &data)
+			inline void read(typename Mat<bool>::View &data)
 			{
 				this->read_mat_view<bool>(data);
 			}
 
-			inline void read(typename mat<char>::view &data)
+			inline void read(typename Mat<char>::View &data)
 			{
 				this->read_mat_view<char>(data);
 			}
 
-			inline void read(typename mat<u8>::view &data)
+			inline void read(typename Mat<u8>::View &data)
 			{
 				this->read_mat_view<u8>(data);
 			}
 
-			inline void read(typename mat<u16>::view &data)
+			inline void read(typename Mat<u16>::View &data)
 			{
 				this->read_mat_view<u16>(data);
 			}
 
-			inline void read(typename mat<u32>::view &data)
+			inline void read(typename Mat<u32>::View &data)
 			{
 				this->read_mat_view<u32>(data);
 			}
 
-			inline void read(typename mat<u64>::view &data)
+			inline void read(typename Mat<u64>::View &data)
 			{
 				this->read_mat_view<u64>(data);
 			}
 
-			inline void read(typename mat<s8>::view &data)
+			inline void read(typename Mat<s8>::View &data)
 			{
 				this->read_mat_view<s8>(data);
 			}
 
-			inline void read(typename mat<s16>::view &data)
+			inline void read(typename Mat<s16>::View &data)
 			{
 				this->read_mat_view<s16>(data);
 			}
 
-			inline void read(typename mat<s32>::view &data)
+			inline void read(typename Mat<s32>::View &data)
 			{
 				this->read_mat_view<s32>(data);
 			}
 
-			inline void read(typename mat<s64>::view &data)
+			inline void read(typename Mat<s64>::View &data)
 			{
 				this->read_mat_view<s64>(data);
 			}
 
-			inline void read(typename mat<f32>::view &data)
+			inline void read(typename Mat<f32>::View &data)
 			{
 				this->read_mat_view<f32>(data);
 			}
 
-			inline void read(typename mat<f64>::view &data)
+			inline void read(typename Mat<f64>::View &data)
 			{
 				this->read_mat_view<f64>(data);
 			}
 
-			inline void read(typename mat<f128>::view &data)
+			inline void read(typename Mat<f128>::View &data)
 			{
 				this->read_mat_view<f128>(data);
 			}
 
-			void read_all(vec<byte> &buf)
+			void read_all(Vec<byte> &buf)
 			{
 				this->seek_set();
 				auto count = this->size();
@@ -387,7 +387,7 @@
 				return (std::feof(this->stream) != 0);
 			}
 
-			inline ~input()
+			inline ~Input()
 			{
 				file::close(this->stream);
 			}
@@ -396,21 +396,21 @@
 			std::FILE *stream;
 		};
 
-		class output {
+		class Output {
 			public:
-			const string filename;
+			const String filename;
 
-			inline output(c_str filename): filename(filename), stream(nullptr)
+			inline Output(c_str filename): filename(filename), stream(nullptr)
 			{
 				this->stream = file::open(this->filename.as_cstr(), "wb");
 			}
 
-			inline output(string &filename): filename(filename.move()), stream(nullptr)
+			inline Output(String &filename): filename(filename.move()), stream(nullptr)
 			{
 				this->stream = file::open(this->filename.as_cstr(), "wb");
 			}
 
-			inline output(output &other): filename(other.filename.as_cstr()), stream(nullptr)
+			inline Output(file::Output &other): filename(other.filename.as_cstr()), stream(nullptr)
 			{
 				this->stream = file::open(this->filename.as_cstr(), "wb");
 			}
@@ -500,145 +500,145 @@
 				this->write_raw<f128>(1, &data);
 			}
 
-			inline void write(const vec<bool> &data)
+			inline void write(const Vec<bool> &data)
 			{
 				this->write_raw<bool>(data.length(), &data[0]);
 			}
 
-			inline void write(const vec<char> &data)
+			inline void write(const Vec<char> &data)
 			{
 				this->write_raw<char>(data.length(), &data[0]);
 			}
 
-			inline void write(const vec<u8> &data)
+			inline void write(const Vec<u8> &data)
 			{
 				this->write_raw<mut<u8>>(data.length(), &data[0]);
 			}
 
-			inline void write(const vec<u16> &data)
+			inline void write(const Vec<u16> &data)
 			{
 				this->write_raw<mut<u16>>(data.length(), &data[0]);
 			}
 
-			inline void write(const vec<u32> &data)
+			inline void write(const Vec<u32> &data)
 			{
 				this->write_raw<mut<u32>>(data.length(), &data[0]);
 			}
 
-			inline void write(const vec<u64> &data)
+			inline void write(const Vec<u64> &data)
 			{
 				this->write_raw<mut<u64>>(data.length(), &data[0]);
 			}
 
-			inline void write(const vec<s8> &data)
+			inline void write(const Vec<s8> &data)
 			{
 				this->write_raw<mut<s8>>(data.length(), &data[0]);
 			}
 
-			inline void write(const vec<s16> &data)
+			inline void write(const Vec<s16> &data)
 			{
 				this->write_raw<mut<s16>>(data.length(), &data[0]);
 			}
 
-			inline void write(const vec<s32> &data)
+			inline void write(const Vec<s32> &data)
 			{
 				this->write_raw<mut<s32>>(data.length(), &data[0]);
 			}
 
-			inline void write(const vec<s64> &data)
+			inline void write(const Vec<s64> &data)
 			{
 				this->write_raw<mut<s64>>(data.length(), &data[0]);
 			}
 
-			inline void write(const vec<f64> &data)
+			inline void write(const Vec<f64> &data)
 			{
 				this->write_raw<mut<f64>>(data.length(), &data[0]);
 			}
 
-			inline void write(const vec<f32> &data)
+			inline void write(const Vec<f32> &data)
 			{
 				this->write_raw<mut<f32>>(data.length(), &data[0]);
 			}
 
-			inline void write(const vec<f128> &data)
+			inline void write(const Vec<f128> &data)
 			{
 				this->write_raw<mut<f128>>(data.length(), &data[0]);
 			}
 
-			inline void write(const string &data)
+			inline void write(const String &data)
 			{
 				this->write_raw<char>(data.length(), data.as_cstr());
 			}
 
-			inline void write(const mat<bool> &data)
+			inline void write(const Mat<bool> &data)
 			{
 				this->write_raw<bool>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void write(const mat<char> &data)
+			inline void write(const Mat<char> &data)
 			{
 				this->write_raw<char>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void write(const mat<u8> &data)
+			inline void write(const Mat<u8> &data)
 			{
 				this->write_raw<mut<u8>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void write(const mat<u16> &data)
+			inline void write(const Mat<u16> &data)
 			{
 				this->write_raw<mut<u16>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void write(const mat<u32> &data)
+			inline void write(const Mat<u32> &data)
 			{
 				this->write_raw<mut<u32>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void write(const mat<u64> &data)
+			inline void write(const Mat<u64> &data)
 			{
 				this->write_raw<mut<u64>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void write(const mat<s8> &data)
+			inline void write(const Mat<s8> &data)
 			{
 				this->write_raw<mut<s8>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void write(const mat<s16> &data)
+			inline void write(const Mat<s16> &data)
 			{
 				this->write_raw<mut<s16>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void write(const mat<s32> &data)
+			inline void write(const Mat<s32> &data)
 			{
 				this->write_raw<mut<s32>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void write(const mat<s64> &data)
+			inline void write(const Mat<s64> &data)
 			{
 				this->write_raw<mut<s64>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void write(const mat<f32> &data)
+			inline void write(const Mat<f32> &data)
 			{
 				this->write_raw<mut<f32>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void write(const mat<f64> &data)
+			inline void write(const Mat<f64> &data)
 			{
 				this->write_raw<mut<f64>>(data.rows()*data.cols(), &data[0]);
 			}
 
-			inline void write(const mat<f128> &data)
+			inline void write(const Mat<f128> &data)
 			{
 				this->write_raw<mut<f128>>(data.rows()*data.cols(), &data[0]);
 			}
 
 			template<typename T>
-			void write_mat_view(const typename mat<T>::view &data)
+			void write_mat_view(const typename Mat<T>::View &data)
 			{
-				// NOTE: Elements of a mat<T>::view may not be stored contiguously
+				// NOTE: Elements of a Mat<T>::View may not be stored contiguously
 				// in memory. Therefore, a loop is needed.
 
 				for (mut<usize> n = 0; n < data.rows(); ++n)
@@ -646,67 +646,67 @@
 						this->write_raw<mut<T>>(1, &data(n, m));
 			}
 
-			inline void write(const typename mat<bool>::view &data)
+			inline void write(const typename Mat<bool>::View &data)
 			{
 				this->write_mat_view<bool>(data);
 			}
 
-			inline void write(const typename mat<char>::view &data)
+			inline void write(const typename Mat<char>::View &data)
 			{
 				this->write_mat_view<char>(data);
 			}
 
-			inline void write(const typename mat<u8>::view &data)
+			inline void write(const typename Mat<u8>::View &data)
 			{
 				this->write_mat_view<u8>(data);
 			}
 
-			inline void write(const typename mat<u16>::view &data)
+			inline void write(const typename Mat<u16>::View &data)
 			{
 				this->write_mat_view<u16>(data);
 			}
 
-			inline void write(const typename mat<u32>::view &data)
+			inline void write(const typename Mat<u32>::View &data)
 			{
 				this->write_mat_view<u32>(data);
 			}
 
-			inline void write(const typename mat<u64>::view &data)
+			inline void write(const typename Mat<u64>::View &data)
 			{
 				this->write_mat_view<u64>(data);
 			}
 
-			inline void write(const typename mat<s8>::view &data)
+			inline void write(const typename Mat<s8>::View &data)
 			{
 				this->write_mat_view<s8>(data);
 			}
 
-			inline void write(const typename mat<s16>::view &data)
+			inline void write(const typename Mat<s16>::View &data)
 			{
 				this->write_mat_view<s16>(data);
 			}
 
-			inline void write(const typename mat<s32>::view &data)
+			inline void write(const typename Mat<s32>::View &data)
 			{
 				this->write_mat_view<s32>(data);
 			}
 
-			inline void write(const typename mat<s64>::view &data)
+			inline void write(const typename Mat<s64>::View &data)
 			{
 				this->write_mat_view<s64>(data);
 			}
 
-			inline void write(const typename mat<f32>::view &data)
+			inline void write(const typename Mat<f32>::View &data)
 			{
 				this->write_mat_view<f32>(data);
 			}
 
-			inline void write(const typename mat<f64>::view &data)
+			inline void write(const typename Mat<f64>::View &data)
 			{
 				this->write_mat_view<f64>(data);
 			}
 
-			inline void write(const typename mat<f128>::view &data)
+			inline void write(const typename Mat<f128>::View &data)
 			{
 				this->write_mat_view<f128>(data);
 			}
@@ -721,7 +721,7 @@
 				file::seek_end(this->stream, count);
 			}
 
-			inline ~output()
+			inline ~Output()
 			{
 				file::close(this->stream);
 			}
@@ -733,13 +733,13 @@
 		template<typename T>
 		static constexpr bool is_input()
 		{
-			return std::is_same<T, file::input>::value;
+			return std::is_same<T, file::Input>::value;
 		}
 
 		template<typename T>
 		static constexpr bool is_output()
 		{
-			return std::is_same<T, file::output>::value;
+			return std::is_same<T, file::Output>::value;
 		}
 	}
 #endif

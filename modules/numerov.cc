@@ -36,13 +36,13 @@
 static constexpr usize FILE_HEADER_OFFSET
 	= 2*sizeof(u32) + sizeof(u8) + 4*sizeof(f64) + sizeof(usize);
 
-numerov::basis numerov::open_basis_file(const string &filename)
+numerov::Basis numerov::open_basis_file(const String &filename)
 {
-	file::input input(filename.as_cstr());
+	file::Input input(filename.as_cstr());
 
 	u32 count = fgh::is_valid(input);
 
-	numerov::basis list(count);
+	numerov::Basis list(count);
 
 	fgh::load_basis(0, input, list[0]);
 
@@ -58,13 +58,13 @@ numerov::basis numerov::open_basis_file(const string &filename)
 	return list;
 }
 
-numerov::potential numerov::open(string &filename, u8 fmt_ver)
+numerov::Potential numerov::open(String &filename, u8 fmt_ver)
 {
 	// TODO: It is missing the implementation of consuming files with Numerov
 	// ratio matrices.
 	assert(fmt_ver == 1);
 
-	file::input buf(filename);
+	file::Input buf(filename);
 
 	mut<u32> tag = 0;
 	buf.read(tag);
@@ -98,14 +98,14 @@ numerov::potential numerov::open(string &filename, u8 fmt_ver)
 	mut<usize> ch_count = 0;
 	buf.read(ch_count);
 
-	mat<f64> coupling(ch_count, ch_count);
+	Mat<f64> coupling(ch_count, ch_count);
 
 	return {n_min, R_min, R_max, R_step, mass, coupling, buf};
 }
 
-numerov::solution numerov::open_ratio_file(string &filename, u8 fmt_ver)
+numerov::Solution numerov::open_ratio_file(String &filename, u8 fmt_ver)
 {
-	file::input input(filename);
+	file::Input input(filename);
 
 	mut<u32> tag = 0;
 	input.read(tag);
@@ -142,7 +142,7 @@ numerov::solution numerov::open_ratio_file(string &filename, u8 fmt_ver)
 	mut<f64> E_step = 0.0;
 	input.read(E_step);
 
-	mat<f64> ratio(ch_count, ch_count);
+	Mat<f64> ratio(ch_count, ch_count);
 
 	if (input.end()) {
 		print::error(WHERE, input.filename.as_cstr(), " has no valid solutions");
@@ -151,7 +151,7 @@ numerov::solution numerov::open_ratio_file(string &filename, u8 fmt_ver)
 	return {mass, R_max, R_step, E_min, E_max, E_step, input, ratio};
 }
 
-const mat<f64>& numerov::potential::operator[](u32 n)
+const Mat<f64>& numerov::Potential::operator[](u32 n)
 {
 	usize offset = sizeof(u32) + sizeof(f64) + this->coupling.size();
 
@@ -172,7 +172,7 @@ const mat<f64>& numerov::potential::operator[](u32 n)
 	return this->coupling;
 }
 
-const mat<f64>& numerov::solution::operator[](u32 n)
+const Mat<f64>& numerov::Solution::operator[](u32 n)
 {
 	constexpr usize RATIO_HEADER_OFFSET
 		= sizeof(numerov::MAGIC_NUMBER) + sizeof(numerov::FORMAT_VERSION) + 6*sizeof(f64) + sizeof(usize);
@@ -195,14 +195,14 @@ const mat<f64>& numerov::solution::operator[](u32 n)
 }
 
 //
-// numerov::smatrix:
+// numerov::ScattMatrix:
 //
 
 static constexpr usize SMATRIX_HEADER_OFFSET
 	= sizeof(numerov::FORMAT_VERSION) + sizeof(numerov::MAGIC_NUMBER) + 2*sizeof(u32) + sizeof(f64);
 
-numerov::smatrix::smatrix(c_str filename, u8 fmt_ver):
-	input(filename), entry(type_zeroed<numerov::smatrix_entry>())
+numerov::ScattMatrix::ScattMatrix(c_str filename, u8 fmt_ver):
+	input(filename), entry(type_zeroed<numerov::ScattMatrixEntry>())
 {
 	CHECK_FILE_HEADER(this->input, fmt_ver);
 
@@ -219,33 +219,33 @@ numerov::smatrix::smatrix(c_str filename, u8 fmt_ver):
 	this->entry.value.resize(energy_count);
 
 	// NOTE: For every pair of channels, ab, there must be this number of bytes
-	// written in the input file. That is, the size of a numerov::smatrix_entry
+	// written in the input file. That is, the size of a numerov::ScattMatrixEntry
 	// object (without the 'size' and 'channel_count' members) plus three extra
 	// integers stored for internal checks (channels and energy indices, all u32).
 	this->entry.size = 12*sizeof(u32) + 2*sizeof(s32) + 2*sizeof(f64) + energy_count*(sizeof(u32) + 3*sizeof(f64));
 }
 
-c_str numerov::smatrix::filename() const
+c_str numerov::ScattMatrix::filename() const
 {
 	return this->input.filename.as_cstr();
 }
 
-f64 numerov::smatrix::reduced_mass() const
+f64 numerov::ScattMatrix::reduced_mass() const
 {
 	return this->entry.mass;
 }
 
-u32 numerov::smatrix::channel_count() const
+u32 numerov::ScattMatrix::channel_count() const
 {
 	return this->entry.channel_count;
 }
 
-u32 numerov::smatrix::energy_count() const
+u32 numerov::ScattMatrix::energy_count() const
 {
 	return as_u32(this->entry.value.length());
 }
 
-const numerov::smatrix_entry* numerov::smatrix::operator()(u32 channel_a, u32 channel_b)
+const numerov::ScattMatrixEntry* numerov::ScattMatrix::operator()(u32 channel_a, u32 channel_b)
 {
 	CHECK_FILE_END(this->input)
 
@@ -304,24 +304,24 @@ const numerov::smatrix_entry* numerov::smatrix::operator()(u32 channel_a, u32 ch
 }
 
 //
-// numerov::scatt_amplitude:
+// numerov::ScattAmplitude:
 //
 
-numerov::scatt_amplitude::scatt_amplitude(u32 j_in, u32 j_out, u32 theta_count, u32 energy_count):
+numerov::ScattAmplitude::ScattAmplitude(u32 j_in, u32 j_out, u32 theta_count, u32 energy_count):
 	entry((2*j_in + 1)*(2*j_out + 1))
 {
 	mut<u32> mm_index = 0;
 
 	for (mut<s32> m_in = -as_s32(j_in); m_in <= as_s32(j_in); ++m_in) {
 		for (mut<s32> m_out = -as_s32(j_out); m_out <= as_s32(j_out); ++m_out) {
-			vec<vec<c64>> theta_list(theta_count);
+			Vec<Vec<c64>> theta_list(theta_count);
 
 			this->entry[mm_index].m_in = m_in;
 			this->entry[mm_index].m_out = m_out;
 			this->entry[mm_index].value.swap(theta_list);
 
 			for (mut<u32> theta_index = 0; theta_index < theta_count; ++theta_index) {
-				vec<c64> energy_list(energy_count);
+				Vec<c64> energy_list(energy_count);
 
 				this->entry[mm_index].value[theta_index].swap(energy_list);
 			}
@@ -331,22 +331,22 @@ numerov::scatt_amplitude::scatt_amplitude(u32 j_in, u32 j_out, u32 theta_count, 
 	}
 }
 
-u32 numerov::scatt_amplitude::mm_count() const
+u32 numerov::ScattAmplitude::mm_count() const
 {
 	return as_u32(this->entry.length());
 }
 
-u32 numerov::scatt_amplitude::theta_count() const
+u32 numerov::ScattAmplitude::theta_count() const
 {
 	return as_u32(this->entry[0].value.length());
 }
 
-u32 numerov::scatt_amplitude::energy_count() const
+u32 numerov::ScattAmplitude::energy_count() const
 {
 	return as_u32(this->entry[0].value[0].length());
 }
 
-c64 numerov::scatt_amplitude::mm_sum(u32 theta_index, u32 energy_index) const
+c64 numerov::ScattAmplitude::mm_sum(u32 theta_index, u32 energy_index) const
 {
 	mut<c64> sum = c64(0.0, 0.0);
 
@@ -357,17 +357,17 @@ c64 numerov::scatt_amplitude::mm_sum(u32 theta_index, u32 energy_index) const
 	return sum;
 }
 
-numerov::scatt_amplitude_entry& numerov::scatt_amplitude::operator()(u32 mm_index) const
+numerov::ScattAmplitudeEntry& numerov::ScattAmplitude::operator()(u32 mm_index) const
 {
 	return this->entry[mm_index];
 }
 
-vec<c64>& numerov::scatt_amplitude::operator()(u32 mm_index, u32 theta_index) const
+Vec<c64>& numerov::ScattAmplitude::operator()(u32 mm_index, u32 theta_index) const
 {
 	return this->entry[mm_index].value[theta_index];
 }
 
-c64& numerov::scatt_amplitude::operator()(u32 mm_index, u32 theta_index, u32 energy_index) const
+c64& numerov::ScattAmplitude::operator()(u32 mm_index, u32 theta_index, u32 energy_index) const
 {
 	return this->entry[mm_index].value[theta_index][energy_index];
 }
@@ -379,10 +379,10 @@ c64& numerov::scatt_amplitude::operator()(u32 mm_index, u32 theta_index, u32 ene
 void numerov::renormalized(f64 mass,
                            f64 step,
                            f64 tot_energy,
-                           const mat<f64> &pot_energy,
-                           mat<f64> &workspace,
-                           mat<f64> &old_ratio,
-                           mat<f64> &new_ratio)
+                           const Mat<f64> &pot_energy,
+                           Mat<f64> &workspace,
+                           Mat<f64> &old_ratio,
+                           Mat<f64> &new_ratio)
 {
 	// NOTE: This routine implements the renormalized Numerov algorithm of Johnson,
 	// which propagates the ratio of the wavefunction from a previous grid point to
@@ -455,8 +455,8 @@ usize numerov::build_react_matrix(f64 mass,
                                   f64 step,
                                   f64 R_max,
                                   f64 tot_energy,
-                                  const mat<f64> &ratio,
-                                  const numerov::basis &level, mat<f64> &k)
+                                  const Mat<f64> &ratio,
+                                  const numerov::Basis &level, Mat<f64> &k)
 {
 	// NOTE: This routine implements Johnson's algorithm to compute the augmented
 	// reaction matrix K, as in B.R. Johnson. J. Chem. Phys. 69, 4678 (1978). See
@@ -476,9 +476,9 @@ usize numerov::build_react_matrix(f64 mass,
 	// NOTE: Eq. (17) combined with Eq. (2).
 	f64 fact = -step*step*2.0*mass/12.0;
 
-	mat<f64> n(ch_count, ch_count), j(ch_count, ch_count);
+	Mat<f64> n(ch_count, ch_count), j(ch_count, ch_count);
 
-	mat<f64> rn(ch_count, ch_count), rj(ch_count, ch_count);
+	Mat<f64> rn(ch_count, ch_count), rj(ch_count, ch_count);
 
 	//
 	// Step 1: Build the diagonal Riccati-Bessel matrices using Eq. (A16), (A17)
@@ -545,8 +545,8 @@ usize numerov::build_react_matrix(f64 mass,
 	return count;
 }
 
-void numerov::build_scatt_matrix(const mat<f64> &k,
-                                 mat<f64> &re_s, mat<f64> &im_s)
+void numerov::build_scatt_matrix(const Mat<f64> &k,
+                                 Mat<f64> &re_s, Mat<f64> &im_s)
 {
 	// NOTE: This routine computes the scatt. matrix S from the open-open block of
 	// the reaction matrix K, as in B.R. Johnson. J. Com. Phys. 13, 445-449 (1973).
@@ -563,7 +563,7 @@ void numerov::build_scatt_matrix(const mat<f64> &k,
 	// Step 1: Compute the square of the K matrix.
 	//
 
-	mat<f64> workspace(ch_count, ch_count);
+	Mat<f64> workspace(ch_count, ch_count);
 
 	blas::gemm<f64>('n', 'n', k, k, workspace);
 
@@ -599,8 +599,8 @@ void numerov::build_scatt_matrix(const mat<f64> &k,
 	blas::gemm<f64>('n', 'n', k, im_s, re_s, 1.0, -1.0);
 }
 
-void numerov::build_scatt_amplitude(const numerov::smatrix_entry &s,
-                                    s32 m_in, s32 m_out, f64 theta, f64 phi, vec<c64> &f)
+void numerov::build_scatt_amplitude(const numerov::ScattMatrixEntry &s,
+                                    s32 m_in, s32 m_out, f64 theta, f64 phi, Vec<c64> &f)
 {
 	// NOTE: This routine computes the energy-dependent scatt. amplitude f as a
 	// function of the scatt. angles (theta, phi) for a given S-matrix element
@@ -651,9 +651,9 @@ void numerov::build_scatt_amplitude(const numerov::smatrix_entry &s,
 	}
 }
 
-void numerov::build_cross_section(const numerov::scatt_amplitude &f, u32 j_in,
-                                  const vec<f64> &wavenum_in, const vec<f64> &wavenum_out,
-                                  mat<c64> &f_sum, mat<f64> &dif_sigma, vec<f64> &int_sigma)
+void numerov::build_cross_section(const numerov::ScattAmplitude &f, u32 j_in,
+                                  const Vec<f64> &wavenum_in, const Vec<f64> &wavenum_out,
+                                  Mat<c64> &f_sum, Mat<f64> &dif_sigma, Vec<f64> &int_sigma)
 {
 	// NOTE: This routine computes the differential and integral cross-sections,
 	// sigma, from a given scatt. amplitude, f, and the incoming and outgoing
@@ -681,7 +681,7 @@ void numerov::build_cross_section(const numerov::scatt_amplitude &f, u32 j_in,
 
 	f64 j_mult = as_f64(2*j_in + 1);
 
-	vec<f64> integrand(theta_count + 1u);
+	Vec<f64> integrand(theta_count + 1u);
 
 	f64 theta_step = (THETA_MAX - THETA_MIN)/as_f64(theta_count);
 

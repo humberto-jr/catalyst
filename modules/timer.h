@@ -14,9 +14,9 @@
 	}
 
 	template<usize MAX_LEN = DEFAULT_TIMER_LENGTH>
-	class timer {
+	class Timer {
 		public:
-		inline timer(): len(0), buf{as_duration(0.0)}
+		inline Timer(): len(0), buf{as_duration(0.0)}
 		{
 			static_assert(MAX_LEN > 0);
 		}

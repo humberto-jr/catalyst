@@ -14,13 +14,13 @@
 
 	#if defined(USE_MKL)
 		#include <mkl_lapacke.h>
-		#define LAPACK_BACKEND_NAME lapack::backend::mkl
+		#define LAPACK_BACKEND_NAME lapack::Backend::mkl
 	#elif defined(USE_LAPACKE)
 		#include <lapacke.h>
-		#define LAPACK_BACKEND_NAME lapack::backend::lapacke
+		#define LAPACK_BACKEND_NAME lapack::Backend::lapacke
 	#else
 		#include "libgsl.h"
-		#define LAPACK_BACKEND_NAME lapack::backend::gsl
+		#define LAPACK_BACKEND_NAME lapack::Backend::gsl
 	#endif
 
 	#define CHECK_LAPACKE_ERROR(name, code)                              \
@@ -31,20 +31,20 @@
 	}
 
 	namespace lapack {
-		enum class backend: u8 {
+		enum class Backend: u8 {
 			gsl,
 			mkl,
 			lapacke
 		};
 
-		static constexpr lapack::backend BACKEND = LAPACK_BACKEND_NAME;
+		static constexpr lapack::Backend BACKEND = LAPACK_BACKEND_NAME;
 
 		static constexpr c_str backend_name()
 		{
 			switch (lapack::BACKEND) {
-				case lapack::backend::gsl:     return "GNU Scientific Library\0";
-				case lapack::backend::mkl:     return "Intel Math Kernel Library\0";
-				case lapack::backend::lapacke: return "LAPACKE\0";
+				case lapack::Backend::gsl:     return "GNU Scientific Library\0";
+				case lapack::Backend::mkl:     return "Intel Math Kernel Library\0";
+				case lapack::Backend::lapacke: return "LAPACKE\0";
 				default:                       return "Unknown\0";
 			}
 		}
@@ -111,7 +111,7 @@
 		}
 
 		template<typename T>
-		static void syev(mat<T> &eigenvec, vec<T> &eigenval)
+		static void syev(Mat<T> &eigenvec, Vec<T> &eigenval)
 		{
 			usize n = eigenvec.rows();
 
@@ -172,7 +172,7 @@
 				// TODO:
 				static_assert(is_f64<T>(), "Only T = f64 is possible when GSL is used as backend");
 
-				vec<f64> a_copy(n*n);
+				Vec<f64> a_copy(n*n);
 
 				for (mut<usize> n = 0; n < a_copy.length(); ++n) {
 					a_copy[n] = a[n];
@@ -198,7 +198,7 @@
 		}
 
 		template<typename T>
-		static void sytri(mat<T> &a, vec<s32> &ipiv)
+		static void sytri(Mat<T> &a, Vec<s32> &ipiv)
 		{
 			usize n = a.rows();
 
@@ -221,9 +221,9 @@
 		}
 
 		template<typename T>
-		static inline void sytri(mat<T> &a)
+		static inline void sytri(Mat<T> &a)
 		{
-			vec<s32> ipiv(a.rows());
+			Vec<s32> ipiv(a.rows());
 			lapack::sytri(a, ipiv);
 		}
 
@@ -269,7 +269,7 @@
 		}
 
 		template<typename T>
-		static void gesv(mat<T> &a, vec<s32> &ipiv, mat<T> &b)
+		static void gesv(Mat<T> &a, Vec<s32> &ipiv, Mat<T> &b)
 		{
 			usize n = a.rows();
 			usize nrhs = b.cols();
@@ -282,14 +282,14 @@
 		}
 
 		template<typename T>
-		static void gesv(mat<T> &a, mat<T> &b)
+		static void gesv(Mat<T> &a, Mat<T> &b)
 		{
 			usize n = a.rows();
 			usize nrhs = b.cols();
 
 			assert(a.cols() == n);
 			assert(b.rows() == n);
-			vec<s32> ipiv(n);
+			Vec<s32> ipiv(n);
 
 			lapack::gesv(n, nrhs, &a[0], &ipiv[0], &b[0]);
 		}

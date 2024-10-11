@@ -27,7 +27,7 @@
 	}
 
 	namespace cuda::blas {
-		class frontend;
+		class Frontend;
 	}
 
 	namespace cuda {
@@ -61,9 +61,9 @@
 		}
 
 		template<typename T>
-		class dev {
+		class Dev {
 			public:
-			ALL inline dev(usize count = 1):
+			ALL inline Dev(usize count = 1):
 				len(count), buf(cuda::malloc<T>(count)), stream(0), operation(CUBLAS_OP_N)
 			{
 				auto info = cudaStreamCreate(&this->stream);
@@ -89,7 +89,7 @@
 				CHECK_CUDA_ERROR("cudaMemcpyAsync()", info)
 			}
 
-			ALL void async_memcpy_from(const vec<T> &source)
+			ALL void async_memcpy_from(const Vec<T> &source)
 			{
 				usize count = std::min(this->size(), source.size());
 
@@ -98,7 +98,7 @@
 				CHECK_CUDA_ERROR("cudaMemcpyAsync()", info)
 			}
 
-			ALL void async_memcpy_from(const mat<T> &source)
+			ALL void async_memcpy_from(const Mat<T> &source)
 			{
 				usize count = std::min(this->size(), source.size());
 
@@ -116,7 +116,7 @@
 				CHECK_CUDA_ERROR("cudaMemcpyAsync()", info)
 			}
 
-			ALL void async_memcpy_to(vec<T> &dest) const
+			ALL void async_memcpy_to(Vec<T> &dest) const
 			{
 				usize count = std::min(dest.size(), this->size());
 
@@ -125,7 +125,7 @@
 				CHECK_CUDA_ERROR("cudaMemcpyAsync()", info)
 			}
 
-			ALL void async_memcpy_to(mat<T> &dest) const
+			ALL void async_memcpy_to(Mat<T> &dest) const
 			{
 				usize count = std::min(dest.size(), this->size());
 
@@ -134,7 +134,7 @@
 				CHECK_CUDA_ERROR("cudaMemcpyAsync()", info)
 			}
 
-			ALL void async_memcpy_to(dev<T> &dest) const
+			ALL void async_memcpy_to(Dev<T> &dest) const
 			{
 				usize count = std::min(dest.size(), this->size());
 
@@ -171,7 +171,7 @@
 				return this->buf[n];
 			}
 
-			ALL ~dev()
+			ALL ~Dev()
 			{
 				auto info = cudaStreamDestroy(this->stream);
 
@@ -186,22 +186,22 @@
 			cudaStream_t stream;
 			cublasOperation_t operation;
 
-			friend class cuda::blas::frontend;
+			friend class cuda::blas::Frontend;
 		};
 
 		namespace blas {
-			// NOTE: The cuBLAS wrappers will be added to the frontend class only
+			// NOTE: The cuBLAS wrappers will be added to the Frontend class only
 			// as they are first required throughout the codebase.
 
-			class frontend {
+			class Frontend {
 				public:
-				GPU frontend(): thread_count(1u)
+				GPU Frontend(): thread_count(1u)
 				{
 					auto info = cublasCreate(&this->handle[0]);
 					CHECK_CUBLAS_ERROR("cublasCreate()", info)
 				}
 
-				CPU frontend(u32 max_thread): thread_count(max_thread)
+				CPU Frontend(u32 max_thread): thread_count(max_thread)
 				{
 					#pragma omp master
 					for (mut<u32> thread = 0; thread < max_thread; ++thread) {
@@ -211,7 +211,7 @@
 				}
 
 				template<typename T>
-				ALL void gemv(usize m, usize n, const dev<T> &a, usize lda, const dev<T> &x, usize incx, dev<T> &y, usize incy, const T alpha = 1.0, const T beta = 0.0)
+				ALL void gemv(usize m, usize n, const Dev<T> &a, usize lda, const Dev<T> &x, usize incx, Dev<T> &y, usize incy, const T alpha = 1.0, const T beta = 0.0)
 				{
 					#if defined(__CUDA_ARCH__)
 						u32 thread = 0u;
@@ -262,7 +262,7 @@
 				}
 
 				template<typename T>
-				ALL void gemm(usize m, usize n, usize k, const dev<T> &a, usize lda, const dev<T> &b, usize ldb, dev<T> &c, usize ldc, const T alpha = 1.0, const T beta = 0.0)
+				ALL void gemm(usize m, usize n, usize k, const Dev<T> &a, usize lda, const Dev<T> &b, usize ldb, Dev<T> &c, usize ldc, const T alpha = 1.0, const T beta = 0.0)
 				{
 					#if defined(__CUDA_ARCH__)
 						u32 thread = 0u;
@@ -312,7 +312,7 @@
 					}
 				}
 
-				ALL ~frontend()
+				ALL ~Frontend()
 				{
 					#if defined(__CUDA_ARCH__)
 						auto info = cublasDestroy(this->handle[0]);

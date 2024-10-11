@@ -4,22 +4,22 @@
 	#include <initializer_list>
 
 	template<typename T = f64>
-	class vector {
+	class Vector {
 		public:
-		inline vector(): len(0), buf(nullptr)
+		inline Vector(): len(0), buf(nullptr)
 		{
 		}
 
-		inline vector(usize count): len(0), buf(nullptr)
+		inline Vector(usize count): len(0), buf(nullptr)
 		{
 			this->resize(count);
 		}
 
-		inline vector(vector<T> &&other): len(other.len), buf(other.release())
+		inline Vector(Vector<T> &&other): len(other.len), buf(other.release())
 		{
 		}
 
-		inline vector(const std::initializer_list<T> &rhs): len(rhs.size()), buf(nullptr)
+		inline Vector(const std::initializer_list<T> &rhs): len(rhs.size()), buf(nullptr)
 		{
 			 this->resize(rhs.size());
 			*this = rhs;
@@ -47,7 +47,7 @@
 			}
 		}
 
-		inline void operator=(const vector<T> &rhs)
+		inline void operator=(const Vector<T> &rhs)
 		{
 			usize n_max = (this->len < rhs.len? this->len : rhs.len);
 
@@ -90,12 +90,12 @@
 			return this->buf[n];
 		}
 
-		inline vector<T> move()
+		inline Vector<T> move()
 		{
-			return vector(*this);
+			return Vector(*this);
 		}
 
-		void swap(vector<T> &other)
+		void swap(Vector<T> &other)
 		{
 			auto len = this->len;
 			auto buf = this->buf;
@@ -131,7 +131,7 @@
 			this->buf = static_cast<mut<T>*>(new_buf);
 		}
 
-		inline ~vector()
+		inline ~Vector()
 		{
 			if (this->buf != nullptr) {
 				std::free(as_void(this->buf));
@@ -145,11 +145,11 @@
 		// NOTE: A copy-constructor from raw parts and internal use only which behaves
 		// as a move-constructor. If made public, the compiler will perform unintended
 		// moves as we don't want to share the internal buf pointer.
-		inline vector(vector<T> &other): len(other.len), buf(other.release())
+		inline Vector(Vector<T> &other): len(other.len), buf(other.release())
 		{
 		}
 	};
 
 	template<typename T = f64>
-	using vec = vector<T>;
+	using Vec = Vector<T>;
 #endif

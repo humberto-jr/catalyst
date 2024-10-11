@@ -19,21 +19,21 @@
 		// in order to print each argument. However, in a multithreaded context, each recursive call may or may not
 		// be interleaved by a call from another thread, producing lines made up of chunks of lines from many threads.
 		// To avoid the problem, each call will store the partially formatted line in a C-string buffer, intrinsically
-		// local to each thread, which will be printed only at the end of the call chain. The print::fmt struct is the
+		// local to each thread, which will be printed only at the end of the call chain. The print::Fmt struct is the
 		// wrapper over the buffer and the boilerplate code needed to use it. Finally, the C format specifier of each
 		// argument is deduced by the type_fmt() function from the types.h module.
 
 		template<u8 PAD = DEFAULT_FMT_PADDING, usize LEN = DEFAULT_FMT_LENGTH>
-		struct fmt {
+		struct Fmt {
 			mut<usize> len;
 			char buf[LEN + 1];
 
-			inline fmt(): len(0), buf{'\0'}
+			inline Fmt(): len(0), buf{'\0'}
 			{
 			}
 
 			template<typename T>
-			inline fmt(const T val): len(0), buf{'\0'}
+			inline Fmt(const T val): len(0), buf{'\0'}
 			{
 				*this += val;
 			}
@@ -77,9 +77,9 @@
 			}
 
 			template<usize RHS_LEN>
-			inline fmt<PAD, LEN + RHS_LEN> operator+(const fmt<PAD, RHS_LEN> &rhs) const
+			inline print::Fmt<PAD, LEN + RHS_LEN> operator+(const print::Fmt<PAD, RHS_LEN> &rhs) const
 			{
-				fmt<PAD, LEN + RHS_LEN> result(this->as_cstr());
+				print::Fmt<PAD, LEN + RHS_LEN> result(this->as_cstr());
 				result += rhs.as_cstr();
 				return result;
 			}
@@ -88,62 +88,62 @@
 		[[maybe_unused]]
 		static inline void line()
 		{
-			fmt<1, 1> blank;
+			print::Fmt<1, 1> blank;
 			blank.flush();
 		}
 
 		template<u8 PAD, usize LEN>
-		static void line(const fmt<PAD, LEN> &content)
+		static void line(const print::Fmt<PAD, LEN> &content)
 		{
 			content.flush();
 		}
 
 		template<u8 PAD, usize LEN, typename T>
-		static void line(const fmt<PAD, LEN> &prev, T last)
+		static void line(const print::Fmt<PAD, LEN> &prev, T last)
 		{
-			fmt<PAD> end(last);
+			print::Fmt<PAD> end(last);
 			line(prev + end);
 		}
 
 		template<u8 PAD, usize LEN, typename T, typename... Ts>
-		static void line(const fmt<PAD, LEN> &prev, T first, Ts... remainder)
+		static void line(const print::Fmt<PAD, LEN> &prev, T first, Ts... remainder)
 		{
-			fmt<PAD> next(first);
+			print::Fmt<PAD> next(first);
 			line(prev + next, remainder...);
 		}
 
 		template<u8 PAD = 1, typename T, typename... Ts>
 		static void line(T first, Ts... remainder)
 		{
-			fmt<PAD> start(first);
+			print::Fmt<PAD> start(first);
 			line(start, remainder...);
 		}
 
 		template<u8 PAD, usize LEN>
-		static void error(const fmt<PAD, LEN> &content)
+		static void error(const print::Fmt<PAD, LEN> &content)
 		{
 			content.flush(stderr);
 			std::exit(EXIT_FAILURE);
 		}
 
 		template<u8 PAD, usize LEN, typename T>
-		static void error(const fmt<PAD, LEN> &prev, T last)
+		static void error(const print::Fmt<PAD, LEN> &prev, T last)
 		{
-			fmt<PAD> end(last);
+			print::Fmt<PAD> end(last);
 			error(prev + end);
 		}
 
 		template<u8 PAD, usize LEN, typename T, typename... Ts>
-		static void error(const fmt<PAD, LEN> &prev, T first, Ts... remainder)
+		static void error(const print::Fmt<PAD, LEN> &prev, T first, Ts... remainder)
 		{
-			fmt<PAD> next(first);
+			print::Fmt<PAD> next(first);
 			error(prev + next, remainder...);
 		}
 
 		template<u8 PAD = 1, typename T, typename... Ts>
 		static void error(T first, Ts... remainder)
 		{
-			fmt<PAD> start(first);
+			print::Fmt<PAD> start(first);
 			error(start, remainder...);
 		}
 
@@ -153,16 +153,16 @@
 			auto now = std::time(nullptr);
 			auto info = std::localtime(&now);
 
-			fmt<127> stamp;
+			print::Fmt<127> stamp;
 			stamp.len = std::strftime(&stamp.buf[0], 128, "# %B %d, %Y %I:%M:%S %p", info);
 
 			stamp.flush();
 		}
 
 		[[maybe_unused]]
-		static print::fmt<1, 255> error_location_label(c_str file, c_str function, u32 line, u32 thread)
+		static print::Fmt<1, 255> error_location_label(c_str file, c_str function, u32 line, u32 thread)
 		{
-			print::fmt<1, 255> label;
+			print::Fmt<1, 255> label;
 			label += "# In ";
 			label += file;
 			label += ", ";

@@ -12,7 +12,7 @@
 		#include "slepceps.h"
 	#endif
 
-	// NOTE: For use inside mpi::frontend methods only.
+	// NOTE: For use inside mpi::Frontend methods only.
 	#define CHECK_PETSC_ERROR(name, code)                                                                \
 	{                                                                                                    \
 	  if ((code) != 0) {                                                                                 \
@@ -21,7 +21,7 @@
 	}
 #endif
 
-// NOTE: For use inside mpi::frontend methods only.
+// NOTE: For use inside mpi::Frontend methods only.
 #define CHECK_MPI_ERROR(name, code)                                                                  \
 {                                                                                                    \
   if ((code) != MPI_SUCCESS) {                                                                       \
@@ -106,7 +106,7 @@ void mpi::about()
 	print::line("# Using SLEPc = ", (using_slepc()? "yes" : "no"));
 }
 
-mpi::frontend::frontend(mut<s32> *argc, char **argv[]):
+mpi::Frontend::Frontend(mut<s32> *argc, char **argv[]):
 	my_rank(0), comm_size(1), total_tasks(1)
 {
 	assert(*argc > -1);
@@ -148,7 +148,7 @@ mpi::frontend::frontend(mut<s32> *argc, char **argv[]):
 	#endif
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u32 count,
                          [[maybe_unused]] u8 data[]) const
 {
@@ -158,7 +158,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u32 count,
                          [[maybe_unused]] u16 data[]) const
 {
@@ -168,7 +168,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u32 count,
                          [[maybe_unused]] u32 data[]) const
 {
@@ -178,7 +178,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u32 count,
                          [[maybe_unused]] u64 data[]) const
 {
@@ -188,7 +188,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u32 count,
                          [[maybe_unused]] s8 data[]) const
 {
@@ -198,7 +198,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u32 count,
                          [[maybe_unused]] s16 data[]) const
 {
@@ -208,7 +208,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u32 count,
                          [[maybe_unused]] s32 data[]) const
 {
@@ -218,7 +218,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u32 count,
                          [[maybe_unused]] s64 data[]) const
 {
@@ -228,7 +228,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u32 count,
                          [[maybe_unused]] const char data[]) const
 {
@@ -238,7 +238,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u32 count,
                          [[maybe_unused]] f32 data[]) const
 {
@@ -248,7 +248,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u32 count,
                          [[maybe_unused]] f64 data[]) const
 {
@@ -258,7 +258,7 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u32 count,
                          [[maybe_unused]] f128 data[]) const
 {
@@ -268,79 +268,79 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u8 data) const
 {
 	this->send(rank, 1, &data);
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u16 data) const
 {
 	this->send(rank, 1, &data);
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u32 data) const
 {
 	this->send(rank, 1, &data);
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u64 data) const
 {
 	this->send(rank, 1, &data);
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] s8 data) const
 {
 	this->send(rank, 1, &data);
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] s16 data) const
 {
 	this->send(rank, 1, &data);
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] s32 data) const
 {
 	this->send(rank, 1, &data);
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] s64 data) const
 {
 	this->send(rank, 1, &data);
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] const char data) const
 {
 	this->send(rank, 1, &data);
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] f32 data) const
 {
 	this->send(rank, 1, &data);
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] f64 data) const
 {
 	this->send(rank, 1, &data);
 }
 
-void mpi::frontend::send([[maybe_unused]] u32 rank,
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] f128 data) const
 {
 	this->send(rank, 1, &data);
 }
 
-// NOTE: For use inside mpi::frontend::send() methods only.
+// NOTE: For use inside mpi::Frontend::send() methods only.
 #define SEND_VECTOR_DATA(rank, data)         \
 {                                            \
   usize len = data.length();                 \
@@ -348,67 +348,67 @@ void mpi::frontend::send([[maybe_unused]] u32 rank,
   this->send((rank), as_u32(len), &data[0]); \
 }
 
-void mpi::frontend::send(u32 rank, const vec<u8> &data) const
+void mpi::Frontend::send(u32 rank, const Vec<u8> &data) const
 {
 	SEND_VECTOR_DATA(rank, data)
 }
 
-void mpi::frontend::send(u32 rank, const vec<u16> &data) const
+void mpi::Frontend::send(u32 rank, const Vec<u16> &data) const
 {
 	SEND_VECTOR_DATA(rank, data)
 }
 
-void mpi::frontend::send(u32 rank, const vec<u32> &data) const
+void mpi::Frontend::send(u32 rank, const Vec<u32> &data) const
 {
 	SEND_VECTOR_DATA(rank, data)
 }
 
-void mpi::frontend::send(u32 rank, const vec<u64> &data) const
+void mpi::Frontend::send(u32 rank, const Vec<u64> &data) const
 {
 	SEND_VECTOR_DATA(rank, data)
 }
 
-void mpi::frontend::send(u32 rank, const vec<s8> &data) const
+void mpi::Frontend::send(u32 rank, const Vec<s8> &data) const
 {
 	SEND_VECTOR_DATA(rank, data)
 }
 
-void mpi::frontend::send(u32 rank, const vec<s16> &data) const
+void mpi::Frontend::send(u32 rank, const Vec<s16> &data) const
 {
 	SEND_VECTOR_DATA(rank, data)
 }
 
-void mpi::frontend::send(u32 rank, const vec<s32> &data) const
+void mpi::Frontend::send(u32 rank, const Vec<s32> &data) const
 {
 	SEND_VECTOR_DATA(rank, data)
 }
 
-void mpi::frontend::send(u32 rank, const vec<s64> &data) const
+void mpi::Frontend::send(u32 rank, const Vec<s64> &data) const
 {
 	SEND_VECTOR_DATA(rank, data)
 }
 
-void mpi::frontend::send(u32 rank, const vec<char> &data) const
+void mpi::Frontend::send(u32 rank, const Vec<char> &data) const
 {
 	SEND_VECTOR_DATA(rank, data)
 }
 
-void mpi::frontend::send(u32 rank, const vec<f32> &data) const
+void mpi::Frontend::send(u32 rank, const Vec<f32> &data) const
 {
 	SEND_VECTOR_DATA(rank, data)
 }
 
-void mpi::frontend::send(u32 rank, const vec<f64> &data) const
+void mpi::Frontend::send(u32 rank, const Vec<f64> &data) const
 {
 	SEND_VECTOR_DATA(rank, data)
 }
 
-void mpi::frontend::send(u32 rank, const vec<f128> &data) const
+void mpi::Frontend::send(u32 rank, const Vec<f128> &data) const
 {
 	SEND_VECTOR_DATA(rank, data)
 }
 
-void mpi::frontend::send(u32 rank, const string &data) const
+void mpi::Frontend::send(u32 rank, const String &data) const
 {
 	// NOTE: The string and the null-terminator character are sent.
 	auto len = data.length();
@@ -416,7 +416,7 @@ void mpi::frontend::send(u32 rank, const string &data) const
 	this->send(rank, as_u32(len + 1), data.as_ptr());
 }
 
-u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
+u32 mpi::Frontend::receive([[maybe_unused]] u32 rank,
                            [[maybe_unused]] u32 count,
                            [[maybe_unused]] mut<u8> data[]) const
 {
@@ -430,7 +430,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 	return recv_count;
 }
 
-u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
+u32 mpi::Frontend::receive([[maybe_unused]] u32 rank,
                            [[maybe_unused]] u32 count,
                            [[maybe_unused]] mut<u16> data[]) const
 {
@@ -444,7 +444,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 	return recv_count;
 }
 
-u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
+u32 mpi::Frontend::receive([[maybe_unused]] u32 rank,
                            [[maybe_unused]] u32 count,
                            [[maybe_unused]] mut<u32> data[]) const
 {
@@ -458,7 +458,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 	return recv_count;
 }
 
-u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
+u32 mpi::Frontend::receive([[maybe_unused]] u32 rank,
                            [[maybe_unused]] u32 count,
                            [[maybe_unused]] mut<u64> data[]) const
 {
@@ -472,7 +472,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 	return recv_count;
 }
 
-u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
+u32 mpi::Frontend::receive([[maybe_unused]] u32 rank,
                            [[maybe_unused]] u32 count,
                            [[maybe_unused]] mut<s8> data[]) const
 {
@@ -486,7 +486,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 	return recv_count;
 }
 
-u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
+u32 mpi::Frontend::receive([[maybe_unused]] u32 rank,
                            [[maybe_unused]] u32 count,
                            [[maybe_unused]] mut<s16> data[]) const
 {
@@ -500,7 +500,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 	return recv_count;
 }
 
-u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
+u32 mpi::Frontend::receive([[maybe_unused]] u32 rank,
                            [[maybe_unused]] u32 count,
                            [[maybe_unused]] mut<s32> data[]) const
 {
@@ -514,7 +514,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 	return recv_count;
 }
 
-u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
+u32 mpi::Frontend::receive([[maybe_unused]] u32 rank,
                            [[maybe_unused]] u32 count,
                            [[maybe_unused]] mut<s64> data[]) const
 {
@@ -528,7 +528,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 	return recv_count;
 }
 
-u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
+u32 mpi::Frontend::receive([[maybe_unused]] u32 rank,
                            [[maybe_unused]] u32 count,
                            [[maybe_unused]] char data[]) const
 {
@@ -542,7 +542,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 	return recv_count;
 }
 
-u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
+u32 mpi::Frontend::receive([[maybe_unused]] u32 rank,
                            [[maybe_unused]] u32 count,
                            [[maybe_unused]] mut<f32> data[]) const
 {
@@ -556,7 +556,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 	return recv_count;
 }
 
-u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
+u32 mpi::Frontend::receive([[maybe_unused]] u32 rank,
                            [[maybe_unused]] u32 count,
                            [[maybe_unused]] mut<f64> data[]) const
 {
@@ -570,7 +570,7 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 	return recv_count;
 }
 
-u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
+u32 mpi::Frontend::receive([[maybe_unused]] u32 rank,
                            [[maybe_unused]] u32 count,
                            [[maybe_unused]] mut<f128> data[]) const
 {
@@ -584,91 +584,91 @@ u32 mpi::frontend::receive([[maybe_unused]] u32 rank,
 	return recv_count;
 }
 
-void mpi::frontend::receive([[maybe_unused]] u32 rank,
+void mpi::Frontend::receive([[maybe_unused]] u32 rank,
                             [[maybe_unused]] mut<u8> &data) const
 {
 	u32 info = this->receive(rank, 1, &data);
 	assert((info == 0) || (info == 1));
 }
 
-void mpi::frontend::receive([[maybe_unused]] u32 rank,
+void mpi::Frontend::receive([[maybe_unused]] u32 rank,
                             [[maybe_unused]] mut<u16> &data) const
 {
 	u32 info = this->receive(rank, 1, &data);
 	assert((info == 0) || (info == 1));
 }
 
-void mpi::frontend::receive([[maybe_unused]] u32 rank,
+void mpi::Frontend::receive([[maybe_unused]] u32 rank,
                             [[maybe_unused]] mut<u32> &data) const
 {
 	u32 info = this->receive(rank, 1, &data);
 	assert((info == 0) || (info == 1));
 }
 
-void mpi::frontend::receive([[maybe_unused]] u32 rank,
+void mpi::Frontend::receive([[maybe_unused]] u32 rank,
                             [[maybe_unused]] mut<u64> &data) const
 {
 	u32 info = this->receive(rank, 1, &data);
 	assert((info == 0) || (info == 1));
 }
 
-void mpi::frontend::receive([[maybe_unused]] u32 rank,
+void mpi::Frontend::receive([[maybe_unused]] u32 rank,
                             [[maybe_unused]] mut<s8> &data) const
 {
 	u32 info = this->receive(rank, 1, &data);
 	assert((info == 0) || (info == 1));
 }
 
-void mpi::frontend::receive([[maybe_unused]] u32 rank,
+void mpi::Frontend::receive([[maybe_unused]] u32 rank,
                             [[maybe_unused]] mut<s16> &data) const
 {
 	u32 info = this->receive(rank, 1, &data);
 	assert((info == 0) || (info == 1));
 }
 
-void mpi::frontend::receive([[maybe_unused]] u32 rank,
+void mpi::Frontend::receive([[maybe_unused]] u32 rank,
                             [[maybe_unused]] mut<s32> &data) const
 {
 	u32 info = this->receive(rank, 1, &data);
 	assert((info == 0) || (info == 1));
 }
 
-void mpi::frontend::receive([[maybe_unused]] u32 rank,
+void mpi::Frontend::receive([[maybe_unused]] u32 rank,
                             [[maybe_unused]] mut<s64> &data) const
 {
 	u32 info = this->receive(rank, 1, &data);
 	assert((info == 0) || (info == 1));
 }
 
-void mpi::frontend::receive([[maybe_unused]] u32 rank,
+void mpi::Frontend::receive([[maybe_unused]] u32 rank,
                             [[maybe_unused]] char &data) const
 {
 	u32 info = this->receive(rank, 1, &data);
 	assert((info == 0) || (info == 1));
 }
 
-void mpi::frontend::receive([[maybe_unused]] u32 rank,
+void mpi::Frontend::receive([[maybe_unused]] u32 rank,
                             [[maybe_unused]] mut<f32> &data) const
 {
 	u32 info = this->receive(rank, 1, &data);
 	assert((info == 0) || (info == 1));
 }
 
-void mpi::frontend::receive([[maybe_unused]] u32 rank,
+void mpi::Frontend::receive([[maybe_unused]] u32 rank,
                             [[maybe_unused]] mut<f64> &data) const
 {
 	u32 info = this->receive(rank, 1, &data);
 	assert((info == 0) || (info == 1));
 }
 
-void mpi::frontend::receive([[maybe_unused]] u32 rank,
+void mpi::Frontend::receive([[maybe_unused]] u32 rank,
                             [[maybe_unused]] mut<f128> &data) const
 {
 	u32 info = this->receive(rank, 1, &data);
 	assert((info == 0) || (info == 1));
 }
 
-// NOTE: For use inside mpi::frontend::receive() methods only.
+// NOTE: For use inside mpi::Frontend::receive() methods only.
 #define RECEIVE_VECTOR_DATA(rank, data)                    \
 {                                                          \
   mut<usize> new_len = 0;                                  \
@@ -684,67 +684,67 @@ void mpi::frontend::receive([[maybe_unused]] u32 rank,
   return info;                                             \
 }
 
-u32 mpi::frontend::receive(u32 rank, vec<u8> &data) const
+u32 mpi::Frontend::receive(u32 rank, Vec<u8> &data) const
 {
 	RECEIVE_VECTOR_DATA(rank, data)
 }
 
-u32 mpi::frontend::receive(u32 rank, vec<u16> &data) const
+u32 mpi::Frontend::receive(u32 rank, Vec<u16> &data) const
 {
 	RECEIVE_VECTOR_DATA(rank, data)
 }
 
-u32 mpi::frontend::receive(u32 rank, vec<u32> &data) const
+u32 mpi::Frontend::receive(u32 rank, Vec<u32> &data) const
 {
 	RECEIVE_VECTOR_DATA(rank, data)
 }
 
-u32 mpi::frontend::receive(u32 rank, vec<u64> &data) const
+u32 mpi::Frontend::receive(u32 rank, Vec<u64> &data) const
 {
 	RECEIVE_VECTOR_DATA(rank, data)
 }
 
-u32 mpi::frontend::receive(u32 rank, vec<s8> &data) const
+u32 mpi::Frontend::receive(u32 rank, Vec<s8> &data) const
 {
 	RECEIVE_VECTOR_DATA(rank, data)
 }
 
-u32 mpi::frontend::receive(u32 rank, vec<s16> &data) const
+u32 mpi::Frontend::receive(u32 rank, Vec<s16> &data) const
 {
 	RECEIVE_VECTOR_DATA(rank, data)
 }
 
-u32 mpi::frontend::receive(u32 rank, vec<s32> &data) const
+u32 mpi::Frontend::receive(u32 rank, Vec<s32> &data) const
 {
 	RECEIVE_VECTOR_DATA(rank, data)
 }
 
-u32 mpi::frontend::receive(u32 rank, vec<s64> &data) const
+u32 mpi::Frontend::receive(u32 rank, Vec<s64> &data) const
 {
 	RECEIVE_VECTOR_DATA(rank, data)
 }
 
-u32 mpi::frontend::receive(u32 rank, vec<char> &data) const
+u32 mpi::Frontend::receive(u32 rank, Vec<char> &data) const
 {
 	RECEIVE_VECTOR_DATA(rank, data);
 }
 
-u32 mpi::frontend::receive(u32 rank, vec<f32> &data) const
+u32 mpi::Frontend::receive(u32 rank, Vec<f32> &data) const
 {
 	RECEIVE_VECTOR_DATA(rank, data);
 }
 
-u32 mpi::frontend::receive(u32 rank, vec<f64> &data) const
+u32 mpi::Frontend::receive(u32 rank, Vec<f64> &data) const
 {
 	RECEIVE_VECTOR_DATA(rank, data);
 }
 
-u32 mpi::frontend::receive(u32 rank, vec<f128> &data) const
+u32 mpi::Frontend::receive(u32 rank, Vec<f128> &data) const
 {
 	RECEIVE_VECTOR_DATA(rank, data);
 }
 
-void mpi::frontend::receive(u32 rank, string &data) const
+void mpi::Frontend::receive(u32 rank, String &data) const
 {
 	data.clear();
 
@@ -762,7 +762,7 @@ void mpi::frontend::receive(u32 rank, string &data) const
 	assert(as_u32(new_len) == info);
 }
 
-void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+void mpi::Frontend::broadcast([[maybe_unused]] u32 rank,
                               [[maybe_unused]] u32 count,
                               [[maybe_unused]] mut<u8> data[]) const
 {
@@ -772,7 +772,7 @@ void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+void mpi::Frontend::broadcast([[maybe_unused]] u32 rank,
                               [[maybe_unused]] u32 count,
                               [[maybe_unused]] mut<u16> data[]) const
 {
@@ -782,7 +782,7 @@ void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+void mpi::Frontend::broadcast([[maybe_unused]] u32 rank,
                               [[maybe_unused]] u32 count,
                               [[maybe_unused]] mut<u32> data[]) const
 {
@@ -792,7 +792,7 @@ void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+void mpi::Frontend::broadcast([[maybe_unused]] u32 rank,
                               [[maybe_unused]] u32 count,
                               [[maybe_unused]] mut<u64> data[]) const
 {
@@ -802,7 +802,7 @@ void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+void mpi::Frontend::broadcast([[maybe_unused]] u32 rank,
                               [[maybe_unused]] u32 count,
                               [[maybe_unused]] mut<s8> data[]) const
 {
@@ -812,7 +812,7 @@ void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+void mpi::Frontend::broadcast([[maybe_unused]] u32 rank,
                               [[maybe_unused]] u32 count,
                               [[maybe_unused]] mut<s16> data[]) const
 {
@@ -822,7 +822,7 @@ void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+void mpi::Frontend::broadcast([[maybe_unused]] u32 rank,
                               [[maybe_unused]] u32 count,
                               [[maybe_unused]] mut<s32> data[]) const
 {
@@ -832,7 +832,7 @@ void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+void mpi::Frontend::broadcast([[maybe_unused]] u32 rank,
                               [[maybe_unused]] u32 count,
                               [[maybe_unused]] mut<s64> data[]) const
 {
@@ -842,7 +842,7 @@ void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+void mpi::Frontend::broadcast([[maybe_unused]] u32 rank,
                               [[maybe_unused]] u32 count,
                               [[maybe_unused]] char data[]) const
 {
@@ -852,7 +852,7 @@ void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+void mpi::Frontend::broadcast([[maybe_unused]] u32 rank,
                               [[maybe_unused]] u32 count,
                               [[maybe_unused]] mut<f32> data[]) const
 {
@@ -862,7 +862,7 @@ void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+void mpi::Frontend::broadcast([[maybe_unused]] u32 rank,
                               [[maybe_unused]] u32 count,
                               [[maybe_unused]] mut<f64> data[]) const
 {
@@ -872,7 +872,7 @@ void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
+void mpi::Frontend::broadcast([[maybe_unused]] u32 rank,
                               [[maybe_unused]] u32 count,
                               [[maybe_unused]] mut<f128> data[]) const
 {
@@ -882,7 +882,7 @@ void mpi::frontend::broadcast([[maybe_unused]] u32 rank,
 	#endif
 }
 
-void mpi::frontend::wait() const
+void mpi::Frontend::wait() const
 {
 	#if defined(USE_MPI)
 		#pragma omp critical
@@ -890,7 +890,7 @@ void mpi::frontend::wait() const
 	#endif
 }
 
-mpi::frontend::~frontend()
+mpi::Frontend::~Frontend()
 {
 	this->wait();
 

@@ -5,17 +5,17 @@
 
 	namespace lapack {
 		// NOTE: Forward declaration to avoid include liblapack.h here.
-		class frontend;
+		class Frontend;
 	}
 
 	template<typename T = f64>
-	class matrix {
+	class Matrix {
 		public:
-		inline matrix(usize max_row, usize max_col): max_col(max_col), buf(vec<T>(max_row*max_col))
+		inline Matrix(usize max_row, usize max_col): max_col(max_col), buf(Vec<T>(max_row*max_col))
 		{
 		}
 
-		inline matrix(matrix &&other): max_col(other.max_col), buf(other.buf.move())
+		inline Matrix(Matrix &&other): max_col(other.max_col), buf(other.buf.move())
 		{
 			other.max_col = 0;
 		}
@@ -45,7 +45,7 @@
 			this->buf = rhs;
 		}
 
-		inline void operator=(const matrix<T> &rhs)
+		inline void operator=(const Matrix<T> &rhs)
 		{
 			this->buf = rhs.buf;
 		}
@@ -61,12 +61,12 @@
 			return this->buf[n];
 		}
 
-		inline matrix<T> move()
+		inline Matrix<T> move()
 		{
-			return matrix(*this);
+			return Matrix(*this);
 		}
 
-		void swap(matrix<T> &other)
+		void swap(Matrix<T> &other)
 		{
 			auto max_col = this->max_col;
 
@@ -82,7 +82,7 @@
 			this->buf.resize(max_row*max_col);
 		}
 
-		class view {
+		class View {
 			public:
 			inline usize rows() const
 			{
@@ -122,9 +122,9 @@
 			usize row_max;
 			usize col_min;
 			usize col_max;
-			matrix<T> &owner;
+			Matrix<T> &owner;
 
-			view(usize row_start, usize row_end, usize col_start, usize col_end, matrix<T> &owner):
+			View(usize row_start, usize row_end, usize col_start, usize col_end, Matrix<T> &owner):
 				row_min(row_start), row_max(row_end), col_min(col_start), col_max(col_end), owner(owner)
 			{
 				assert(row_end >= row_start);
@@ -132,30 +132,30 @@
 				assert(owner.length() > 0);
 			}
 
-			// NOTE: We bind the constructor of views to a method of the parent matrix
+			// NOTE: We bind the constructor of View to a method of the parent Matrix
 			// in order to enforce that the parent class outlives the child, as the
 			// destructors are called in a LIFO order. Still, care should be taken
-			// whenever handling complex lifetimes, like pointers to views and/or
-			// static views. Avoid those, if possible.
-			friend class matrix<T>;
+			// whenever handling complex lifetimes, like pointers to View and/or
+			// static View. Avoid those, if possible.
+			friend class Matrix<T>;
 		};
 
-		inline view block_view(usize row_start, usize row_end, usize col_start, usize col_end)
+		inline Matrix<T>::View block_view(usize row_start, usize row_end, usize col_start, usize col_end)
 		{
-			return view(row_start, row_end, col_start, col_end, *this);
+			return Matrix<T>::View(row_start, row_end, col_start, col_end, *this);
 		}
 
-		inline view row_view(usize n)
+		inline Matrix<T>::View row_view(usize n)
 		{
 			return this->block_view(n, n, 0, this->cols() - 1);
 		}
 
-		inline view col_view(usize m)
+		inline Matrix<T>::View col_view(usize m)
 		{
 			return this->block_view(0, this->rows() - 1, m, m);
 		}
 
-		void row_copy(usize n, vec<T> &row) const
+		void row_copy(usize n, Vec<T> &row) const
 		{
 			usize count = this->cols();
 
@@ -168,7 +168,7 @@
 			}
 		}
 
-		void col_copy(usize m, vec<T> &col) const
+		void col_copy(usize m, Vec<T> &col) const
 		{
 			usize count = this->rows();
 
@@ -182,17 +182,17 @@
 		}
 
 		private:
-		friend class lapack::frontend;
+		friend class lapack::Frontend;
 
 		mut<usize> max_col;
-		vec<T> buf;
+		Vec<T> buf;
 
-		// NOTE: See the note on the private copy-constructor of vector.
-		inline matrix(matrix &other): max_col(other.max_col), buf(other.buf.move())
+		// NOTE: See the note on the private copy-constructor of Vector.
+		inline Matrix(Matrix &other): max_col(other.max_col), buf(other.buf.move())
 		{
 		}
 	};
 
 	template<typename T = f64>
-	using mat = matrix<T>;
+	using Mat = Matrix<T>;
 #endif

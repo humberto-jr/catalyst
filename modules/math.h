@@ -37,15 +37,15 @@
 
 		using integrand = f64 (*)(f64 x, void *params);
 
-		class spline {
+		class Spline {
 			public:
-			spline(vec<f64> &x, vec<f64> &f);
+			Spline(Vec<f64> &x, Vec<f64> &f);
 
-			spline(spline &&other);
+			Spline(math::Spline &&other);
 
-			const vec<f64>& abscissa();
+			const Vec<f64>& abscissa();
 
-			const vec<f64>& ordinate();
+			const Vec<f64>& ordinate();
 
 			void use_akima();
 
@@ -59,20 +59,20 @@
 
 			f64 integral(f64 a, f64 b) const;
 
-			~spline();
+			~Spline();
 
 			private:
-			vec<f64> x;
-			vec<f64> f;
+			Vec<f64> x;
+			Vec<f64> f;
 			void *data;
 			void *state;
 		};
 
 		template<typename T = mut<f64>>
-		struct vec3 {
+		struct Vec3 {
 			T x, y, z;
 
-			inline vec3(T x = 0.0, T y = 0.0, T z = 0.0): x(x), y(y), z(z)
+			inline Vec3(T x = 0.0, T y = 0.0, T z = 0.0): x(x), y(y), z(z)
 			{
 			}
 
@@ -81,7 +81,7 @@
 				this->x = this->y = this->z = x;
 			}
 
-			inline vec3<T> operator+(const vec3<T> &rhs)
+			inline Vec3<T> operator+(const Vec3<T> &rhs)
 			{
 				return {this->x + rhs.x, this->y + rhs.y, this->z + rhs.z};
 			}
@@ -93,7 +93,7 @@
 				this->z += rhs;
 			}
 
-			inline T operator-(const vec3<T> &rhs)
+			inline T operator-(const Vec3<T> &rhs)
 			{
 				auto x = this->x - rhs.x;
 				auto y = this->y - rhs.y;
@@ -180,17 +180,17 @@
 
 		f64 gaunt_coeff(s32 q, s32 ja, s32 jb, s32 lambda);
 
-		f32 simpson(f32 step, const vec<f32> &integrand);
+		f32 simpson(f32 step, const Vec<f32> &integrand);
 
-		f64 simpson(f64 step, const vec<f64> &integrand);
+		f64 simpson(f64 step, const Vec<f64> &integrand);
 
-		f128 simpson(f128 step, const vec<f128> &integrand);
+		f128 simpson(f128 step, const Vec<f128> &integrand);
 
-		c32 simpson(c32 step, const vec<c32> &integrand);
+		c32 simpson(c32 step, const Vec<c32> &integrand);
 
-		c64 simpson(c64 step, const vec<c64> &integrand);
+		c64 simpson(c64 step, const Vec<c64> &integrand);
 
-		c128 simpson(c128 step, const vec<c128> &integrand);
+		c128 simpson(c128 step, const Vec<c128> &integrand);
 
 		f64 gauss_legendre(f64 a, f64 b, u8 order, void *params, math::integrand f);
 
