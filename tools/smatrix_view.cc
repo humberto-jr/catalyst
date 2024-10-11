@@ -9,7 +9,7 @@ int main(int argc, const char *argv[])
 		print::error("# Usage: ", argv[0], " <filename> [shift] [scale]");
 	}
 
-	numerov::smatrix s(argv[1]);
+	numerov::ScattMatrix s(argv[1]);
 
 	f64 shift = (argc > 2? as_f64(argv[2]) : 0.0);
 

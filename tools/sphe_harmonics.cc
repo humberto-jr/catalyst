@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 	s32 m_max = input::argument_line<s32>(argc, argv, 'm', 2, m_min, as_s32(l), as_s32(l));
 
 	//
-	// Theta range:
+	// Theta Range:
 	//
 
 	u32 theta_count = input::argument_line<u32>(argc, argv, 't', 1, 1, u32_max, 180);
@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 	f64 theta_step = (theta_max - theta_min)/as_f64(theta_count);
 
 	//
-	// Phi range:
+	// Phi Range:
 	//
 
 	u32 phi_count = input::argument_line<u32>(argc, argv, 'p', 1, 1, u32_max, 360);

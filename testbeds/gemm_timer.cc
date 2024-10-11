@@ -12,7 +12,7 @@ constexpr usize INC_MATRIX_SIZE = 32;
 
 int main()
 {
-	print::line("# General square matrix-matrix product Timer");
+	print::line("# General square matrix-matrix product timer");
 	print::line("# Build details:");
 	print::line("# Date = ", __DATE__);
 	print::line("# File = ", __FILE__);

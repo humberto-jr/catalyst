@@ -8,9 +8,9 @@ int main(int argc, const char *argv[])
 		print::error("# Usage: ", argv[0], " [filename]");
 	}
 
-	fgh::basis result;
+	fgh::Basis result;
 
-	file::input buf(argv[1]);
+	file::Input buf(argv[1]);
 
 	u32 total = fgh::is_valid(buf);
 
