@@ -12,21 +12,21 @@ constexpr usize INC_MATRIX_SIZE = 32;
 
 int main()
 {
-	print::line("# General square matrix-matrix product timer");
+	print::line("# General square matrix-matrix product Timer");
 	print::line("# Build details:");
 	print::line("# Date = ", __DATE__);
 	print::line("# File = ", __FILE__);
 
 	#if defined(USE_CUDA)
-		cuda::blas::frontend blas(1);
+		cuda::blas::Frontend blas(1);
 		print::line("# Backend = cuBLAS");
 	#else
 		switch (blas::BACKEND) {
-			case blas::backend::gsl: print::line("# Backend = GNU Scientific Library"); break;
+			case blas::Backend::gsl: print::line("# Backend = GNU Scientific Library"); break;
 
-			case blas::backend::mkl: print::line("# Backend = Intel Math Kernel Library"); break;
+			case blas::Backend::mkl: print::line("# Backend = Intel Math Kernel Library"); break;
 
-			case blas::backend::lapack: print::line("# Backend = LAPACK"); break;
+			case blas::Backend::lapack: print::line("# Backend = LAPACK"); break;
 
 			default: print::line("# Backend = Unknown"); break;
 		}
@@ -35,10 +35,10 @@ int main()
 	print::line("# Size	    Time (s)          Error (avg.)");
 
 	mut<u32> count = 0;
-	timer<MAX_MATRIX_SIZE> clock;
+	Timer<MAX_MATRIX_SIZE> clock;
 
 	for (mut<usize> n = MIN_MATRIX_SIZE; n < MAX_MATRIX_SIZE; n += INC_MATRIX_SIZE) {
-		mat<f64> a(n, n), b(n, n), c(n, n);
+		Mat<f64> a(n, n), b(n, n), c(n, n);
 
 		a = 1.0;
 		b = 2.0;
@@ -47,7 +47,7 @@ int main()
 		f64 result = as_f64(n)*2.0 + 3.0;
 
 		#if defined(USE_CUDA)
-			cuda::dev<f64> a_gpu(n*n), b_gpu(n*n), c_gpu(n*n);
+			cuda::Dev<f64> a_gpu(n*n), b_gpu(n*n), c_gpu(n*n);
 
 			clock.start();
 

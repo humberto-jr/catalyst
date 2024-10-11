@@ -5,7 +5,7 @@ constexpr usize MAX_TASK = 100;
 
 int main(int argc, char *argv[])
 {
-	mpi::frontend mpi(&argc, &argv);
+	mpi::Frontend mpi(&argc, &argv);
 
 	mpi.set_tasks(MAX_TASK);
 
@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 	const auto end = mpi.last_local_task();
 	const auto extra = mpi.extra_task();
 
-	print::fmt log;
+	print::Fmt log;
 	log += "Rank ";
 	log += mpi.rank();
 	log += ", task index range: [";

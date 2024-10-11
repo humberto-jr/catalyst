@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[])
 {
-	mpi::frontend mpi(&argc, &argv);
+	mpi::Frontend mpi(&argc, &argv);
 
 	u32 this_rank = mpi.rank();
 	u32 next_rank = this_rank + 1;

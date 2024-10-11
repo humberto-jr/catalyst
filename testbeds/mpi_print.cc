@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[])
 {
-	mpi::frontend mpi(&argc, &argv);
+	mpi::Frontend mpi(&argc, &argv);
 
 	if (mpi.rank() == mpi::MASTER_PROCESS_RANK) {
 		print::line("# Ordered MPI printing");

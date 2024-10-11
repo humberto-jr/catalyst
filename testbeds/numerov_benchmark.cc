@@ -5,7 +5,7 @@
 
 constexpr u8 PAD = 4;
 
-void call_olson_smith_model(u32 l, f64 mass, f64 R, mat<f64> &v)
+void call_olson_smith_model(u32 l, f64 mass, f64 R, Mat<f64> &v)
 {
 	v(0, 0) = pes::olson_smith_pra1971(0, 0, R) + numerov::centrifugal_term(l, mass, R);
 	v(0, 1) = pes::olson_smith_pra1971(0, 1, R);
@@ -41,7 +41,7 @@ f64 propagate(u32 l)
 	// Asymptotic levels:
 	//
 
-	numerov::basis level(2);
+	numerov::Basis level(2);
 
 	level[0].l = l;
 	level[0].eigenval = pes::olson_smith_pra1971(0, 0, R_inf);
@@ -53,7 +53,7 @@ f64 propagate(u32 l)
 	// Propagation:
 	//
 
-	mat<f64> workspace(2, 2), old_ratio(2, 2), ratio(2, 2), pot_energy(2, 2);
+	Mat<f64> workspace(2, 2), old_ratio(2, 2), ratio(2, 2), pot_energy(2, 2);
 
 	for (mut<u32> n = 0; n <= R_count; ++n) {
 		f64 R = R_min + as_f64(n)*R_step;
@@ -69,7 +69,7 @@ f64 propagate(u32 l)
 	// S-Matrix:
 	//
 
-	mat<f64> k(2, 2), re_s(2, 2), im_s(2, 2);
+	Mat<f64> k(2, 2), re_s(2, 2), im_s(2, 2);
 
 	usize count = numerov::build_react_matrix(mass, R_step, R_max, tot_energy, ratio, level, k);
 
