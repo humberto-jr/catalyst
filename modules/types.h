@@ -565,7 +565,7 @@
 		}
 
 		// NOTE: The Range<T>::Iterator below only exists so that the compiler can
-		// generate Range-based for-loops from a range<T>. It is not intended for
+		// generate range-based for-loops from a Range<T>. It is not intended for
 		// manual use outside this context.
 
 		struct Iterator {
@@ -579,7 +579,7 @@
 			constexpr bool operator!=(const T rhs) const
 			{
 				// NOTE: The actual operation does not correspond the operator in
-				// order to enforce that the compiler generates finite Range-based
+				// order to enforce that the compiler generates finite range-based
 				// for-loops when T is an integer with step greater than 1 and also
 				// floating-points. Here, rhs must be the output of Range<T>::end().
 				return (this->value < rhs);
