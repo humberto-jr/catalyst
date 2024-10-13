@@ -187,9 +187,9 @@ int main()
 
 				c64 s = c64(task[n].re_s(channel_a, channel_b), task[n].im_s(channel_a, channel_b));
 
-				f64 wavenum_a = std::sqrt(2.0*solution.mass*(task[n].total_energy - basis[channel_a].eigenval));
+				f64 wavenum_a = numerov::wavenumber(solution.mass, task[n].total_energy, basis[channel_a].eigenval);
 
-				f64 wavenum_b = std::sqrt(2.0*solution.mass*(task[n].total_energy - basis[channel_b].eigenval));
+				f64 wavenum_b = numerov::wavenumber(solution.mass, task[n].total_energy, basis[channel_b].eigenval);
 
 				print::line<PAD>(total_energy - eigenval_a, total_energy, wavenum_a, wavenum_b, std::abs(s*s), s.real(), s.imag(), k);
 			}
