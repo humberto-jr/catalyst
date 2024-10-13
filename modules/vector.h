@@ -131,6 +131,43 @@
 			this->buf = static_cast<mut<T>*>(new_buf);
 		}
 
+		class Iterator {
+			public:
+			inline Iterator(const Vector<T> &owner): index(0u), owner(owner)
+			{
+			}
+
+			inline bool operator!=(usize max_len) const
+			{
+				return (this->index < max_len);
+			}
+
+			inline mut<T>& operator*() const
+			{
+				return this->owner[this->index];
+			}
+
+			inline void operator++()
+			{
+				assert(this->index < this->owner.len);
+				this->index += 1u;
+			}
+
+			private:
+			mut<usize> index;
+			const Vector<T> &owner;
+		};
+
+		inline Vector<T>::Iterator begin() const
+		{
+			return Vector<T>::Iterator(*this);
+		}
+
+		inline usize end() const
+		{
+			return this->len;
+		}
+
 		inline ~Vector()
 		{
 			if (this->buf != nullptr) {
