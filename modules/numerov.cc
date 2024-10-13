@@ -496,7 +496,7 @@ usize numerov::build_react_matrix(f64 mass,
 			tot_energy - (level[ch].eigenval + numerov::centrifugal_term(l, mass, R_inf))
 		);
 
-		f64 wavenum = std::sqrt(2.0*mass*(tot_energy - level[ch].eigenval));
+		f64 wavenum = numerov::wavenumber(mass, tot_energy, level[ch].eigenval);
 
 		f64 x_max = wavenum*R_max;
 
@@ -640,9 +640,9 @@ void numerov::build_scatt_amplitude(const numerov::ScattMatrixEntry &s,
 
 	for (mut<u32> n = 0; n < f.length(); ++n) {
 		if ((s.total_energy[n] > s.eigenval_in) && (s.total_energy[n] > s.eigenval_out)) {
-			f64 wavenum_in = std::sqrt(2.0*s.mass*(s.total_energy[n] - s.eigenval_in));
+			f64 wavenum_in = numerov::wavenumber(s.mass, s.total_energy[n], s.eigenval_in);
 
-			f64 wavenum_out = std::sqrt(2.0*s.mass*(s.total_energy[n] - s.eigenval_out));
+			f64 wavenum_out = numerov::wavenumber(s.mass, s.total_energy[n], s.eigenval_out);
 
 			f64 fact = std::sqrt(math::PI*l_mult/(wavenum_in*wavenum_out));
 

@@ -182,5 +182,10 @@
 		{
 			return numerov::centrifugal_term(as_f64(l), mass, x);
 		}
+
+		inline static f64 wavenumber(f64 mass, f64 total_energy, f64 eigenval)
+		{
+			return std::sqrt(2.0*mass*(total_energy - eigenval));
+		}
 	}
 #endif
