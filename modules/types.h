@@ -604,5 +604,48 @@
 		{
 			return this->max;
 		}
+
+		// In addition, it is often valuable that range-based for-loops from a
+		// Range<T> can produce both the value of type T and its index. The pair
+		// is wrapped in the type IndexedEntry below. Thus, instead of Range<T>,
+		// a Range<IndexedEntry> is used to build the iterator when calling the
+		// Range<T>::indexed() member defined below.
+
+		template<typename I = usize>
+		struct IndexedEntry {
+			mut<T> value;
+			mut<I> index;
+
+			constexpr IndexedEntry(T value, I index): value(value), index(index)
+			{
+			}
+
+			constexpr bool operator<(const Range<T>::IndexedEntry<I> &rhs) const
+			{
+				// NOTE: Operation required exclusively by the operator != of
+				// Range<U>::Iterator. Where U = Range<T>::IndexedEntry.
+				return (this->value < rhs.value);
+			}
+
+			constexpr void operator+=(const Range<T>::IndexedEntry<I> &rhs)
+			{
+				// NOTE: Operation required exclusively by the operator ++ of
+				// Range<U>::Iterator. Where U = Range<T>::IndexedEntry.
+				this->index += rhs.index;
+				this->value += rhs.value;
+			}
+		};
+
+		template<typename I = usize>
+		constexpr auto indexed() const
+		{
+			usize count = this->count();
+
+			Range<T>::IndexedEntry<I> min(this->min, static_cast<I>(0));
+			Range<T>::IndexedEntry<I> max(this->max, static_cast<I>(count));
+			Range<T>::IndexedEntry<I> step(this->step, static_cast<I>(1));
+
+			return Range<Range<T>::IndexedEntry<I>>(min, max, step);
+		}
 	};
 #endif
