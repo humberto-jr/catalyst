@@ -533,19 +533,10 @@
 			return std::remainder(this->max - this->min, this->step) == static_cast<T>(0);
 		}
 
-		usize count() const
+		inline usize count() const
 		{
 			T count = (this->max - this->min)/this->step;
-
-			if (count == static_cast<T>(0)) {
-				return 0u;
-			}
-
-			if constexpr(is_floating_point<T>()) {
-				return as_usize(count) + 1u;
-			} else {
-				return (this->is_divided_evenly()? as_usize(count) : as_usize(count) + 1u);
-			}
+			return (this->is_divided_evenly()? as_usize(count) : as_usize(count) + 1u);
 		}
 
 		constexpr Range<T> as_range_inclusive() const
@@ -608,8 +599,9 @@
 		// In addition, it is often valuable that range-based for-loops from a
 		// Range<T> can produce both the value of type T and its index. The pair
 		// is wrapped in the type IndexedEntry below. Thus, instead of Range<T>,
-		// a Range<IndexedEntry> is used to build the iterator when calling the
-		// Range<T>::indexed() member defined below.
+		// a Range<IndexedEntry<I>> is used to build the iterator when calling
+		// the Range<T>::indexed() member defined below. Where I is the integer
+		// type.
 
 		template<typename I = usize>
 		struct IndexedEntry {
@@ -623,14 +615,14 @@
 			constexpr bool operator<(const Range<T>::IndexedEntry<I> &rhs) const
 			{
 				// NOTE: Operation required exclusively by the operator != of
-				// Range<U>::Iterator. Where U = Range<T>::IndexedEntry.
+				// Range<U>::Iterator. Where U = Range<T>::IndexedEntry<I>.
 				return (this->value < rhs.value);
 			}
 
 			constexpr void operator+=(const Range<T>::IndexedEntry<I> &rhs)
 			{
 				// NOTE: Operation required exclusively by the operator ++ of
-				// Range<U>::Iterator. Where U = Range<T>::IndexedEntry.
+				// Range<U>::Iterator. Where U = Range<T>::IndexedEntry<I>.
 				this->index += rhs.index;
 				this->value += rhs.value;
 			}
