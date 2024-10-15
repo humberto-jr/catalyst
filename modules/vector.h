@@ -131,9 +131,14 @@
 			this->buf = static_cast<mut<T>*>(new_buf);
 		}
 
+		struct IndexedEntry {
+			mut<T> &value;
+			usize index;
+		};
+
 		class Iterator {
 			public:
-			inline Iterator(const Vector<T> &owner): index(0u), owner(owner)
+			inline Iterator(const Vector<T> &owner): index(0u), buf(owner.buf)
 			{
 			}
 
@@ -142,20 +147,19 @@
 				return (this->index < max_len);
 			}
 
-			inline mut<T>& operator*() const
+			inline Vector<T>::IndexedEntry operator*() const
 			{
-				return this->owner[this->index];
+				return {this->buf[this->index], this->index};
 			}
 
 			inline void operator++()
 			{
-				assert(this->index < this->owner.len);
 				this->index += 1u;
 			}
 
 			private:
 			mut<usize> index;
-			const Vector<T> &owner;
+			mut<T> *buf;
 		};
 
 		inline Vector<T>::Iterator begin() const
