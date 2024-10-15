@@ -434,6 +434,11 @@ smatrix_view.out: $(TOOLS_DIR)/smatrix_view.cc fgh.o numerov.o math.o $(ESSENTIA
 	$(CC) $(CFLAGS) $< -o $@ fgh.o numerov.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
 	@echo
 
+cross_section_view.out: $(TOOLS_DIR)/cross_section_view.cc fgh.o numerov.o math.o $(ESSENTIALS)
+	@echo "$<:"
+	$(CC) $(CFLAGS) $< -o $@ fgh.o numerov.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
+	@echo
+
 #
 # Rules to build and install external libraries:
 #
