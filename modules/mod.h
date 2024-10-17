@@ -1,5 +1,5 @@
-#if !defined(LIB_HEADER)
-	#define LIB_HEADER
+#if !defined(MOD_HEADER)
+	#define MOD_HEADER
 	#include "essentials.h"
 	#include <optional>
 
@@ -11,14 +11,14 @@
 	// one or more object files *.o, which in turn are compiled with the -fPIC option.
 	// The flags for specific compilers should be checked.
 
-	class lib {
+	class Mod {
 		public:
-		inline lib(c_str filename):
+		inline Mod(c_str filename):
 			file(filename), handle(dlopen(filename, RTLD_LAZY | RTLD_LOCAL))
 		{
 		}
 
-		inline lib(lib &&other):
+		inline Mod(Mod &&other):
 			file(other.file.move()), handle(other.handle)
 		{
 			other.handle = nullptr;
@@ -51,7 +51,7 @@
 			}
 		}
 
-		inline ~lib()
+		inline ~Mod()
 		{
 			if (this->is_loaded()) {
 				dlclose(this->handle);

@@ -69,7 +69,7 @@ void pes::Frontend::start_extern_pes(c_str filename)
 }
 
 pes::Frontend::Frontend(const String &filename, const nist::Isotope a, const nist::Isotope b, const nist::Isotope c):
-	extern_pes(lib(filename.as_cstr())), a(a), b(b), c(c), mass_a(0.0), mass_b(0.0), mass_c(0.0)
+	extern_pes(filename.as_cstr()), a(a), b(b), c(c), mass_a(0.0), mass_b(0.0), mass_c(0.0)
 {
 	// NOTE: Atomic masses are stored in atomic units.
 	this->mass_a = nist::atomic_mass(a)*nist::ATOMIC_MASS_TO_ATOMIC_UNIT;

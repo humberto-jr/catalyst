@@ -2,7 +2,7 @@
 	#define PES_HEADER
 	#include "essentials.h"
 	#include "nist.h"
-	#include "lib.h"
+	#include "mod.h"
 
 	namespace pes {
 		using pfn_startup = void (*)();
@@ -67,7 +67,7 @@
 			~Frontend();
 
 			private:
-			lib extern_pes;
+			Mod extern_pes;
 			nist::Isotope a;
 			nist::Isotope b;
 			nist::Isotope c;

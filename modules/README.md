@@ -34,7 +34,7 @@ A collection of lightweight modules that wraps the boilerplate code required for
 
 **timer.h**: Defines the array-like type `Timer<N>` to measure and store up to `N` elapsed time values between each consecutive calls of the member functions `Timer::start()` and `Timer::stop()`. In addition, it provides various helper member functions.
 
-**lib.h**: Defines the `lib` type for loading shared libraries (`*.so`) at runtime. Once instantiated, function pointers of type `T`, pointing to symbols from those libraries, can be retrieved using the `lib::find_symbol<T>()` member function.
+**mod.h**: Defines the `Mod` type for loading shared libraries (`*.so`) at runtime. Once instantiated, function pointers of type `T`, pointing to symbols from those libraries, can be retrieved using the `Mod::find_symbol<T>()` member function.
 
 **pes.h**: Provides the `pes` namespace and the `pes::Frontend` type, which serves as a C++ abstraction over the user-defined potential energy surface (PES) routine. The user must implement the `void pes_startup()`, `f64 pes_value(f64 x[])`, and `void pes_shutdown()` functions, using whichever programming language is most convenient, and build them as a shared library, `*.so`. Then, the filename of the library can be used to instantiate an object of type `pes::Frontend`. For a given set of internuclear distances in atomic units (Bohr), say `x`, the PES value must be returned also in atomic units (Hartree). The `pes::Frontend` provides various helper member functions to manipulate the PES. Since PESs are traditionally implemented using the Fortran programming language, a [Fortran 90 wrapper](../templates/pes_wrapper.f90) for the used-defined routine is provided in the `catalyst/templates` directory.
 
