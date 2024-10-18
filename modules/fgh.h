@@ -8,41 +8,27 @@
 
 		static constexpr u32 MAGIC_NUMBER = 464748u;
 
-		static constexpr usize BASIS_FILE_HEADER = sizeof(fgh::MAGIC_NUMBER) + sizeof(fgh::FORMAT_VERSION) + 2*sizeof(u32) + 3*sizeof(f64);
-
 		void matrix(f64 mass, f64 step, const Vec<f64> &potential, Mat<f64> &result);
 
 		void matrix(f64 mass, f64 step, const Vec<Mat<f64>> &potential, Mat<f64> &result);
 
 		f64 norm(f64 step, const Vec<f64> &eigenvec);
 
-		struct Basis {
+		struct BasisEntry {
 			mut<u32> J;
 			mut<u32> v;
 			mut<u32> j;
 			mut<u32> l;
 			mut<s32> p;
-			mut<u32> comp;
-			mut<u32> n_min;
+			mut<u32> n;
 			mut<f64> norm;
-			mut<f64> r_min;
-			mut<f64> r_max;
-			mut<f64> r_step;
+			Range<f64> r_list;
 			mut<f64> eigenval;
 			Vec<f64> eigenvec;
 
-			inline Basis(usize count = 0):
-				J(0), v(0), j(0), l(0), p(0), comp(0), n_min(0), norm(1.0), r_min(0.0), r_max(0.0), r_step(0.0), eigenval(0.0), eigenvec(count)
+			inline BasisEntry(usize count = 0):
+				J(0), v(0), j(0), l(0), p(0), n(0), norm(1.0), r_list(0.0, 0.0, 0.0), eigenval(0.0), eigenvec(count)
 			{
-			}
-
-			void resize()
-			{
-				usize count = as_usize((this->r_max - this->r_min)/this->r_step);
-
-				if (count > this->eigenvec.length()) {
-					this->eigenvec.resize(count);
-				}
 			}
 
 			inline f64 operator[](usize n) const
@@ -51,8 +37,56 @@
 			}
 		};
 
-		u32 is_valid(file::Input &buf);
+		class Basis {
+			public:
+			Basis(c_str filename, u8 fmt_ver = 1);
 
-		void load_basis(u32 n, file::Input &buf, fgh::Basis &data);
+			const BasisEntry& operator[](usize index);
+
+			inline usize count() const
+			{
+				return this->len;
+			}
+
+			struct Iterator {
+				inline Iterator(fgh::Basis &owner): index(0), owner(owner)
+				{
+				}
+
+				inline bool operator!=(usize max_len) const
+				{
+					return (this->index < max_len);
+				}
+
+				inline const fgh::BasisEntry& operator*()
+				{
+					return this->owner[this->index];
+				}
+
+				inline void operator++()
+				{
+					this->index += 1;
+				}
+
+				mut<usize> index;
+				Basis &owner;
+			};
+
+			inline Basis::Iterator begin()
+			{
+				return Basis::Iterator(*this);
+			}
+
+			inline usize end() const
+			{
+				return this->count();
+			}
+
+			private:
+			mut<usize> len;
+			mut<usize> stride;
+			file::Input input;
+			fgh::BasisEntry entry;
+		};
 	}
 #endif

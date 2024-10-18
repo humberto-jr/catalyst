@@ -1,6 +1,36 @@
 #include "fgh.h"
 #include "math.h"
 
+#define CHECK_FILE_END(input)                                                                \
+{                                                                                            \
+  if ((input).end()) {                                                                       \
+    print::error(WHERE, "Unexpected end of file when reading ", (input).filename.as_cstr()); \
+  }                                                                                          \
+}
+
+#define CHECK_FILE_HEADER(input, fmt_ver)                                                            \
+{                                                                                                    \
+  mut<decltype(fgh::MAGIC_NUMBER)> tag = 0;                                                          \
+                                                                                                     \
+  (input).read(tag);                                                                                 \
+                                                                                                     \
+  CHECK_FILE_END(input)                                                                              \
+                                                                                                     \
+  if (tag != fgh::MAGIC_NUMBER) {                                                                    \
+    print::error(WHERE, (input).filename.as_cstr(), " is not a FGH file (tag = ", tag, ')');         \
+  }                                                                                                  \
+                                                                                                     \
+  mut<decltype(fgh::FORMAT_VERSION)> ver = 0;                                                        \
+                                                                                                     \
+  (input).read(ver);                                                                                 \
+                                                                                                     \
+  CHECK_FILE_END(input)                                                                              \
+                                                                                                     \
+  if ((ver != (fmt_ver)) || (ver > fgh::FORMAT_VERSION)) {                                           \
+    print::error(WHERE, (input).filename.as_cstr(), " does not have a valid format version: ", ver); \
+  }                                                                                                  \
+}
+
 void fgh::matrix(f64 mass, f64 step, const Vec<f64> &potential, Mat<f64> &result)
 {
 	// References:
@@ -117,65 +147,61 @@ f64 fgh::norm(f64 step, const Vec<f64> &eigenvec)
 	return 1.0/std::sqrt(sum);
 }
 
-u32 fgh::is_valid(file::Input &buf)
+//
+// fgh::Basis:
+//
+
+static constexpr usize BASIS_FILE_HEADER = sizeof(fgh::MAGIC_NUMBER)
+                                         + sizeof(fgh::FORMAT_VERSION)
+                                         + sizeof(usize) + 3*sizeof(f64);
+
+fgh::Basis::Basis(c_str filename, u8 fmt_ver): len(0), stride(0), input(filename)
 {
-	buf.seek_set();
+	CHECK_FILE_HEADER(this->input, fmt_ver)
 
-	mut<u32> tag = 0;
-	buf.read(tag);
+	this->input.read(this->len);
 
-	if ((tag != fgh::MAGIC_NUMBER) || buf.end()) {
-		print::error(WHERE, buf.filename.as_cstr(), " does not correspond to a FGH basis file");
+	CHECK_FILE_END(this->input)
+
+	if (this->len == 0) {
+		print::error(WHERE, this->input.filename.as_cstr(), " has no FGH basis stored");
 	}
 
-	mut<u8> ver = 0;
-	buf.read(ver);
+	this->input.read(this->entry.r_list);
 
-	if ((ver != fgh::FORMAT_VERSION) || buf.end()) {
-		print::error(WHERE, buf.filename.as_cstr(), " does not have a valid format version");
-	}
+	CHECK_FILE_END(this->input)
 
-	mut<u32> count = 0;
-	buf.read(count);
+	this->entry.eigenvec.resize(this->entry.r_list.count());
 
-	if ((count == 0) || buf.end()) {
-		print::error(WHERE, buf.filename.as_cstr(), " has no basis functions stored");
-	}
-
-	return count;
+	// NOTE: There is an extra usize entry used for the basis indexing in each
+	// chunk of data stored in the file, which is not part of fgh::BasisEntry.
+	this->stride = sizeof(usize)
+	             + 5*sizeof(u32)
+	             + sizeof(s32) + 2*sizeof(f64) + this->entry.eigenvec.size();
 }
 
-void fgh::load_basis(u32 n, file::Input &buf, fgh::Basis &basis)
+const fgh::BasisEntry& fgh::Basis::operator[](usize index)
 {
-	buf.seek_set(sizeof(fgh::MAGIC_NUMBER) + sizeof(fgh::FORMAT_VERSION) + sizeof(u32));
+	CHECK_FILE_END(this->input)
 
-	buf.read(basis.n_min);
-	buf.read(basis.r_min);
-	buf.read(basis.r_max);
-	buf.read(basis.r_step);
+	this->input.seek_set(BASIS_FILE_HEADER + index*this->stride);
 
-	basis.resize();
+	mut<usize> saved_index = 0;
+	this->input.read(saved_index);
 
-	// NOTE: There is an extra u32 entry in each chunk of data for the basis indexing,
-	// which is not part of the struct fgh::Basis (see saved_n below).
-	usize offset = n*(6*sizeof(u32) + sizeof(s32) + 2*sizeof(f64) + basis.eigenvec.size());
-
-	buf.seek_set(fgh::BASIS_FILE_HEADER + offset);
-
-	mut<u32> saved_n = 0;
-	buf.read(saved_n);
-
-	if (saved_n != n) {
-		print::error(WHERE, buf.filename.as_cstr(), " layout is inconsistent; expected n = ", n, ", but found n = ", saved_n);
+	if (saved_index != index) {
+		print::error(WHERE, "Expected basis index ", index, ", but received ", saved_index, " when reading from ", this->input.filename.as_cstr());
 	}
 
-	buf.read(basis.j);
-	buf.read(basis.v);
-	buf.read(basis.J);
-	buf.read(basis.l);
-	buf.read(basis.p);
-	buf.read(basis.comp);
-	buf.read(basis.norm);
-	buf.read(basis.eigenval);
-	buf.read(basis.eigenvec);
+	this->input.read(this->entry.j);
+	this->input.read(this->entry.v);
+	this->input.read(this->entry.J);
+	this->input.read(this->entry.l);
+	this->input.read(this->entry.p);
+	this->input.read(this->entry.n);
+	this->input.read(this->entry.norm);
+	this->input.read(this->entry.eigenval);
+	this->input.read(this->entry.eigenvec);
+
+	return this->entry;
 }
