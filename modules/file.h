@@ -348,6 +348,79 @@
 				this->read_mat_view<f128>(data);
 			}
 
+			template<typename T>
+			void read_range(Range<T> &data)
+			{
+				mut<T> list[3];
+				type_zeroed(list, 3);
+
+				this->read_raw<mut<T>>(3, list);
+
+				data.min = list[0];
+				data.max = list[1];
+				data.step = list[2];
+			}
+
+			inline void read(Range<char> &data)
+			{
+				this->read_range<char>(data);
+			}
+
+			inline void read(Range<u8> &data)
+			{
+				this->read_range<u8>(data);
+			}
+
+			inline void read(Range<u16> &data)
+			{
+				this->read_range<u16>(data);
+			}
+
+			inline void read(Range<u32> &data)
+			{
+				this->read_range<u32>(data);
+			}
+
+			inline void read(Range<u64> &data)
+			{
+				this->read_range<u64>(data);
+			}
+
+			inline void read(Range<s8> &data)
+			{
+				this->read_range<s8>(data);
+			}
+
+			inline void read(Range<s16> &data)
+			{
+				this->read_range<s16>(data);
+			}
+
+			inline void read(Range<s32> &data)
+			{
+				this->read_range<s32>(data);
+			}
+
+			inline void read(Range<s64> &data)
+			{
+				this->read_range<s64>(data);
+			}
+
+			inline void read(Range<f32> &data)
+			{
+				this->read_range<f32>(data);
+			}
+
+			inline void read(Range<f64> &data)
+			{
+				this->read_range<f64>(data);
+			}
+
+			inline void read(Range<f128> &data)
+			{
+				this->read_range<f128>(data);
+			}
+
 			void read_all(Vec<byte> &buf)
 			{
 				this->seek_set();
@@ -709,6 +782,73 @@
 			inline void write(const typename Mat<f128>::View &data)
 			{
 				this->write_mat_view<f128>(data);
+			}
+
+			template<typename T>
+			inline void write_range(const Range<T> &data)
+			{
+				T list[] = {data.min, data.max, data.step};
+				this->write_raw<mut<T>>(3, list);
+			}
+
+			inline void write(const Range<char> &data)
+			{
+				this->write_range<char>(data);
+			}
+
+			inline void write(const Range<u8> &data)
+			{
+				this->write_range<u8>(data);
+			}
+
+			inline void write(const Range<u16> &data)
+			{
+				this->write_range<u16>(data);
+			}
+
+			inline void write(const Range<u32> &data)
+			{
+				this->write_range<u32>(data);
+			}
+
+			inline void write(const Range<u64> &data)
+			{
+				this->write_range<u64>(data);
+			}
+
+			inline void write(const Range<s8> &data)
+			{
+				this->write_range<s8>(data);
+			}
+
+			inline void write(const Range<s16> &data)
+			{
+				this->write_range<s16>(data);
+			}
+
+			inline void write(const Range<s32> &data)
+			{
+				this->write_range<s32>(data);
+			}
+
+			inline void write(const Range<s64> &data)
+			{
+				this->write_range<s64>(data);
+			}
+
+			inline void write(const Range<f32> &data)
+			{
+				this->write_range<f32>(data);
+			}
+
+			inline void write(const Range<f64> &data)
+			{
+				this->write_range<f64>(data);
+			}
+
+			inline void write(const Range<f128> &data)
+			{
+				this->write_range<f128>(data);
 			}
 
 			inline void seek_set(usize count = 0)
