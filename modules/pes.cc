@@ -207,7 +207,7 @@ f64 pes::Frontend::legendre_multipole_term(const char arrang, u32 lambda, f64 r,
 	// References:
 	// [1] W. H. Miller, J. Chem. Phys., Vol. 50, Num. 1, 407-418 (1969)
 
-	struct legendre {
+	struct Legendre {
 		const pes::Frontend &pes;
 		const char arrang;
 		u32 lambda;
@@ -216,7 +216,7 @@ f64 pes::Frontend::legendre_multipole_term(const char arrang, u32 lambda, f64 r,
 	};
 
 	auto integrand = [](f64 theta, void *params) -> f64 {
-		auto input = static_cast<legendre*>(params);
+		auto input = static_cast<Legendre*>(params);
 
 		f64 x = math::as_deg(theta);
 
@@ -227,7 +227,7 @@ f64 pes::Frontend::legendre_multipole_term(const char arrang, u32 lambda, f64 r,
 		return (v_inf - v)*math::legendre_poly(input->lambda, cos(theta))*sin(theta);
 	};
 
-	legendre params = {*this, arrang, lambda, r, R};
+	Legendre params = {*this, arrang, lambda, r, R};
 
 	f64 result = math::gauss_legendre(0.0, math::PI, 64, as_void(&params), integrand);
 
