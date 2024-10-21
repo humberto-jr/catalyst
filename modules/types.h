@@ -533,10 +533,14 @@
 			return std::remainder(this->max - this->min, this->step) == static_cast<T>(0);
 		}
 
-		inline usize count() const
+		usize count() const
 		{
-			T count = (this->max - this->min)/this->step;
-			return (this->is_divided_evenly()? as_usize(count) : as_usize(count) + 1u);
+			if (this->step == static_cast<T>(0)) {
+				return 0;
+			} else {
+				T count = (this->max - this->min)/this->step;
+				return (this->is_divided_evenly()? as_usize(count) : as_usize(count) + 1u);
+			}
 		}
 
 		constexpr Range<T> as_range_inclusive() const
