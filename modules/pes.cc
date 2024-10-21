@@ -235,12 +235,13 @@ f64 pes::Frontend::legendre_multipole_term(const char arrang, u32 lambda, f64 r,
 	return as_f64(2*lambda + 1)*result/2.0;
 }
 
-void pes::Frontend::legendre_multipole_term(const char arrang, u32 lambda, u32 n_min, f64 r_min, f64 r_step, f64 R, Vec<f64> &result) const
+void pes::Frontend::legendre_multipole_term(const char arrang, u32 lambda,
+                                            const Range<f64> &r_list, f64 R, Vec<f64> &result) const
 {
-	for (mut<usize> n = 0; n < result.length(); ++n) {
-		f64 r = r_min + as_f64(n_min + n)*r_step;
+	assert(r_list.count() == result.length());
 
-		result[n] = this->legendre_multipole_term(arrang, lambda, r, R);
+	for (auto r : r_list.indexed()) {
+		result[r.index] = this->legendre_multipole_term(arrang, lambda, r.value, R);
 	}
 }
 
