@@ -353,35 +353,125 @@ static T simpson_driver(const T step, const Vec<T> &integrand)
 	return fact*step*sum;
 }
 
-f32 math::simpson(f32 step, const Vec<f32> &integrand)
-{
-	return simpson_driver<f32>(step, integrand);
+#define MATH_SIMPSON_IMPL1(type)                          \
+type math::simpson(type step, const Vec<type> &integrand) \
+{                                                         \
+  return simpson_driver<type>(step, integrand);           \
 }
 
-f64 math::simpson(f64 step, const Vec<f64> &integrand)
+MATH_SIMPSON_IMPL1(f32)
+MATH_SIMPSON_IMPL1(f64)
+MATH_SIMPSON_IMPL1(f128)
+MATH_SIMPSON_IMPL1(c32)
+MATH_SIMPSON_IMPL1(c64)
+MATH_SIMPSON_IMPL1(c128)
+
+#undef MATH_SIMPSON_IMPL1
+
+template<typename T>
+static T simpson_driver(const T step,
+                        const Vec<T> &integrand_a,
+                        const Vec<T> &integrand_b)
 {
-	return simpson_driver<f64>(step, integrand);
+	assert(integrand_a.length() == integrand_b.length());
+
+	constexpr T fact = static_cast<T>(3.0/8.0);
+
+	mut<usize> n_max = integrand_a.length() - 1;
+
+	while (n_max%3 != 0) {
+		--n_max;
+	}
+
+	assert(n_max > 2);
+
+	#define INTEGRAND(n) (integrand_a[(n)]*integrand_b[(n)])
+
+	mut<T> sum = INTEGRAND(0);
+
+	for (mut<usize> n = 1; n < (n_max - 3); n += 3) {
+		sum += static_cast<T>(3.0)*INTEGRAND(n + 0)
+		     + static_cast<T>(3.0)*INTEGRAND(n + 1)
+		     + static_cast<T>(2.0)*INTEGRAND(n + 2);
+	}
+
+	sum += static_cast<T>(3.0)*INTEGRAND(n_max - 1) + INTEGRAND(n_max);
+
+	#undef INTEGRAND
+
+	return fact*step*sum;
 }
 
-f128 math::simpson(f128 step, const Vec<f128> &integrand)
-{
-	return simpson_driver<f128>(step, integrand);
+#define MATH_SIMPSON_IMPL2(type)                               \
+type math::simpson(type step,                                  \
+                   const Vec<type> &integrand_a,               \
+                   const Vec<type> &integrand_b)               \
+{                                                              \
+  return simpson_driver<type>(step, integrand_a, integrand_b); \
 }
 
-c32 math::simpson(c32 step, const Vec<c32> &integrand)
+MATH_SIMPSON_IMPL2(f32)
+MATH_SIMPSON_IMPL2(f64)
+MATH_SIMPSON_IMPL2(f128)
+MATH_SIMPSON_IMPL2(c32)
+MATH_SIMPSON_IMPL2(c64)
+MATH_SIMPSON_IMPL2(c128)
+
+#undef MATH_SIMPSON_IMPL2
+
+template<typename T>
+static T simpson_driver(const T step,
+                        const Vec<T> &integrand_a,
+                        const Vec<T> &integrand_b,
+                        const Vec<T> &integrand_c)
 {
-	return simpson_driver<c32>(step, integrand);
+	assert(integrand_a.length() == integrand_b.length());
+	assert(integrand_b.length() == integrand_c.length());
+
+	constexpr T fact = static_cast<T>(3.0/8.0);
+
+	mut<usize> n_max = integrand_a.length() - 1;
+
+	while (n_max%3 != 0) {
+		--n_max;
+	}
+
+	assert(n_max > 2);
+
+	#define INTEGRAND(n) (integrand_a[(n)]*integrand_b[(n)]*integrand_c[(n)])
+
+	mut<T> sum = INTEGRAND(0);
+
+	for (mut<usize> n = 1; n < (n_max - 3); n += 3) {
+		sum += static_cast<T>(3.0)*INTEGRAND(n + 0)
+		     + static_cast<T>(3.0)*INTEGRAND(n + 1)
+		     + static_cast<T>(2.0)*INTEGRAND(n + 2);
+	}
+
+	sum += static_cast<T>(3.0)*INTEGRAND(n_max - 1) + INTEGRAND(n_max);
+
+	#undef INTEGRAND
+
+	return fact*step*sum;
 }
 
-c64 math::simpson(c64 step, const Vec<c64> &integrand)
-{
-	return simpson_driver<c64>(step, integrand);
+#define MATH_SIMPSON_IMPL3(type)                                            \
+type math::simpson(type step,                                               \
+                   const Vec<type> &integrand_a,                            \
+                   const Vec<type> &integrand_b,                            \
+                   const Vec<type> &integrand_c)                            \
+{                                                                           \
+  return simpson_driver<type>(step, integrand_a, integrand_b, integrand_c); \
 }
 
-c128 math::simpson(c128 step, const Vec<c128> &integrand)
-{
-	return simpson_driver<c128>(step, integrand);
-}
+MATH_SIMPSON_IMPL3(f32)
+MATH_SIMPSON_IMPL3(f64)
+MATH_SIMPSON_IMPL3(f128)
+MATH_SIMPSON_IMPL3(c32)
+MATH_SIMPSON_IMPL3(c64)
+MATH_SIMPSON_IMPL3(c128)
+
+#undef MATH_SIMPSON_IMPL3
 
 static constexpr f128 gauss_legendre_weight_2nd[] = {
 	1.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000,

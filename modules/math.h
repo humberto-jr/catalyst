@@ -192,6 +192,60 @@
 
 		c128 simpson(c128 step, const Vec<c128> &integrand);
 
+		f32 simpson(f32 step,
+		            const Vec<f32> &integrand_a,
+		            const Vec<f32> &integrand_b);
+
+		f64 simpson(f64 step,
+		            const Vec<f64> &integrand_a,
+		            const Vec<f64> &integrand_b);
+
+		f128 simpson(f128 step,
+		            const Vec<f128> &integrand_a,
+		            const Vec<f128> &integrand_b);
+
+		c32 simpson(c32 step,
+		            const Vec<c32> &integrand_a,
+		            const Vec<c32> &integrand_b);
+
+		c64 simpson(c64 step,
+		            const Vec<c64> &integrand_a,
+		            const Vec<c64> &integrand_b);
+
+		c128 simpson(c128 step,
+		            const Vec<c128> &integrand_a,
+		            const Vec<c128> &integrand_b);
+
+		f32 simpson(f32 step,
+		            const Vec<f32> &integrand_a,
+		            const Vec<f32> &integrand_b,
+		            const Vec<f32> &integrand_c);
+
+		f64 simpson(f64 step,
+		            const Vec<f64> &integrand_a,
+		            const Vec<f64> &integrand_b,
+		            const Vec<f64> &integrand_c);
+
+		f128 simpson(f128 step,
+		            const Vec<f128> &integrand_a,
+		            const Vec<f128> &integrand_b,
+		            const Vec<f128> &integrand_c);
+
+		c32 simpson(c32 step,
+		            const Vec<c32> &integrand_a,
+		            const Vec<c32> &integrand_b,
+		            const Vec<c32> &integrand_c);
+
+		c64 simpson(c64 step,
+		            const Vec<c64> &integrand_a,
+		            const Vec<c64> &integrand_b,
+		            const Vec<c64> &integrand_c);
+
+		c128 simpson(c128 step,
+		            const Vec<c128> &integrand_a,
+		            const Vec<c128> &integrand_b,
+		            const Vec<c128> &integrand_c);
+
 		f64 gauss_legendre(f64 a, f64 b, u8 order, void *params, math::integrand f);
 
 		static constexpr f64 factorial(u8 n)
