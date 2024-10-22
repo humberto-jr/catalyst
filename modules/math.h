@@ -227,9 +227,9 @@
 		            const Vec<f64> &integrand_c);
 
 		f128 simpson(f128 step,
-		            const Vec<f128> &integrand_a,
-		            const Vec<f128> &integrand_b,
-		            const Vec<f128> &integrand_c);
+		             const Vec<f128> &integrand_a,
+		             const Vec<f128> &integrand_b,
+		             const Vec<f128> &integrand_c);
 
 		c32 simpson(c32 step,
 		            const Vec<c32> &integrand_a,
@@ -242,9 +242,9 @@
 		            const Vec<c64> &integrand_c);
 
 		c128 simpson(c128 step,
-		            const Vec<c128> &integrand_a,
-		            const Vec<c128> &integrand_b,
-		            const Vec<c128> &integrand_c);
+		             const Vec<c128> &integrand_a,
+		             const Vec<c128> &integrand_b,
+		             const Vec<c128> &integrand_c);
 
 		f64 gauss_legendre(f64 a, f64 b, u8 order, void *params, math::integrand f);
 
