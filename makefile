@@ -439,6 +439,11 @@ cross_section_view.out: $(TOOLS_DIR)/cross_section_view.cc fgh.o numerov.o math.
 	$(CC) $(CFLAGS) $< -o $@ fgh.o numerov.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
 	@echo
 
+coupling_matrix_view.out: $(TOOLS_DIR)/coupling_matrix_view.cc fgh.o numerov.o math.o $(ESSENTIALS)
+	@echo "$<:"
+	$(CC) $(CFLAGS) $< -o $@ fgh.o numerov.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
+	@echo
+
 #
 # Rules to build and install external libraries:
 #
