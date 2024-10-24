@@ -10,36 +10,38 @@
 
 		constexpr u32 MAGIC_NUMBER = 1701998454u;
 
-		using Basis = Vec<fgh::Basis>;
+		struct Basis {
+			String filename;
+			Vec<fgh::BasisEntry> list;
 
-		struct Potential {
+			Basis(String &filename);
+		};
+
+		struct PotentialEntry {
+			mut<f64> R;
+			Mat<f64> value;
+			mut<usize> index;
+
+			PotentialEntry(usize channel_count);
+		};
+
+		class Potential {
 			public:
-			u32 n_min;
-			f64 R_min;
-			f64 R_max;
-			f64 R_step;
-			f64 mass;
+			Potential(c_str filename, u8 fmt_ver = 1);
 
-			inline Potential(u32 n_min, f64 R_min, f64 R_max, f64 R_step, f64 mass, Mat<f64> &coupling, file::Input &input):
-				n_min(n_min), R_min(R_min), R_max(R_max), R_step(R_step), mass(mass), coupling(coupling.move()), input(input)
-			{
-			}
+			c_str filename() const;
 
-			inline Potential(numerov::Potential &&other):
-				n_min(other.n_min), R_min(other.R_min), R_max(other.R_max), R_step(other.R_step), mass(other.mass), coupling(other.coupling.move()), input(other.input)
-			{
-			}
+			f64 reduced_mass();
 
-			const Mat<f64>& operator[](u32 n);
+			usize channel_count() const;
 
-			inline c_str filename() const
-			{
-				return this->input.filename.as_cstr();
-			}
+			Range<f64> grid_range();
+
+			const PotentialEntry& operator[](usize grid_index);
 
 			private:
-			Mat<f64> coupling;
 			file::Input input;
+			PotentialEntry entry;
 		};
 
 		struct Solution {

@@ -10,9 +10,19 @@
   }                                                                                          \
 }
 
+#define CHECK_DATA_INDEX(input, index, name)                                                                                      \
+{                                                                                                                                 \
+  mut<usize> saved_index = 0;                                                                                                     \
+  (input).read(saved_index);                                                                                                      \
+                                                                                                                                  \
+  if (saved_index != (index)) {                                                                                                   \
+    print::error(WHERE, "Expected", (name), index, ", but received ", saved_index, " when reading ", (input).filename.as_cstr()); \
+  }                                                                                                                               \
+}
+
 #define CHECK_FILE_HEADER(input, fmt_ver)                                                            \
 {                                                                                                    \
-  mut<decltype(numerov::MAGIC_NUMBER)> tag = -1;                                                     \
+  mut<decltype(numerov::MAGIC_NUMBER)> tag = 0;                                                      \
                                                                                                      \
   (input).read(tag);                                                                                 \
                                                                                                      \
@@ -22,7 +32,7 @@
     print::error(WHERE, (input).filename.as_cstr(), " is not a Numerov file (tag = ", tag, ')');     \
   }                                                                                                  \
                                                                                                      \
-  mut<decltype(numerov::FORMAT_VERSION)> ver = -1;                                                   \
+  mut<decltype(numerov::FORMAT_VERSION)> ver = 0;                                                    \
                                                                                                      \
   (input).read(ver);                                                                                 \
                                                                                                      \
@@ -33,75 +43,120 @@
   }                                                                                                  \
 }
 
-static constexpr usize FILE_HEADER_OFFSET
-	= 2*sizeof(u32) + sizeof(u8) + 4*sizeof(f64) + sizeof(usize);
+//
+// numerov::Basis:
+//
 
-numerov::Basis numerov::open_basis_file(const String &filename)
+numerov::Basis::Basis(String &filename): filename(filename.move())
 {
-	file::Input input(filename.as_cstr());
+	fgh::Basis basis(this->filename.as_cstr());
 
-	u32 count = fgh::is_valid(input);
+	this->list.resize(basis.count());
 
-	numerov::Basis list(count);
+	for (auto entry : this->list) {
+		auto &data = basis[entry.index];
 
-	fgh::load_basis(0, input, list[0]);
+		entry.value.J = data.J;
+		entry.value.v = data.v;
+		entry.value.j = data.j;
+		entry.value.l = data.l;
+		entry.value.p = data.p;
+		entry.value.n = data.n;
+		entry.value.norm = data.norm;
+		entry.value.r_list = data.r_list;
+		entry.value.eigenval = data.eigenval;
 
-	for (mut<u32> n = 1; n < count; ++n) {
-		fgh::load_basis(n, input, list[n]);
+		entry.value.eigenvec.resize(data.eigenvec.length());
 
-		assert(list[n].n_min  == list[n - 1].n_min);
-		assert(list[n].r_min  == list[n - 1].r_min);
-		assert(list[n].r_max  == list[n - 1].r_max);
-		assert(list[n].r_step == list[n - 1].r_step);
+		entry.value.eigenvec = data.eigenvec;
 	}
-
-	return list;
 }
 
-numerov::Potential numerov::open(String &filename, u8 fmt_ver)
+//
+// numerov::PotentialEntry:
+//
+
+numerov::PotentialEntry::PotentialEntry(usize channel_count = 0):
+	R(0.0), value(channel_count, channel_count), index(0)
 {
-	// TODO: It is missing the implementation of consuming files with Numerov
-	// ratio matrices.
-	assert(fmt_ver == 1);
+}
 
-	file::Input buf(filename);
+//
+// numerov::Potential:
+//
 
-	mut<u32> tag = 0;
-	buf.read(tag);
+static constexpr usize POTENTIAL_FILE_HEADER = sizeof(numerov::MAGIC_NUMBER)
+                                             + sizeof(numerov::FORMAT_VERSION)
+                                             + sizeof(usize) + 4*sizeof(f64);
 
-	if ((tag != numerov::MAGIC_NUMBER) || buf.end()) {
-		print::error(WHERE, buf.filename.as_cstr(), " does not correspond to a Numerov file");
-	}
+numerov::Potential::Potential(c_str filename, u8 fmt_ver): input(filename)
+{
+	CHECK_FILE_HEADER(this->input, fmt_ver);
 
-	mut<u8> ver = 0;
-	buf.read(ver);
+	mut<usize> channel_count = 0;
+	this->input.read(channel_count);
 
-	if ((ver != fmt_ver) || buf.end()) {
-		print::error(WHERE, buf.filename.as_cstr(), " does not have a valid format version");
-	}
+	CHECK_FILE_END(this->input)
 
-	mut<u32> n_min = 0;
-	buf.read(n_min);
+	this->entry.R = 0.0;
+	this->entry.index = 0;
+	this->entry.value.resize(channel_count, channel_count);
+}
 
-	mut<f64> R_min = 0.0;
-	buf.read(R_min);
+c_str numerov::Potential::filename() const
+{
+	return this->input.filename.as_cstr();
+}
 
-	mut<f64> R_max = 0.0;
-	buf.read(R_max);
+f64 numerov::Potential::reduced_mass()
+{
+	this->input.seek_set(POTENTIAL_FILE_HEADER - sizeof(f64));
 
-	mut<f64> R_step = 0.0;
-	buf.read(R_step);
+	CHECK_FILE_END(this->input)
 
 	mut<f64> mass = 0.0;
-	buf.read(mass);
+	this->input.read(mass);
 
-	mut<usize> ch_count = 0;
-	buf.read(ch_count);
-
-	Mat<f64> coupling(ch_count, ch_count);
-
-	return {n_min, R_min, R_max, R_step, mass, coupling, buf};
+	return mass;
 }
+
+usize numerov::Potential::channel_count() const
+{
+	return this->entry.value.rows();
+}
+
+Range<f64> numerov::Potential::grid_range()
+{
+	this->input.seek_set(POTENTIAL_FILE_HEADER - 4*sizeof(f64));
+
+	CHECK_FILE_END(this->input)
+
+	Range<f64> range;
+	this->input.read(range);
+
+	return range;
+}
+
+const numerov::PotentialEntry& numerov::Potential::operator[](usize grid_index)
+{
+	usize stride = sizeof(PotentialEntry::index)
+	             + sizeof(PotentialEntry::R) + this->entry.value.size();
+
+	this->input.seek_set(POTENTIAL_FILE_HEADER + grid_index*stride);
+
+	CHECK_FILE_END(this->input)
+	CHECK_DATA_INDEX(this->input, grid_index, " grid index ")
+
+	this->entry.index = grid_index;
+	this->input.read(this->entry.R);
+	this->input.read(this->entry.value);
+
+	return this->entry;
+}
+
+//
+// numerov::Ratio:
+//
 
 numerov::Solution numerov::open_ratio_file(String &filename, u8 fmt_ver)
 {
@@ -149,27 +204,6 @@ numerov::Solution numerov::open_ratio_file(String &filename, u8 fmt_ver)
 	}
 
 	return {mass, R_max, R_step, E_min, E_max, E_step, input, ratio};
-}
-
-const Mat<f64>& numerov::Potential::operator[](u32 n)
-{
-	usize offset = sizeof(u32) + sizeof(f64) + this->coupling.size();
-
-	this->input.seek_set(FILE_HEADER_OFFSET + n*offset);
-
-	mut<u32> n_saved = 0;
-	this->input.read(n_saved);
-
-	if (n_saved != n) {
-		print::error(WHERE, "Expected n = ", n, ", but received n = ", n_saved, " when reading from ", this->input.filename.as_cstr());
-	}
-
-	mut<f64> R = 0.0;
-	this->input.read(R);
-
-	this->input.read(this->coupling);
-
-	return this->coupling;
 }
 
 const Mat<f64>& numerov::Solution::operator[](u32 n)
@@ -467,7 +501,7 @@ usize numerov::build_react_matrix(f64 mass,
 
 	assert(k.rows() == ch_count);
 	assert(k.cols() == ch_count);
-	assert(level.length() == ch_count);
+	assert(level.list.length() == ch_count);
 
 	mut<usize> count = 0;
 
@@ -486,23 +520,23 @@ usize numerov::build_react_matrix(f64 mass,
 	//
 
 	for (mut<usize> ch = 0; ch < ch_count; ++ch) {
-		f64 l = as_f64(level[ch].l);
+		f64 l = as_f64(level.list[ch].l);
 
 		f64 T_max = fact*(
-			tot_energy - (level[ch].eigenval + numerov::centrifugal_term(l, mass, R_max))
+			tot_energy - (level.list[ch].eigenval + numerov::centrifugal_term(l, mass, R_max))
 		);
 
 		f64 T_inf = fact*(
-			tot_energy - (level[ch].eigenval + numerov::centrifugal_term(l, mass, R_inf))
+			tot_energy - (level.list[ch].eigenval + numerov::centrifugal_term(l, mass, R_inf))
 		);
 
-		f64 wavenum = numerov::wavenumber(mass, tot_energy, level[ch].eigenval);
+		f64 wavenum = numerov::wavenumber(mass, tot_energy, level.list[ch].eigenval);
 
 		f64 x_max = wavenum*R_max;
 
 		f64 x_inf = wavenum*R_inf;
 
-		if (level[ch].eigenval < tot_energy) {
+		if (level.list[ch].eigenval < tot_energy) {
 			++count;
 
 			n(ch, ch) = (1.0 - T_max)*math::riccati_bessel('n', l, x_max);
