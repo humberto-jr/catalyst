@@ -10,14 +10,16 @@
   }                                                                                          \
 }
 
-#define CHECK_DATA_INDEX(input, index, name)                                                                                      \
-{                                                                                                                                 \
-  mut<usize> saved_index = 0;                                                                                                     \
-  (input).read(saved_index);                                                                                                      \
-                                                                                                                                  \
-  if (saved_index != (index)) {                                                                                                   \
-    print::error(WHERE, "Expected", (name), index, ", but received ", saved_index, " when reading ", (input).filename.as_cstr()); \
-  }                                                                                                                               \
+#define CHECK_DATA_INDEX(input, index, name)                                                                                           \
+{                                                                                                                                      \
+  mut<usize> saved_index = 0;                                                                                                          \
+  (input).read(saved_index);                                                                                                           \
+                                                                                                                                       \
+  CHECK_FILE_END(input)                                                                                                                \
+                                                                                                                                       \
+  if (saved_index != (index)) {                                                                                                        \
+    print::error(WHERE, "Expected", (name), ' ', index, ", but received ", saved_index, " when reading ", (input).filename.as_cstr()); \
+  }                                                                                                                                    \
 }
 
 #define CHECK_FILE_HEADER(input, fmt_ver)                                                            \
@@ -98,8 +100,6 @@ numerov::Potential::Potential(c_str filename, u8 fmt_ver): input(filename)
 
 	CHECK_FILE_END(this->input)
 
-	this->entry.R = 0.0;
-	this->entry.index = 0;
 	this->entry.value.resize(channel_count, channel_count);
 }
 
@@ -144,14 +144,26 @@ const numerov::PotentialEntry& numerov::Potential::operator[](usize grid_index)
 
 	this->input.seek_set(POTENTIAL_FILE_HEADER + grid_index*stride);
 
-	CHECK_FILE_END(this->input)
 	CHECK_DATA_INDEX(this->input, grid_index, " grid index ")
 
-	this->entry.index = grid_index;
 	this->input.read(this->entry.R);
 	this->input.read(this->entry.value);
 
 	return this->entry;
+}
+
+//
+// numerov::RatioEntry:
+//
+
+numerov::RatioEntry::RatioEntry(usize channel_count = 0):
+	R(0.0), energy(0.0), value(channel_count, channel_count)
+{
+}
+
+usize numerov::RatioEntry::size() const
+{
+	return sizeof(this->R) + sizeof(this->energy) + this->value.size();
 }
 
 //

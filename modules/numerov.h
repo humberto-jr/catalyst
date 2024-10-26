@@ -44,6 +44,40 @@
 			PotentialEntry entry;
 		};
 
+		struct RatioEntry {
+			mut<f64> R;
+			mut<f64> energy;
+			Mat<f64> value;
+
+			RatioEntry(usize channel_count);
+
+			usize size() const;
+		};
+
+		class Ratio {
+			public:
+			Ratio(c_str filename, u8 fmt_ver = 2);
+
+			c_str filename() const;
+
+			f64 reduced_mass();
+
+			usize channel_count() const;
+
+			Range<f64> grid_range();
+
+			Range<f64> energy_range();
+
+			const RatioEntry& last_entry(usize energy_index);
+
+			const RatioEntry& operator()(usize grid_index, usize energy_index);
+
+			private:
+			mut<usize> stride;
+			file::Input input;
+			RatioEntry entry;
+		};
+
 		struct Solution {
 			public:
 			f64 mass;
@@ -143,10 +177,6 @@
 			private:
 			Vec<ScattAmplitudeEntry> entry;
 		};
-
-		numerov::Basis open_basis_file(const String &filename);
-
-		numerov::Potential open(String &filename, u8 fmt_ver = 1);
 
 		numerov::Solution open_ratio_file(String &filename, u8 fmt_ver = 2);
 
