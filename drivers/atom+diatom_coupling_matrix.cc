@@ -115,9 +115,7 @@ int main(int argc, char *argv[])
 		clock.start();
 
 		for (u32 lambda : lambda_list.as_range_inclusive()) {
-			// NOTE: Assuming that r_min and r_step are the same for all basis functions.
-			pes.legendre_multipole_term(arrang, lambda,
-			                            basis.list[0].r_list, R, multipole);
+			pes.legendre_multipole_term(arrang, lambda, basis.list[0].r_list, R, multipole);
 
 			_Pragma(OMP_PARALLEL_LOOP)
 			for (mut<usize> channel_a = 0; channel_a < result.rows(); ++channel_a) {
@@ -143,6 +141,7 @@ int main(int argc, char *argv[])
 						continue;
 					}
 
+					assert(basis.list[channel_a].r_list.min == basis.list[channel_b].r_list.min);
 					assert(basis.list[channel_a].r_list.step == basis.list[channel_b].r_list.step);
 
 					f64 overlap_ab = math::simpson(basis.list[channel_a].r_list.step,
