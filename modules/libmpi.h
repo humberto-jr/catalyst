@@ -5,7 +5,7 @@
 	#include <optional>
 
 	namespace mpi {
-		static constexpr u32 MASTER_PROCESS_RANK = 0;
+		static constexpr u32 MASTER_PROCESS_RANK = 0u;
 
 		bool is_used();
 
@@ -29,36 +29,36 @@
 				return as_u32(this->my_rank);
 			}
 
-			inline u32 task_count() const
+			inline usize task_count() const
 			{
 				// NOTE: The number of tasks for the current process.
 				return this->total_tasks/this->world_size();
 			}
 
-			inline u32 first_local_task() const
+			inline usize first_local_task() const
 			{
 				// NOTE: The first task index for the current process.
 				return this->rank()*this->task_count();
 			}
 
-			inline u32 last_local_task() const
+			inline usize last_local_task() const
 			{
 				// NOTE: The last task index for the current process.
-				return this->first_local_task() + this->task_count() - 1;
+				return this->first_local_task() + this->task_count() - 1u;
 			}
 
-			inline u32 last_global_task() const
+			inline usize last_global_task() const
 			{
-				u32 last_rank = this->world_size() - 1;
+				usize last_rank = this->world_size() - 1u;
 
 				// NOTE: The last task index for the last process.
-				return last_rank*this->task_count() + this->task_count() - 1;
+				return last_rank*this->task_count() + this->task_count() - 1u;
 			}
 
-			std::optional<u32> extra_task()
+			std::optional<usize> extra_task()
 			{
 				// NOTE: An additional task index for the current process.
-				u32 index = this->last_global_task() + this->rank() + 1;
+				usize index = this->last_global_task() + this->rank() + 1u;
 
 				if (index < this->total_tasks) {
 					return index;
@@ -67,7 +67,7 @@
 				}
 			}
 
-			inline void set_tasks(u32 count)
+			inline void set_tasks(usize count)
 			{
 				assert(count > 0);
 				this->total_tasks = count;
@@ -283,14 +283,10 @@
 			template<u8 PAD, usize LEN>
 			void print_line(const print::Fmt<PAD, LEN> &content)
 			{
-				if (this->rank() == MASTER_PROCESS_RANK) {
+				if (this->rank() == mpi::MASTER_PROCESS_RANK) {
 					content.flush();
 
-					for (mut<u32> rank = 0; rank < this->world_size(); ++rank) {
-						if (rank == MASTER_PROCESS_RANK) {
-							continue;
-						}
-
+					for (mut<u32> rank = 1u; rank < this->world_size(); ++rank) {
 						print::Fmt<PAD, LEN> new_content;
 
 						this->receive(rank, new_content);
@@ -300,7 +296,7 @@
 						}
 					}
 				} else {
-					this->send(MASTER_PROCESS_RANK, content);
+					this->send(mpi::MASTER_PROCESS_RANK, content);
 				}
 			}
 
@@ -334,11 +330,11 @@
 			{
 				T val = static_cast<T>(0);
 
-				if (this->rank() == MASTER_PROCESS_RANK) {
+				if (this->rank() == mpi::MASTER_PROCESS_RANK) {
 					val = input::keyword(key, min, max, dummy);
 				}
 
-				this->broadcast(MASTER_PROCESS_RANK, 1, &val);
+				this->broadcast(mpi::MASTER_PROCESS_RANK, 1, &val);
 
 				return val;
 			}
@@ -347,17 +343,17 @@
 			{
 				String val;
 
-				if (this->rank() == MASTER_PROCESS_RANK) {
+				if (this->rank() == mpi::MASTER_PROCESS_RANK) {
 					val += input::keyword(key, dummy).as_cstr();
 				}
 
-				this->broadcast(MASTER_PROCESS_RANK, 1, &val.end);
+				this->broadcast(mpi::MASTER_PROCESS_RANK, 1, &val.end);
 
-				if ((this->rank() != MASTER_PROCESS_RANK) && (val.end > val.buf.length())) {
+				if ((this->rank() != mpi::MASTER_PROCESS_RANK) && (val.end > val.buf.length())) {
 					val.buf.resize(val.end);
 				}
 
-				this->broadcast(MASTER_PROCESS_RANK, as_u32(val.end), &val.buf[0]);
+				this->broadcast(mpi::MASTER_PROCESS_RANK, as_u32(val.end), &val.buf[0]);
 
 				return val;
 			}
@@ -366,11 +362,11 @@
 			{
 				mut<s32> val = 0;
 
-				if (this->rank() == MASTER_PROCESS_RANK) {
+				if (this->rank() == mpi::MASTER_PROCESS_RANK) {
 					val = input::keyword(key, dummy);
 				}
 
-				this->broadcast(MASTER_PROCESS_RANK, 1, &val);
+				this->broadcast(mpi::MASTER_PROCESS_RANK, 1, &val);
 
 				return as_bool(val);
 			}
@@ -379,11 +375,11 @@
 			{
 				mut<u16> val = static_cast<u16>(nist::Isotope::atom_unknown);
 
-				if (this->rank() == MASTER_PROCESS_RANK) {
+				if (this->rank() == mpi::MASTER_PROCESS_RANK) {
 					val = static_cast<u16>(input::keyword(key, dummy));
 				}
 
-				this->broadcast(MASTER_PROCESS_RANK, 1, &val);
+				this->broadcast(mpi::MASTER_PROCESS_RANK, 1, &val);
 
 				return static_cast<nist::Isotope>(val);
 			}
@@ -395,7 +391,7 @@
 			// to match the MPI backend implementations.
 			mut<s32> my_rank;
 			mut<s32> comm_size;
-			mut<u32> total_tasks;
+			mut<usize> total_tasks;
 		};
 	}
 #endif
