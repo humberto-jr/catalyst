@@ -278,6 +278,30 @@
 
 			void broadcast(u32 rank, u32 count, mut<f128> data[]) const;
 
+			void broadcast(u32 rank, Vec<u8> &data) const;
+
+			void broadcast(u32 rank, Vec<u16> &data) const;
+
+			void broadcast(u32 rank, Vec<u32> &data) const;
+
+			void broadcast(u32 rank, Vec<u64> &data) const;
+
+			void broadcast(u32 rank, Vec<s8> &data) const;
+
+			void broadcast(u32 rank, Vec<s16> &data) const;
+
+			void broadcast(u32 rank, Vec<s32> &data) const;
+
+			void broadcast(u32 rank, Vec<s64> &data) const;
+
+			void broadcast(u32 rank, Vec<char> &data) const;
+
+			void broadcast(u32 rank, Vec<f32> &data) const;
+
+			void broadcast(u32 rank, Vec<f64> &data) const;
+
+			void broadcast(u32 rank, Vec<f128> &data) const;
+
 			void wait() const;
 
 			template<u8 PAD, usize LEN>

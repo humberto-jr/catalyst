@@ -53,13 +53,6 @@
   }                                                                                                                 \
 }
 
-#define CALL_MPI_BROADCAST(rank, count, buffer, datatype)                     \
-{                                                                             \
-  auto info = MPI_Bcast(&data[0], (count), datatype, (rank), MPI_COMM_WORLD); \
-                                                                              \
-  CHECK_MPI_ERROR("MPI_Bcast()", info)                                        \
-}
-
 [[maybe_unused]]
 static constexpr s32 MESSAGE_COUNT_TAG = 666;
 
@@ -762,6 +755,17 @@ void mpi::Frontend::receive(u32 rank, String &data) const
 	assert(as_u32(new_len) == info);
 }
 
+//
+// Broadcasts:
+//
+
+#define CALL_MPI_BROADCAST(rank, count, buf, datatype)                     \
+{                                                                          \
+  auto info = MPI_Bcast(buf, (count), (datatype), (rank), MPI_COMM_WORLD); \
+                                                                           \
+  CHECK_MPI_ERROR("MPI_Bcast()", info)                                     \
+}
+
 void mpi::Frontend::broadcast([[maybe_unused]] u32 rank,
                               [[maybe_unused]] u32 count,
                               [[maybe_unused]] mut<u8> data[]) const
@@ -881,6 +885,29 @@ void mpi::Frontend::broadcast([[maybe_unused]] u32 rank,
 		CALL_MPI_BROADCAST(rank, count, data, MPI_LONG_DOUBLE)
 	#endif
 }
+
+#undef CALL_MPI_BROADCAST
+
+#define FRONTEND_VECTOR_BROADCAST_IMPL(type)                   \
+void mpi::Frontend::broadcast(u32 rank, Vec<type> &data) const \
+{                                                              \
+  this->broadcast(rank, as_u32(data.length()), &data[0]);      \
+}
+
+FRONTEND_VECTOR_BROADCAST_IMPL(u8)
+FRONTEND_VECTOR_BROADCAST_IMPL(u16)
+FRONTEND_VECTOR_BROADCAST_IMPL(u32)
+FRONTEND_VECTOR_BROADCAST_IMPL(u64)
+FRONTEND_VECTOR_BROADCAST_IMPL(s8)
+FRONTEND_VECTOR_BROADCAST_IMPL(s16)
+FRONTEND_VECTOR_BROADCAST_IMPL(s32)
+FRONTEND_VECTOR_BROADCAST_IMPL(s64)
+FRONTEND_VECTOR_BROADCAST_IMPL(char)
+FRONTEND_VECTOR_BROADCAST_IMPL(f32)
+FRONTEND_VECTOR_BROADCAST_IMPL(f64)
+FRONTEND_VECTOR_BROADCAST_IMPL(f128)
+
+#undef FRONTEND_VECTOR_BROADCAST_IMPL
 
 void mpi::Frontend::wait() const
 {
