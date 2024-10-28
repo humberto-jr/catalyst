@@ -162,6 +162,12 @@
 	}
 
 	template<typename T>
+	static constexpr const void* as_void(const T *x_ptr)
+	{
+		return static_cast<const void*>(x_ptr);
+	}
+
+	template<typename T>
 	static constexpr void* as_void(T *x_ptr)
 	{
 		return static_cast<void*>(x_ptr);
