@@ -174,6 +174,12 @@
 	}
 
 	template<typename T>
+	static constexpr std::uintptr_t as_address(const T &object)
+	{
+		return reinterpret_cast<std::uintptr_t>(&object);
+	}
+
+	template<typename T>
 	static constexpr bool is_bool()
 	{
 		return std::is_same<T, bool>::value || std::is_same<T, const bool>::value;
