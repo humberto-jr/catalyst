@@ -516,6 +516,79 @@
 	// Auxiliary basic types:
 	//
 
+	enum class Primitive: u8 {
+		type_u8,
+		type_u16,
+		type_u32,
+		type_u64,
+		type_s8,
+		type_s16,
+		type_s32,
+		type_s64,
+		type_f32,
+		type_f64,
+		type_f128,
+		type_c32,
+		type_c64,
+		type_c128,
+		type_bool,
+		type_char,
+		type_cstr,
+		type_void,
+		type_usize,
+		type_unknown
+	};
+
+	template<typename T>
+	static constexpr Primitive type_enum()
+	{
+		if constexpr(is_bool<T>()) {
+			return Primitive::type_bool;
+		} else if constexpr(is_u8<T>()) {
+			return Primitive::type_u8;
+		} else if constexpr(is_u16<T>()) {
+			return Primitive::type_u16;
+		}  else if constexpr(is_u32<T>()) {
+			return Primitive::type_u32;
+		} else if constexpr(is_u64<T>()) {
+			return Primitive::type_u64;
+		} else if constexpr(is_usize<T>()) {
+			return Primitive::type_usize;
+		} else if constexpr(is_s8<T>()) {
+			return Primitive::type_s8;
+		} else if constexpr(is_s16<T>()) {
+			return Primitive::type_s16;
+		} else if constexpr(is_s32<T>()) {
+			return Primitive::type_s32;
+		} else if constexpr(is_s64<T>()) {
+			return Primitive::type_s64;
+		} else if constexpr(is_f32<T>()) {
+			return Primitive::type_f32;
+		} else if constexpr(is_f64<T>()) {
+			return Primitive::type_f64;
+		} else if constexpr(is_f128<T>()) {
+			return Primitive::type_f128;
+		} else if constexpr(is_c32<T>()) {
+			return Primitive::type_c32;
+		} else if constexpr(is_c64<T>()) {
+			return Primitive::type_c64;
+		} else if constexpr(is_c128<T>()) {
+			return Primitive::type_c128;
+		} else if constexpr(is_char<T>()) {
+			return Primitive::type_char;
+		} else if constexpr(is_cstr<T>()) {
+			return Primitive::type_cstr;
+		} else if constexpr(is_void<T>()) {
+			return Primitive::type_void;
+		} else {
+			return Primitive::type_unknown;
+		}
+
+		// NOTE: The Intel icpc compiler requires
+		// yet another default return value here.
+		return Primitive::type_unknown;
+	}
+
 	template<typename T = usize>
 	struct Range {
 		mut<T> min;
