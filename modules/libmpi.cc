@@ -29,25 +29,25 @@
   }                                                                                                  \
 }
 
-#define CALL_SYNC_MPI_SEND(rank, count, buffer, datatype)                                      \
-{                                                                                              \
-  auto info = MPI_Send(&(count), 1, MPI_UINT32_T, (rank), MESSAGE_COUNT_TAG, MPI_COMM_WORLD);  \
-                                                                                               \
-  CHECK_MPI_ERROR("1st MPI_Send()", info)                                                      \
-                                                                                               \
-  info = MPI_Send(&buffer[0], (count), datatype, (rank), MESSAGE_CONTENT_TAG, MPI_COMM_WORLD); \
-                                                                                               \
-  CHECK_MPI_ERROR("2nd MPI_Send()", info)                                                      \
+#define CALL_SYNC_MPI_SEND(rank, count, buf, datatype)                                        \
+{                                                                                             \
+  auto info = MPI_Send(&(count), 1, MPI_UINT32_T, (rank), MESSAGE_COUNT_TAG, MPI_COMM_WORLD); \
+                                                                                              \
+  CHECK_MPI_ERROR("1st MPI_Send()", info)                                                     \
+                                                                                              \
+  info = MPI_Send(buf, (count), datatype, (rank), MESSAGE_CONTENT_TAG, MPI_COMM_WORLD);       \
+                                                                                              \
+  CHECK_MPI_ERROR("2nd MPI_Send()", info)                                                     \
 }
 
-#define CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, buffer, datatype)                                            \
+#define CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, buf, datatype)                                               \
 {                                                                                                                   \
   auto info = MPI_Recv(&recv_count, 1, MPI_UINT32_T, (rank), MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE); \
                                                                                                                     \
   CHECK_MPI_ERROR("1st MPI_Recv()", info)                                                                           \
                                                                                                                     \
   if ((count) >= recv_count) {                                                                                      \
-    info = MPI_Recv(&data[0], (count), datatype, (rank), MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);   \
+    info = MPI_Recv(buf, (count), datatype, (rank), MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);        \
                                                                                                                     \
     CHECK_MPI_ERROR("2nd MPI_Recv()", info)                                                                         \
   }                                                                                                                 \
