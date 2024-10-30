@@ -294,6 +294,36 @@
 	}
 
 	template<typename T>
+	static constexpr bool is_pointer()
+	{
+		return std::is_pointer<T>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_array()
+	{
+		return std::is_array<T>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_enum()
+	{
+		return std::is_enum<T>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_class()
+	{
+		return std::is_class<T>::value;
+	}
+
+	template<typename T>
+	static constexpr bool is_union()
+	{
+		return std::is_union<T>::value;
+	}
+
+	template<typename T>
 	static constexpr bool is_primitive()
 	{
 		return (
@@ -429,7 +459,7 @@
 			return "%*lu";
 		}
 
-		if constexpr(std::is_enum<T>::value) {
+		if constexpr(is_enum<T>()) {
 			return "%*d";
 		}
 
