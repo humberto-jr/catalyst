@@ -55,7 +55,7 @@
 			this->block.offset[n] = this->buf.length();
 
 			if constexpr(is_pointer<T>()) {
-				this->block.size[n] = sizeof(typename std::remove_pointer<T>::type);
+				this->block.size[n] = sizeof(Target<T>);
 			} else {
 				this->block.size[n] = sizeof(T);
 			}
@@ -67,11 +67,11 @@
 			this->block.count += 1;
 		}
 
-		template<typename T, typename MARKER = typename std::enable_if<is_pointer<T>() == true>::type>
+		template<typename T, typename TARGET = typename std::enable_if<is_pointer<T>() == true, Target<T>>::type>
 		mut<T> dereference(usize n)
 		{
-			if (sizeof(typename std::remove_pointer<T>::type) != this->block.size[n]) {
-				print::error(WHERE, "Type size mismatch when dereferencing member ", n);
+			if (sizeof(TARGET) != this->block.size[n]) {
+				print::error(WHERE, "Type size mismatch when dereferencing member ", n, " as ", type_name<TARGET>(), '*');
 			}
 
 			mut<byte> *raw = &this->buf[this->block.offset[n]];
@@ -79,11 +79,11 @@
 			return reinterpret_cast<mut<T>>(raw);
 		}
 
-		template<typename T, typename MARKER = typename std::enable_if<is_pointer<T>() == false>::type>
+		template<typename T, typename TARGET = typename std::enable_if<is_pointer<T>() == false>::type>
 		mut<T>& dereference(usize n)
 		{
 			if (sizeof(T) != this->block.size[n]) {
-				print::error(WHERE, "Type size mismatch when dereferencing member ", n);
+				print::error(WHERE, "Type size mismatch when dereferencing member ", n, " as ", type_name<T>());
 			}
 
 			mut<byte> *raw = &this->buf[this->block.offset[n]];

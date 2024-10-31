@@ -558,6 +558,9 @@
 	// Auxiliary basic types:
 	//
 
+	template<typename T>
+	using Target = typename std::remove_pointer<T>::type;
+
 	enum class Primitive: u8 {
 		type_u8,
 		type_u16,
@@ -648,7 +651,7 @@
 			return std::remainder(this->max - this->min, this->step) == static_cast<T>(0);
 		}
 
-		usize count() const
+		inline usize count() const
 		{
 			if (this->step == static_cast<T>(0)) {
 				return 0;
