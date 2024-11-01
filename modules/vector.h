@@ -1,6 +1,7 @@
 #if !defined(VECTOR_HEADER)
 	#define VECTOR_HEADER
 	#include "print.h"
+	#include <memory>
 	#include <initializer_list>
 
 	template<typename T = f64>
@@ -23,6 +24,11 @@
 		{
 			 this->resize(rhs.size());
 			*this = rhs;
+		}
+
+		inline Vector(usize count, std::unique_ptr<T> &raw): len(count), buf(raw.release())
+		{
+			assert(this->buf != nullptr);
 		}
 
 		inline usize length() const
