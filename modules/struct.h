@@ -74,7 +74,7 @@
 				print::error(WHERE, "Type size mismatch when dereferencing member ", n, " as ", type_name<TARGET>(), '*');
 			}
 
-			mut<byte> *raw = &this->buf[this->block.offset[n]];
+			mut<byte> *raw = this->member_ptr(n);
 
 			return reinterpret_cast<mut<T>>(raw);
 		}
@@ -86,7 +86,7 @@
 				print::error(WHERE, "Type size mismatch when dereferencing member ", n, " as ", type_name<T>());
 			}
 
-			mut<byte> *raw = &this->buf[this->block.offset[n]];
+			mut<byte> *raw = this->member_ptr(n);
 
 			return *reinterpret_cast<mut<T>*>(raw);
 		}
@@ -112,6 +112,11 @@
 			usize new_len = this->size() + next_chunk;
 
 			this->buf.resize(new_len);
+		}
+
+		inline mut<byte>* member_ptr(usize n)
+		{
+			return &this->buf[this->block.offset[n]];
 		}
 	};
 
