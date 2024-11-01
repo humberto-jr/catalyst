@@ -44,27 +44,13 @@
 		}
 
 		template<typename T>
-		void push_member(usize count = 1)
+		inline void push_member(usize count = 1)
 		{
-			usize n = this->block.count;
-
-			if (n == MAX_STRUCT_BLOCK_COUNT) {
-				print::error(WHERE, "Limit of ", MAX_STRUCT_BLOCK_COUNT, " elements reached");
-			}
-
-			this->block.offset[n] = this->buf.length();
-
 			if constexpr(is_pointer<T>()) {
-				this->block.size[n] = sizeof(Target<T>);
+				setup_next_entry(sizeof(Target<T>), count);
 			} else {
-				this->block.size[n] = sizeof(T);
+				setup_next_entry(sizeof(T), count);
 			}
-
-			this->append(this->block.size[n]*count);
-
-			this->block.length[n] = count;
-
-			this->block.count += 1;
 		}
 
 		template<typename T, typename TARGET = typename std::enable_if<is_pointer<T>() == true, Target<T>>::type>
@@ -79,7 +65,7 @@
 			return reinterpret_cast<mut<T>>(raw);
 		}
 
-		template<typename T, typename TARGET = typename std::enable_if<is_pointer<T>() == false>::type>
+		template<typename T, typename DUMMY = typename std::enable_if<is_pointer<T>() == false>::type>
 		mut<T>& dereference(usize n)
 		{
 			if (sizeof(T) != this->block.size[n]) {
@@ -112,6 +98,28 @@
 			usize new_len = this->size() + next_chunk;
 
 			this->buf.resize(new_len);
+		}
+
+		void setup_next_entry(usize size, usize count)
+		{
+			#pragma omp critical
+			{
+				usize n = this->block.count;
+
+				if (n == MAX_STRUCT_BLOCK_COUNT) {
+					print::error(WHERE, "Limit of ", MAX_STRUCT_BLOCK_COUNT, " members reached");
+				}
+
+				this->block.offset[n] = this->buf.length();
+
+				this->block.length[n] = count;
+
+				this->block.size[n] = size;
+
+				this->append(size*count);
+
+				this->block.count += 1;
+			}
 		}
 
 		inline mut<byte>* member_ptr(usize n)
