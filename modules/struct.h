@@ -47,9 +47,9 @@
 		inline void push_member(usize count = 1)
 		{
 			if constexpr(is_pointer<T>()) {
-				setup_next_entry(sizeof(Target<T>), count);
+				this->setup_next_entry(sizeof(Target<T>), count);
 			} else {
-				setup_next_entry(sizeof(T), count);
+				this->setup_next_entry(sizeof(T), count);
 			}
 		}
 
@@ -75,6 +75,26 @@
 			mut<byte> *raw = this->member_ptr(n);
 
 			return *reinterpret_cast<mut<T>*>(raw);
+		}
+
+		template<typename T>
+		auto dereference_as_vec(usize n)
+		{
+			mut<T> *ptr = nullptr;
+
+			if constexpr(is_pointer<T>()) {
+				ptr = this->dereference<T>(n);
+			} else {
+				mut<T> &ref = this->dereference<T>(n);
+				ptr = &ref;
+			}
+
+			// NOTE: Here, the vector must necessarily be set as a view and cannot
+			// free the data when dropped. It is also needed to be fixed so that it
+			// is not allowed to resize, since the Struct member size is fixed and
+			// allocated contiguously in memory. The Struct object must outlive the
+			// vector itself, otherwise it will be referencing garbage.
+			return Vec(this->block.length[n], ptr);
 		}
 
 		inline mut<byte>& operator[](usize n) const
