@@ -1,7 +1,6 @@
 #if !defined(VECTOR_HEADER)
 	#define VECTOR_HEADER
 	#include "print.h"
-	#include <memory>
 	#include <initializer_list>
 
 	template<typename T = f64>
@@ -28,7 +27,7 @@
 			*this = rhs;
 		}
 
-		inline Vector(usize count, std::unique_ptr<T> &raw): len(count), buf(raw.release())
+		inline Vector(usize count, T *raw): len(count), buf(raw)
 		{
 			assert(this->buf != nullptr);
 		}
