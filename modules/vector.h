@@ -8,26 +8,26 @@
 		using type = T;
 
 		public:
-		inline Vector(): len(0), buf(nullptr)
+		inline Vector(): len(0), buf(nullptr), state(0)
 		{
 		}
 
-		inline Vector(usize count): len(0), buf(nullptr)
+		inline Vector(usize count): len(0), buf(nullptr), state(0)
 		{
 			this->resize(count);
 		}
 
-		inline Vector(Vector<T> &&other): len(other.len), buf(other.release())
+		inline Vector(Vector<T> &&other): len(other.len), buf(other.release()), state(other.state)
 		{
 		}
 
-		inline Vector(const std::initializer_list<T> &rhs): len(rhs.size()), buf(nullptr)
+		inline Vector(const std::initializer_list<T> &rhs): len(rhs.size()), buf(nullptr), state(0)
 		{
 			 this->resize(rhs.size());
 			*this = rhs;
 		}
 
-		inline Vector(usize count, T *raw): len(count), buf(raw)
+		inline Vector(usize count, T *raw): len(count), buf(raw), state(IS_VIEW | IS_FIXED)
 		{
 			assert(this->buf != nullptr);
 		}
@@ -40,6 +40,16 @@
 		inline usize size() const
 		{
 			return sizeof(T)*this->len;
+		}
+
+		inline bool is_view() const
+		{
+			return ((this->state & IS_VIEW) == IS_VIEW);
+		}
+
+		inline bool is_fixed() const
+		{
+			return ((this->state & IS_FIXED) == IS_FIXED);
 		}
 
 		void operator=(const std::initializer_list<T> &rhs)
@@ -106,16 +116,21 @@
 		{
 			auto len = this->len;
 			auto buf = this->buf;
+			auto state = this->state;
 
 			this->len = other.len;
 			this->buf = other.buf;
+			this->state = other.state;
 
 			other.len = len;
 			other.buf = buf;
+			other.state = state;
 		}
 
 		mut<T>* release()
 		{
+			// NOTE: We must keep its current state because it is used in the
+			// move constructors after the release.
 			auto raw = this->buf;
 			this->buf = nullptr;
 			this->len = 0;
@@ -124,6 +139,10 @@
 
 		void resize(usize count)
 		{
+			if (this->is_fixed()) {
+				print::error(WHERE, "Unable to resize a fixed vector");
+			}
+
 			auto new_buf = std::realloc(as_void(this->buf), sizeof(T)*count);
 
 			if ((new_buf == nullptr) && (count > 0)) {
@@ -181,7 +200,7 @@
 
 		inline ~Vector()
 		{
-			if (this->buf != nullptr) {
+			if ((this->buf != nullptr) && (this->is_view() == false)) {
 				std::free(as_void(this->buf));
 			}
 		}
@@ -189,13 +208,19 @@
 		private:
 		mut<usize> len;
 		mut<T> *buf;
+		mut<u8> state;
 
 		// NOTE: A copy-constructor from raw parts and internal use only which behaves
 		// as a move-constructor. If made public, the compiler will perform unintended
 		// moves as we don't want to share the internal buf pointer.
-		inline Vector(Vector<T> &other): len(other.len), buf(other.release())
+		inline Vector(Vector<T> &other): len(other.len), buf(other.release()), state(other.state)
 		{
 		}
+
+		enum State {
+			IS_VIEW   = (1u << 0),
+			IS_FIXED  = (1u << 1)
+		};
 	};
 
 	template<typename T = f64>
