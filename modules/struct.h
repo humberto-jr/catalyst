@@ -54,7 +54,7 @@
 		}
 
 		template<typename T, typename TARGET = typename std::enable_if<is_pointer<T>() == true, Target<T>>::type>
-		mut<T> dereference(usize n)
+		mut<T> deref(usize n)
 		{
 			if (sizeof(TARGET) != this->block.size[n]) {
 				print::error(WHERE, "Type size mismatch when dereferencing member ", n, " as ", type_name<TARGET>(), '*');
@@ -66,7 +66,7 @@
 		}
 
 		template<typename T, typename DUMMY = typename std::enable_if<is_pointer<T>() == false>::type>
-		mut<T>& dereference(usize n)
+		mut<T>& deref(usize n)
 		{
 			if (sizeof(T) != this->block.size[n]) {
 				print::error(WHERE, "Type size mismatch when dereferencing member ", n, " as ", type_name<T>());
@@ -78,22 +78,22 @@
 		}
 
 		template<typename T>
-		auto dereference_as_vec(usize n)
+		auto deref_as_vec(usize n)
 		{
 			mut<T> *ptr = nullptr;
 
 			if constexpr(is_pointer<T>()) {
-				ptr = this->dereference<T>(n);
+				ptr = this->deref<T>(n);
 			} else {
-				mut<T> &ref = this->dereference<T>(n);
+				mut<T> &ref = this->deref<T>(n);
 				ptr = &ref;
 			}
 
 			// NOTE: Here, the vector must necessarily be set as a view and cannot
 			// free the data when dropped. It is also needed to be fixed so that it
 			// is not allowed to resize, since the Struct member size is fixed and
-			// allocated contiguously in memory. The Struct object must outlive the
-			// vector itself, otherwise it will be referencing garbage.
+			// allocated contiguously in memory. The Struct object must outlive that
+			// of the Vec<T> itself, otherwise it will be referencing garbage data.
 			return Vec(this->block.length[n], ptr);
 		}
 
