@@ -1,6 +1,7 @@
 #if !defined(LIBMPI_HEADER)
 	#define LIBMPI_HEADER
 	#include "essentials.h"
+	#include "struct.h"
 	#include "input.h"
 	#include <optional>
 
@@ -151,6 +152,8 @@
 
 			void send(u32 rank, const String &data) const;
 
+			void send(u32 rank, const Struct &data) const;
+
 			template<u8 PAD, usize LEN>
 			void send(u32 rank, const print::Fmt<PAD, LEN> &data) const
 			{
@@ -236,6 +239,8 @@
 			u32 receive(u32 rank, Vec<f128> &data) const;
 
 			void receive(u32 rank, String &data) const;
+
+			void receive(u32 rank, Struct &data) const;
 
 			template<u8 PAD, usize LEN>
 			void receive(u32 rank, print::Fmt<PAD, LEN> &data) const

@@ -29,30 +29,6 @@
   }                                                                                                  \
 }
 
-#define CALL_SYNC_MPI_SEND(rank, count, buf, datatype)                                        \
-{                                                                                             \
-  auto info = MPI_Send(&(count), 1, MPI_UINT32_T, (rank), MESSAGE_COUNT_TAG, MPI_COMM_WORLD); \
-                                                                                              \
-  CHECK_MPI_ERROR("1st MPI_Send()", info)                                                     \
-                                                                                              \
-  info = MPI_Send(buf, (count), datatype, (rank), MESSAGE_CONTENT_TAG, MPI_COMM_WORLD);       \
-                                                                                              \
-  CHECK_MPI_ERROR("2nd MPI_Send()", info)                                                     \
-}
-
-#define CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, buf, datatype)                                               \
-{                                                                                                                   \
-  auto info = MPI_Recv(&recv_count, 1, MPI_UINT32_T, (rank), MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE); \
-                                                                                                                    \
-  CHECK_MPI_ERROR("1st MPI_Recv()", info)                                                                           \
-                                                                                                                    \
-  if ((count) >= recv_count) {                                                                                      \
-    info = MPI_Recv(buf, (count), datatype, (rank), MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);        \
-                                                                                                                    \
-    CHECK_MPI_ERROR("2nd MPI_Recv()", info)                                                                         \
-  }                                                                                                                 \
-}
-
 [[maybe_unused]]
 static constexpr s32 MESSAGE_COUNT_TAG = 666;
 
@@ -139,6 +115,21 @@ mpi::Frontend::Frontend(mut<s32> *argc, char **argv[]):
 			CHECK_MPI_ERROR("MPI_Comm_rank()", info)
 		}
 	#endif
+}
+
+//
+// Sends:
+//
+
+#define CALL_SYNC_MPI_SEND(rank, count, buf, datatype)                                        \
+{                                                                                             \
+  auto info = MPI_Send(&(count), 1, MPI_UINT32_T, (rank), MESSAGE_COUNT_TAG, MPI_COMM_WORLD); \
+                                                                                              \
+  CHECK_MPI_ERROR("1st MPI_Send()", info)                                                     \
+                                                                                              \
+  info = MPI_Send((buf), (count), datatype, (rank), MESSAGE_CONTENT_TAG, MPI_COMM_WORLD);     \
+                                                                                              \
+  CHECK_MPI_ERROR("2nd MPI_Send()", info)                                                     \
 }
 
 void mpi::Frontend::send([[maybe_unused]] u32 rank,
@@ -261,6 +252,8 @@ void mpi::Frontend::send([[maybe_unused]] u32 rank,
 	#endif
 }
 
+#undef CALL_SYNC_MPI_SEND
+
 void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u8 data) const
 {
@@ -331,6 +324,12 @@ void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] f128 data) const
 {
 	this->send(rank, 1, &data);
+}
+
+void mpi::Frontend::send([[maybe_unused]] u32 rank,
+                         [[maybe_unused]] const Struct &data) const
+{
+	this->send(rank, as_u32(data.size()), &data[0]);
 }
 
 // NOTE: For use inside mpi::Frontend::send() methods only.
@@ -407,6 +406,23 @@ void mpi::Frontend::send(u32 rank, const String &data) const
 	auto len = data.length();
 	this->send(rank, 1, &len);
 	this->send(rank, as_u32(len + 1), data.as_ptr());
+}
+
+//
+// Receives:
+//
+
+#define CALL_SYNC_MPI_RECEIVE(rank, recv_count, count, buf, datatype)                                               \
+{                                                                                                                   \
+  auto info = MPI_Recv(&recv_count, 1, MPI_UINT32_T, (rank), MESSAGE_COUNT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE); \
+                                                                                                                    \
+  CHECK_MPI_ERROR("1st MPI_Recv()", info)                                                                           \
+                                                                                                                    \
+  if ((count) >= recv_count) {                                                                                      \
+    info = MPI_Recv((buf), (count), datatype, (rank), MESSAGE_CONTENT_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);      \
+                                                                                                                    \
+    CHECK_MPI_ERROR("2nd MPI_Recv()", info)                                                                         \
+  }                                                                                                                 \
 }
 
 u32 mpi::Frontend::receive([[maybe_unused]] u32 rank,
@@ -577,6 +593,8 @@ u32 mpi::Frontend::receive([[maybe_unused]] u32 rank,
 	return recv_count;
 }
 
+#undef CALL_SYNC_MPI_RECEIVE
+
 void mpi::Frontend::receive([[maybe_unused]] u32 rank,
                             [[maybe_unused]] mut<u8> &data) const
 {
@@ -659,6 +677,13 @@ void mpi::Frontend::receive([[maybe_unused]] u32 rank,
 {
 	u32 info = this->receive(rank, 1, &data);
 	assert((info == 0) || (info == 1));
+}
+
+void mpi::Frontend::receive([[maybe_unused]] u32 rank,
+                            [[maybe_unused]] Struct &data) const
+{
+	usize info = this->receive(rank, as_u32(data.size()), &data[0]);
+	assert(info == data.size());
 }
 
 // NOTE: For use inside mpi::Frontend::receive() methods only.
@@ -759,11 +784,11 @@ void mpi::Frontend::receive(u32 rank, String &data) const
 // Broadcasts:
 //
 
-#define CALL_MPI_BROADCAST(rank, count, buf, datatype)                     \
-{                                                                          \
-  auto info = MPI_Bcast(buf, (count), (datatype), (rank), MPI_COMM_WORLD); \
-                                                                           \
-  CHECK_MPI_ERROR("MPI_Bcast()", info)                                     \
+#define CALL_MPI_BROADCAST(rank, count, buf, datatype)                       \
+{                                                                            \
+  auto info = MPI_Bcast((buf), (count), (datatype), (rank), MPI_COMM_WORLD); \
+                                                                             \
+  CHECK_MPI_ERROR("MPI_Bcast()", info)                                       \
 }
 
 void mpi::Frontend::broadcast([[maybe_unused]] u32 rank,
