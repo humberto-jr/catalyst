@@ -6,6 +6,8 @@
 
 	template<typename T = f64>
 	class Vector {
+		using type = T;
+
 		public:
 		inline Vector(): len(0), buf(nullptr)
 		{
