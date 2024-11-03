@@ -1,6 +1,7 @@
 #if !defined(FILE_HEADER)
 	#define FILE_HEADER
 	#include "essentials.h"
+	#include "struct.h"
 
 	namespace file {
 		static std::FILE* open(c_str filename, c_str mode)
@@ -419,6 +420,11 @@
 			inline void read(Range<f128> &data)
 			{
 				this->read_range<f128>(data);
+			}
+
+			inline void read(Struct &data)
+			{
+				this->read_raw<mut<byte>>(data.size(), &data[0]);
 			}
 
 			void read_all(Vec<byte> &buf)
@@ -849,6 +855,11 @@
 			inline void write(const Range<f128> &data)
 			{
 				this->write_range<f128>(data);
+			}
+
+			inline void write(const Struct &data)
+			{
+				this->write_raw<byte>(data.size(), &data[0]);
 			}
 
 			inline void seek_set(usize count = 0)
