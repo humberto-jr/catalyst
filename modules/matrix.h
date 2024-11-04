@@ -3,11 +3,6 @@
 	#include "types.h"
 	#include "vector.h"
 
-	namespace lapack {
-		// NOTE: Forward declaration to avoid include liblapack.h here.
-		class Frontend;
-	}
-
 	template<typename T = f64>
 	class Matrix {
 		public:
@@ -182,8 +177,6 @@
 		}
 
 		private:
-		friend class lapack::Frontend;
-
 		mut<usize> max_col;
 		Vec<T> buf;
 
