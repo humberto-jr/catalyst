@@ -361,7 +361,6 @@
 			}
 		}
 
-		// NOTE: See the note on the private copy-constructor of vector.
 		inline String(String &other): buf(other.buf.move()), end(other.end), begin(other.begin)
 		{
 		}

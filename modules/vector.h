@@ -17,6 +17,11 @@
 			this->resize(count);
 		}
 
+		inline Vector(usize count, T *raw): len(count), buf(raw), state(IS_VIEW | IS_FIXED)
+		{
+			assert(this->buf != nullptr);
+		}
+
 		inline Vector(Vector<T> &&other): len(other.len), buf(other.release()), state(other.state)
 		{
 		}
@@ -27,9 +32,8 @@
 			*this = rhs;
 		}
 
-		inline Vector(usize count, T *raw): len(count), buf(raw), state(IS_VIEW | IS_FIXED)
+		inline Vector(Vector<T> &other): len(other.len), buf(other.buf), state(other.state | IS_VIEW)
 		{
-			assert(this->buf != nullptr);
 		}
 
 		inline usize length() const
@@ -130,7 +134,7 @@
 		mut<T>* release()
 		{
 			// NOTE: We must keep its current state because it is used in the
-			// move constructors after the release.
+			// move constructor after the release.
 			auto raw = this->buf;
 			this->buf = nullptr;
 			this->len = 0;
@@ -210,16 +214,9 @@
 		mut<T> *buf;
 		mut<u8> state;
 
-		// NOTE: A copy-constructor from raw parts and internal use only which behaves
-		// as a move-constructor. If made public, the compiler will perform unintended
-		// moves as we don't want to share the internal buf pointer.
-		inline Vector(Vector<T> &other): len(other.len), buf(other.release()), state(other.state)
-		{
-		}
-
 		enum State {
-			IS_VIEW   = (1u << 0),
-			IS_FIXED  = (1u << 1)
+			IS_VIEW  = (1u << 0),
+			IS_FIXED = (1u << 1)
 		};
 	};
 

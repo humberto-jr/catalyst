@@ -187,7 +187,6 @@
 		mut<usize> max_col;
 		Vec<T> buf;
 
-		// NOTE: See the note on the private copy-constructor of Vector.
 		inline Matrix(Matrix &other): max_col(other.max_col), buf(other.buf.move())
 		{
 		}
