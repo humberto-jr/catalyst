@@ -97,6 +97,14 @@
 			return Vec(this->block.length[n], ptr);
 		}
 
+		template<typename T>
+		inline auto deref_as_mat(usize n, usize max_row, usize max_col)
+		{
+			auto raw = this->deref_as_vec<T>(n);
+
+			return Mat(max_row, max_col, raw);
+		}
+
 		inline mut<byte>& operator[](usize n) const
 		{
 			return this->buf[n];
