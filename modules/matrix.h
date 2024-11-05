@@ -6,13 +6,20 @@
 	template<typename T = f64>
 	class Matrix {
 		public:
-		inline Matrix(usize max_row, usize max_col): max_col(max_col), buf(Vec<T>(max_row*max_col))
+		using type = T;
+
+		inline Matrix(usize max_row, usize max_col): max_col(max_col), buf(max_row*max_col)
 		{
 		}
 
 		inline Matrix(Matrix &&other): max_col(other.max_col), buf(other.buf.move())
 		{
 			other.max_col = 0;
+		}
+
+		inline Matrix(usize max_row, usize max_col, Vec<T> &raw): max_col(max_col), buf(raw)
+		{
+			assert(this->length() == max_row*max_col);
 		}
 
 		inline usize length() const
