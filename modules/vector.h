@@ -17,7 +17,7 @@
 			this->resize(count);
 		}
 
-		inline Vector(usize count, T *raw): len(count), buf(raw), state(IS_VIEW | IS_FIXED)
+		inline Vector(usize count, mut<T> *raw): len(count), buf(raw), state(IS_VIEW | IS_FIXED)
 		{
 			assert(this->buf != nullptr);
 		}
