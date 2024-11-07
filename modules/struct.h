@@ -54,7 +54,7 @@
 		}
 
 		template<typename T, typename TARGET = typename std::enable_if<is_pointer<T>() == true, Target<T>>::type>
-		mut<T> deref(usize n)
+		mut<T> dereference(usize n)
 		{
 			if (sizeof(TARGET) != this->block.size[n]) {
 				print::error(WHERE, "Type size mismatch when dereferencing member ", n, " as ", type_name<TARGET>(), '*');
@@ -66,7 +66,7 @@
 		}
 
 		template<typename T, typename DUMMY = typename std::enable_if<is_pointer<T>() == false>::type>
-		mut<T>& deref(usize n)
+		mut<T>& dereference(usize n)
 		{
 			if (sizeof(T) != this->block.size[n]) {
 				print::error(WHERE, "Type size mismatch when dereferencing member ", n, " as ", type_name<T>());
@@ -78,14 +78,14 @@
 		}
 
 		template<typename T>
-		auto deref_as_vec(usize n)
+		Vec<T> dereference_as_vec(usize n)
 		{
 			mut<T> *ptr = nullptr;
 
 			if constexpr(is_pointer<T>()) {
-				ptr = this->deref<T>(n);
+				ptr = this->dereference<T>(n);
 			} else {
-				mut<T> &ref = this->deref<T>(n);
+				mut<T> &ref = this->dereference<T>(n);
 				ptr = &ref;
 			}
 
@@ -98,9 +98,9 @@
 		}
 
 		template<typename T>
-		inline auto deref_as_mat(usize n, usize max_row, usize max_col)
+		inline Mat<T> dereference_as_mat(usize n, usize max_row, usize max_col)
 		{
-			auto raw = this->deref_as_vec<T>(n);
+			Vec<T> raw = this->dereference_as_vec<T>(n);
 
 			return Mat(max_row, max_col, raw);
 		}
