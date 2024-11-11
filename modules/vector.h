@@ -143,22 +143,28 @@
 
 		void resize(usize count)
 		{
+			if (count == 0) {
+				return;
+			}
+
 			if (this->is_fixed()) {
 				print::error(WHERE, "Unable to resize a fixed vector");
 			}
 
 			auto new_buf = std::realloc(as_void(this->buf), sizeof(T)*count);
 
-			if ((new_buf == nullptr) && (count > 0)) {
+			if (new_buf == nullptr) {
 				print::error(WHERE, "Unable to reallocate ", count, " elements of ", sizeof(T), " bytes");
+			} else {
+				this->buf = static_cast<mut<T>*>(new_buf);
 			}
 
-			if (this->len == 0) {
-				std::memset(new_buf, 0, sizeof(T)*count);
+			if (count > this->len) {
+				usize chunk = count - this->len;
+				std::memset(as_void(this->buf + this->len), 0, sizeof(T)*chunk);
 			}
 
 			this->len = count;
-			this->buf = static_cast<mut<T>*>(new_buf);
 		}
 
 		struct IndexedEntry {
