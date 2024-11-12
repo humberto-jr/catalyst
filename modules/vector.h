@@ -113,7 +113,7 @@
 
 		inline Vector<T> move()
 		{
-			return Vector(*this);
+			return std::move(*this);
 		}
 
 		void swap(Vector<T> &other)
