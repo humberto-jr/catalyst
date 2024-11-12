@@ -1,33 +1,21 @@
 #include "modules/essentials.h"
 #include "modules/numerov.h"
-#include "modules/libmpi.h"
-#include "modules/input.h"
+#include "modules/struct.h"
 #include "modules/timer.h"
-#include "modules/math.h"
-#include "modules/file.h"
-
-// Internals
-#include "filename.h"
-#include "key.h"
+#include "user.h"
 
 constexpr u8 FORMAT_VERSION = 2;
 
-struct Job {
-	mut<u32> index;
-	Mat<f64> ratio;
-	mut<f64> tot_energy;
-
-	inline Job(usize channel_count): index(0), ratio(channel_count, channel_count), tot_energy(0.0)
-	{
+void setup_task_list(Mat<Struct> &list, usize channel_count)
+{
+	for (mut<usize> task = 0; task < list.length(); ++task) {
+		list[task].push_member<usize>();
+		list[task].push_member<usize>();
+		list[task].push_member<f64>();
+		list[task].push_member<f64>();
+		list[task].push_member<f64>(channel_count*channel_count);
 	}
-
-	void operator=(Job &&other)
-	{
-		this->index = other.index;
-		this->ratio.swap(other.ratio);
-		this->tot_energy = other.tot_energy;
-	}
-};
+}
 
 int main(int argc, char *argv[])
 {
@@ -37,57 +25,55 @@ int main(int argc, char *argv[])
 	// Coupling potential:
 	//
 
-	String potname = mpi.input_keyword(key::coupling_input_filename, filename::coupling_matrix);
+	String filename = user::coupling_input_file(&mpi);
 
-	numerov::Potential coupling = numerov::open(potname);
+	numerov::Potential coupling(filename.as_cstr());
 
-	u32 R_count = as_u32((coupling.R_max - coupling.R_min)/coupling.R_step);
+	f64 mass = coupling.reduced_mass();
 
-	usize channel_count = coupling[0].rows();
+	usize channel_count = coupling.channel_count();
+
+	const Range<f64> R_list = coupling.grid_range();
 
 	//
 	// Collision energy grid:
 	//
 
-	u32 E_count = mpi.input_keyword(key::coll_grid_size, 1u, u32_max, 1u);
+	const Range<f64> energy_list = user::total_energy_grid(&mpi);
 
-	f64 E_min = mpi.input_keyword(key::E_min, 0.0, f64_max, 0.0);
+	mpi.set_tasks(energy_list.count());
 
-	f64 E_max = mpi.input_keyword(key::E_max, E_min, f64_max, E_min);
-
-	f64 E_step = (E_max - E_min)/as_f64(E_count);
-
-	mpi.set_tasks(E_count);
-
-	u32 chunk_count = (mpi.extra_task().has_value()? mpi.task_count() + 1 : mpi.task_count());
+	usize chunk_count = mpi.task_count() + 1;
 
 	//
-	// Setup of the propagation matrices:
+	// The Job struct: Stores both grid indices, the R value, the collision energy,
+	// and the respective ratio matrix. It uses the Struct type to easily serialize
+	// and deserialize all data. A matrix of size MPI processes by collision
+	// energies will hold all tasks ordered in the MPI master process.
 	//
+	// Layout example:
+	//
+	// struct Job {
+	//	 mut<usize> grid_index;
+	//	 mut<usize> energy_index;
+	//   mut<f64> R;
+	//   mut<f64> total_energy;
+	//	 Mat<f64> ratio;
+	// };
 
-	mut<usize> memory_used = 0;
+	Mat<Struct> list(1, chunk_count);
 
-	Vec<Job> task(chunk_count);
-
-	for (mut<u32> n = 0; n < chunk_count; ++n) {
-		task[n] = Job(channel_count);
-		memory_used += task[n].ratio.size();
+	if ((mpi.rank() == mpi::MASTER_PROCESS_RANK) && (mpi.world_size() > 1)) {
+		list.resize(mpi.world_size(), chunk_count);
 	}
 
-	Mat<f64> old_ratio(channel_count, channel_count);
-	Mat<f64> workspace(channel_count, channel_count);
-
-	// NOTE: This amounts to three extra matrices: The old_ratio, the workspace,
-	// and the potential matrix. Some processes may have an extra step (matrix),
-	// which is taken into account here. Therefore, the reported memory usage
-	// may slightly overestimate that of some processes.
-	memory_used += 3*old_ratio.size();
+	setup_task_list(list, channel_count);
 
 	//
-	// Numerov solutions: Only the master process will open the output file later.
+	// Numerov solutions: Only the MPI master process will write to it.
 	//
 
-	String bufname = mpi.input_keyword(key::numerov_output_filename, filename::ratio_matrix);
+	file::Output solution = user::numerov_output_file(&mpi);
 
 	//
 	// Summary:
@@ -96,55 +82,60 @@ int main(int argc, char *argv[])
 	if (mpi.rank() == mpi::MASTER_PROCESS_RANK) {
 		print::timestamp();
 		print::line("# MPI procs.: ", mpi.world_size());
-		print::line("# Grid size: ", R_count);
-		print::line("# Coupled channels: ", channel_count);
-		print::line("# Coupling potential: ", coupling.filename());
-		print::line("# Numerov solutions: ", bufname.as_cstr());
-		print::line("# Approx. memory usage: ", as_f32(memory_used/1000000u), " MB/process");
-		print::line("# Reduced mass: ", coupling.mass, " a.u.");
+		print::line("# Grid size: ", R_list.count());
+		print::line("# Channel count: ", channel_count);
+		print::line("# Coupling input: ", coupling.filename());
+		print::line("# Solution output: ", solution.filename.as_cstr());
+		print::line("# Reduced mass: ", mass, " a.u.");
 		print::line("#");
-		print::line("#  Grid   Proc.      I/O time (s)       prop. time (s)     total (s)");
-		print::line("# ---------------------------------------------------------------------");
+		print::line("# Proc.                    R (a.u.)                I/O time (s)              prop. time (s)              total time (s)");
 	}
 
 	//
-	// Propagation:
+	// Step 1: Propagation of all collision energies for each R-value:
 	//
 
-	for (mut<u32> n = 0; n < R_count; ++n) {
+	Mat<f64> workspace(channel_count, channel_count);
+	Mat<f64> prev_ratio(channel_count, channel_count);
+
+	for (auto R : R_list.as_range_inclusive().indexed()) {
 		Timer<2> clock;
 
 		clock.start();
-		const Mat<f64>& pot_energy = coupling[n];
+		auto &potential = coupling[R.index];
 		clock.stop();
 
-		// NOTE: The m-th energy index used below is relative to each process,
-		// thus the task vector is indexed using the count variable.
+		// NOTE: The n-th energy index used below (task) is relative to each
+		// MPI process, thus the job list is indexed using the count variable.
 		mut<usize> count = 0;
 
 		clock.start();
 
-		for (mut<u32> m = mpi.first_local_task(); m <= mpi.last_local_task(); ++m) {
+		for (mut<usize> task = mpi.first_local_task(); task <= mpi.last_local_task(); ++task) {
 			extra_step:
 
-			if (n == 0) {
-				task[count].index = m;
-				task[count].tot_energy = E_min + as_f64(m)*E_step;
+			if (R.index == 0) {
+				list(0, count).dereference<usize>(0) = R.index;
+				list(0, count).dereference<usize>(1) = task;
+				list(0, count).dereference<f64>(2) = R.value;
+				list(0, count).dereference<f64>(3) = energy_list[task];
 			}
 
-			task[count].ratio.swap(old_ratio);
+			Mat<f64> next_ratio = list(0, count).dereference_as_mat<f64>(4, channel_count, channel_count);
 
-			numerov::renormalized(coupling.mass,
-			                      coupling.R_step,
-			                      task[count].tot_energy, pot_energy,
-			                      workspace, old_ratio, task[count].ratio);
+			prev_ratio = next_ratio;
+
+			numerov::renormalized(mass,
+			                      R_list.step,
+			                      energy_list[task],
+			                      potential.value, workspace, prev_ratio, next_ratio);
 			++count;
 
-			if (m == mpi.last_local_task()) {
+			if (task == mpi.last_local_task()) {
 				auto index = mpi.extra_task();
 
 				if (index.has_value()) {
-					m = index.value();
+					task = index.value();
 					goto extra_step;
 				}
 			}
@@ -152,59 +143,81 @@ int main(int argc, char *argv[])
 
 		clock.stop();
 
-		print::line<7>(n, mpi.rank(), ' ', as_f32(clock[0]), ' ', as_f32(clock[1]), ' ', as_f32(clock[0] + clock[1]));
+		print::line<7>(mpi.rank(), ' ', R.value, ' ', clock[0], ' ', clock[1], ' ', clock[0] + clock[1]);
 	}
 
 	//
-	// Sorting: If MPI is used, the master process will now receive all Numerov
-	// ratio matrices ordered by ranks (energy) and write them on the output.
+	// Step 2: Send all Numerov ratio matrices to the MPI master process:
 	//
 
 	if (mpi.rank() == mpi::MASTER_PROCESS_RANK) {
-		file::Output solution(bufname);
-
-		solution.write(numerov::MAGIC_NUMBER);
-		solution.write(FORMAT_VERSION);
-		solution.write(coupling.R_max);
-		solution.write(coupling.R_step);
-		solution.write(coupling.mass);
-		solution.write(channel_count);
-		solution.write(E_min);
-		solution.write(E_max);
-		solution.write(E_step);
-
-		for (mut<u32> n = 0; n < chunk_count; ++n) {
-			solution.write(task[n].index);
-			solution.write(task[n].tot_energy);
-			solution.write(task[n].ratio);
-		}
-
 		for (mut<u32> rank = 1; rank < mpi.world_size(); ++rank) {
-			mut<u32> next_chunk = 0;
-			mpi.receive(rank, next_chunk);
-
-			assert(chunk_count >= next_chunk);
-
-			for (mut<u32> n = 0; n < next_chunk; ++n) {
-				mpi.receive(rank, task[n].index);
-				mpi.receive(rank, task[n].tot_energy);
-				mpi.receive(rank, task[n].ratio);
-
-				if (task[n].index > mpi.last_local_task()) {
-					solution.write(task[n].index);
-					solution.write(task[n].tot_energy);
-					solution.write(task[n].ratio);
-				}
+			for (mut<usize> task = 0; task < chunk_count; ++task) {
+				mpi.receive(rank, list(rank, task));
 			}
 		}
 	} else {
-		mpi.send(mpi::MASTER_PROCESS_RANK, chunk_count);
-
-		for (mut<u32> n = 0; n < chunk_count; ++n) {
-			mpi.send(mpi::MASTER_PROCESS_RANK, task[n].index);
-			mpi.send(mpi::MASTER_PROCESS_RANK, task[n].tot_energy);
-			mpi.send(mpi::MASTER_PROCESS_RANK, task[n].ratio);
+		for (mut<usize> task = 0; task < chunk_count; ++task) {
+			mpi.send(mpi::MASTER_PROCESS_RANK, list(0, task));
 		}
+	}
+
+	//
+	// Step 3: The MPI master process will now write all Numerov ratio matrices
+	// ordered by collision energies on the output file. Notice that only the
+	// final ratio matrices at the last R value are written, so to save disk
+	// space.
+	//
+
+	if (mpi.rank() == mpi::MASTER_PROCESS_RANK) {
+		mut<usize> count = 0;
+
+		solution.write(numerov::MAGIC_NUMBER);
+		solution.write(FORMAT_VERSION);
+		solution.write(channel_count);
+		solution.write(mass);
+		solution.write(R_list.max);
+		solution.write(R_list.max);
+		solution.write(R_list.step);
+		solution.write(energy_list);
+
+		for (mut<u32> rank = 0; rank < mpi.world_size(); ++rank) {
+			for (mut<usize> task = 0; task < (chunk_count - 1); ++task) {
+				mut<usize> energy_index = list(rank, task).dereference<usize>(1);
+
+				if (energy_index != count) {
+					// NOTE: This is a logic error in the MPI communication and can never happen.
+					print::error(WHERE, "Unexpected energy index ", count, "/", chunk_count, " for process ", rank, ": ", energy_index);
+				}
+
+				solution.write(list(rank, task));
+				++count;
+			}
+		}
+
+		//
+		// Step 4: The remainder energies, if any, are only written after, so to
+		// have all energies sorted in ascending order.
+		//
+
+		usize extra_task = chunk_count - 1;
+
+		for (mut<u32> rank = 0; rank < mpi.world_size(); ++rank) {
+			mut<usize> energy_index = list(rank, extra_task).dereference<usize>(1);
+
+			if (energy_index == 0) {
+				// NOTE: Remainder task indices can be zero, meaning that they
+				// are unused and outside the energy grid. All work is done at
+				// the first occurrence.
+				break;
+			}
+
+			solution.write(list(rank, extra_task));
+			++count;
+		}
+
+		// NOTE: Just a sanity check.
+		assert(energy_list.count() == count);
 	}
 
 	return EXIT_SUCCESS;
