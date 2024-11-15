@@ -118,8 +118,8 @@ f64 pes::Frontend::value(const char arrang, f64 r, f64 R, f64 theta) const
 			bc.y = (b.y*this->mass_b + c.y*this->mass_c)/(this->mass_b + this->mass_c);
 
 			a.x = bc.x;
-			a.y = bc.y + R*std::sin(th);
-			a.z = bc.z + R*std::cos(th);
+			a.y = bc.y + R*std::cos(th);
+			a.z = bc.z + R*std::sin(th);
 
 			internuc[0] = r;
 			internuc[1] = a - c;
@@ -140,8 +140,8 @@ f64 pes::Frontend::value(const char arrang, f64 r, f64 R, f64 theta) const
 			ac.y = (a.y*this->mass_a + c.y*this->mass_c)/(this->mass_a + this->mass_c);
 
 			b.x = ac.x;
-			b.y = ac.y + R*std::sin(th);
-			b.z = ac.z + R*std::cos(th);
+			b.y = ac.y + R*std::cos(th);
+			b.z = ac.z + R*std::sin(th);
 
 			internuc[0] = b - c;
 			internuc[1] = r;
@@ -162,8 +162,8 @@ f64 pes::Frontend::value(const char arrang, f64 r, f64 R, f64 theta) const
 			ab.y = (a.y*this->mass_a + b.y*this->mass_b)/(this->mass_a + this->mass_b);
 
 			c.x = ab.x;
-			c.y = ab.y + R*std::sin(th);
-			c.z = ab.z + R*std::cos(th);
+			c.y = ab.y + R*std::cos(th);
+			c.z = ab.z + R*std::sin(th);
 
 			internuc[0] = b - c;
 			internuc[1] = a - c;
