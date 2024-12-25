@@ -13,5 +13,7 @@
 	  }                                                          \
 	}
 
+	// NOTE: The toml namespace is now available. The toml++ documentation can
+	// be found at https://marzer.github.io/tomlplusplus/namespacetoml.html
 	#include "../vendors/toml.hpp"
 #endif

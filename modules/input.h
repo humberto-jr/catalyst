@@ -253,6 +253,115 @@
 				return dummy;
 			}
 		}
+
+		static const toml::table& toml_table()
+		{
+			static toml::table input;
+			static bool first_call = true;
+
+			#pragma omp critical(first_call)
+			if (first_call) {
+				first_call = false;
+
+				auto parsing = toml::parse(std::cin);
+
+				if (parsing.failed()) {
+					print::error(WHERE, "Unable to parse the standard input as a TOML configuration file");
+				}
+
+				input = std::move(parsing).table();
+			}
+
+			return input;
+		}
+
+		template<typename T>
+		static T toml(c_str block, c_str key, T min, T max, T val)
+		{
+			static_assert(is_integer<T>() || is_floating_point<T>());
+
+			auto node = input::toml_table()[block][key];
+
+			if (node.type() == toml::node_type::none) {
+				return val;
+			}
+
+			mut<T> entry = static_cast<T>(0);
+
+			if constexpr(is_integer<T>()) {
+				if (node.type() != toml::node_type::integer) {
+					print::error(WHERE, "Expecting an integer value at ", block, '.', key);
+				}
+
+				entry = static_cast<T>(node.ref<s64>());
+			}
+
+			if constexpr(is_floating_point<T>()) {
+				if (node.type() != toml::node_type::floating_point) {
+					print::error(WHERE, "Expecting a floating point value at ", block, '.', key);
+				}
+
+				entry = static_cast<T>(node.ref<f64>());
+			}
+
+			if (entry < min) {
+				return min;
+			} else if (entry > max) {
+				return max;
+			} else {
+				return entry;
+			}
+		}
+
+		[[maybe_unused]]
+		static bool toml(c_str block, c_str key, bool val)
+		{
+			auto node = input::toml_table()[block][key];
+
+			if (node.type() == toml::node_type::none) {
+				return val;
+			}
+
+			if (node.type() != toml::node_type::boolean) {
+				print::error(WHERE, "Expecting a boolean value at ", block, '.', key);
+			}
+
+			return node.ref<bool>();
+		}
+
+		[[maybe_unused]]
+		static String toml(c_str block, c_str key, c_str val)
+		{
+			auto node = input::toml_table()[block][key];
+
+			if (node.type() == toml::node_type::none) {
+				return String(val);
+			}
+
+			if (node.type() != toml::node_type::string) {
+				print::error(WHERE, "Expecting a string at ", block, '.', key);
+			}
+
+			return String(node.ref<std::string>().c_str());
+		}
+
+		[[maybe_unused]]
+		static nist::Isotope toml(c_str block, c_str key, nist::Isotope val)
+		{
+			auto node = input::toml_table()[block][key];
+
+			if (node.type() == toml::node_type::none) {
+				return val;
+			}
+
+			if (node.type() != toml::node_type::string) {
+				print::error(WHERE, "Expecting an isotope symbol string at ", block, '.', key);
+			}
+
+			c_str symbol = node.ref<std::string>().c_str();
+
+			return nist::isotope_enum(symbol);
+		}
 	}
 
 	#undef MAX_INPUT_LENGTH
