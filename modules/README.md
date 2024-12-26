@@ -49,3 +49,5 @@ A collection of lightweight modules that wraps the boilerplate code required for
 **numerov.h**: Provides the `numerov` namespace and implements various algorithms and types based on the [renormalized Numerov method](http://dx.doi.org/10.1063/1.436421) to integrate single and multichannel Schrodinger equations, and to compute closely related quantities such as reactance matrix, scattering matrix, and evaluation of bound states.
 
 **struct.h**: Defines the `Struct` type, which stores an arbitrary number of members contiguously in memory. New members of type `T` can be added using `Struct::push_member<T>()` and later dereferenced with `Struct::dereference<T>()`. The `Struct` type allows easy serialization and de-serialization of complex data structures into/from a raw stream of bytes.
+
+**libtoml.h**: Provides access to the raw [toml++](https://marzer.github.io/tomlplusplus/) third-party library to parse [TOML](https://toml.io/en/) configuration files. The `toml` namespace is made available.
