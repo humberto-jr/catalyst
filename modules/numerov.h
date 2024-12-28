@@ -68,41 +68,12 @@
 
 			Range<f64> energy_range();
 
-			const RatioEntry& last_entry(usize energy_index);
-
 			const RatioEntry& operator()(usize grid_index, usize energy_index);
 
 			private:
 			mut<usize> stride;
 			file::Input input;
 			RatioEntry entry;
-		};
-
-		struct Solution {
-			public:
-			f64 mass;
-			f64 R_max;
-			f64 R_step;
-			f64 E_min;
-			f64 E_max;
-			f64 E_step;
-			mut<f64> energy;
-			file::Input input;
-
-			inline Solution(f64 mass, f64 R_max, f64 R_step, f64 E_min, f64 E_max, f64 E_step, file::Input &input, Mat<f64> &ratio):
-				mass(mass), R_max(R_max), R_step(R_step), E_min(E_min), E_max(E_max), E_step(E_step), energy(0.0), input(input), ratio(ratio.move())
-			{
-			}
-
-			inline Solution(numerov::Solution &&other):
-				mass(other.mass), R_max(other.R_max), R_step(other.R_step), E_min(other.E_min), E_max(other.E_max), E_step(other.E_step), energy(0.0), input(other.input), ratio(other.ratio.move())
-			{
-			}
-
-			const Mat<f64>& operator[](u32 n);
-
-			private:
-			Mat<f64> ratio;
 		};
 
 		struct ScattMatrixEntry {

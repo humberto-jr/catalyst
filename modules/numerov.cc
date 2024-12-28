@@ -10,16 +10,16 @@
   }                                                                                          \
 }
 
-#define CHECK_DATA_INDEX(input, index, name)                                                                                           \
-{                                                                                                                                      \
-  mut<usize> saved_index = 0;                                                                                                          \
-  (input).read(saved_index);                                                                                                           \
-                                                                                                                                       \
-  CHECK_FILE_END(input)                                                                                                                \
-                                                                                                                                       \
-  if (saved_index != (index)) {                                                                                                        \
-    print::error(WHERE, "Expected", (name), ' ', index, ", but received ", saved_index, " when reading ", (input).filename.as_cstr()); \
-  }                                                                                                                                    \
+#define CHECK_DATA_INDEX(input, index, name)                                                                                            \
+{                                                                                                                                       \
+  mut<usize> saved_index = 0;                                                                                                           \
+  (input).read(saved_index);                                                                                                            \
+                                                                                                                                        \
+  CHECK_FILE_END(input)                                                                                                                 \
+                                                                                                                                        \
+  if (saved_index != (index)) {                                                                                                         \
+    print::error(WHERE, "Expected ", (name), ' ', index, ", but received ", saved_index, " when reading ", (input).filename.as_cstr()); \
+  }                                                                                                                                     \
 }
 
 #define CHECK_FILE_HEADER(input, fmt_ver)                                                            \
@@ -144,7 +144,7 @@ const numerov::PotentialEntry& numerov::Potential::operator[](usize grid_index)
 
 	this->input.seek_set(POTENTIAL_FILE_HEADER + grid_index*stride);
 
-	CHECK_DATA_INDEX(this->input, grid_index, " grid index ")
+	CHECK_DATA_INDEX(this->input, grid_index, "grid index")
 
 	this->input.read(this->entry.R);
 	this->input.read(this->entry.value);
@@ -163,81 +163,106 @@ numerov::RatioEntry::RatioEntry(usize channel_count = 0):
 
 usize numerov::RatioEntry::size() const
 {
-	return sizeof(this->R) + sizeof(this->energy) + this->value.size();
+	// NOTE: The ratio entry size in the binary file is that of a RatioEntry struct plus
+	// two usize indices tracking the grid and energy indices.
+	return 2*sizeof(usize) + sizeof(this->R) + sizeof(this->energy) + this->value.size();
 }
 
 //
 // numerov::Ratio:
 //
 
-numerov::Solution numerov::open_ratio_file(String &filename, u8 fmt_ver)
+static constexpr usize RATIO_FILE_HEADER = sizeof(numerov::MAGIC_NUMBER)
+                                         + sizeof(numerov::FORMAT_VERSION)
+                                         + sizeof(usize) + sizeof(f64)
+                                         + 2*sizeof(Range<f64>);
+
+numerov::Ratio::Ratio(c_str filename, u8 fmt_ver): stride(0), input(filename)
 {
-	file::Input input(filename);
+	CHECK_FILE_HEADER(this->input, fmt_ver);
 
-	mut<u32> tag = 0;
-	input.read(tag);
+	mut<usize> channel_count = 0;
+	this->input.read(channel_count);
 
-	if ((tag != numerov::MAGIC_NUMBER) || input.end()) {
-		print::error(WHERE, input.filename.as_cstr(), " does not correspond to a Numerov file");
-	}
+	CHECK_FILE_END(this->input)
 
-	mut<u8> ver = 0;
-	input.read(ver);
-
-	if ((ver != fmt_ver) || input.end()) {
-		print::error(WHERE, input.filename.as_cstr(), " does not have a valid format version");
-	}
-
-	mut<f64> R_max = 0.0;
-	input.read(R_max);
-
-	mut<f64> R_step = 0.0;
-	input.read(R_step);
-
-	mut<f64> mass = 0.0;
-	input.read(mass);
-
-	mut<usize> ch_count = 0;
-	input.read(ch_count);
-
-	mut<f64> E_min = 0.0;
-	input.read(E_min);
-
-	mut<f64> E_max = 0.0;
-	input.read(E_max);
-
-	mut<f64> E_step = 0.0;
-	input.read(E_step);
-
-	Mat<f64> ratio(ch_count, ch_count);
-
-	if (input.end()) {
-		print::error(WHERE, input.filename.as_cstr(), " has no valid solutions");
-	}
-
-	return {mass, R_max, R_step, E_min, E_max, E_step, input, ratio};
+	this->entry.value.resize(channel_count, channel_count);
+	this->stride = this->energy_range().count();
 }
 
-const Mat<f64>& numerov::Solution::operator[](u32 n)
+c_str numerov::Ratio::filename() const
 {
-	constexpr usize RATIO_HEADER_OFFSET
-		= sizeof(numerov::MAGIC_NUMBER) + sizeof(numerov::FORMAT_VERSION) + 6*sizeof(f64) + sizeof(usize);
+	return this->input.filename.as_cstr();
+}
 
-	usize stride = sizeof(u32) + sizeof(f64) + this->ratio.size();
+f64 numerov::Ratio::reduced_mass()
+{
+	static constexpr usize HEADER_OFFSET = sizeof(f64) + 2*sizeof(Range<f64>);
 
-	this->input.seek_set(RATIO_HEADER_OFFSET + n*stride);
+	this->input.seek_set(RATIO_FILE_HEADER - HEADER_OFFSET);
 
-	mut<u32> n_saved = 0;
-	this->input.read(n_saved);
+	CHECK_FILE_END(this->input)
 
-	if (n_saved != n) {
-		print::error(WHERE, "Expected n = ", n, ", but received n = ", n_saved, " when reading from ", this->input.filename.as_cstr());
-	}
+	mut<f64> mass = 0.0;
+	this->input.read(mass);
 
-	this->input.read(this->energy);
-	this->input.read(this->ratio);
+	return mass;
+}
 
-	return this->ratio;
+usize numerov::Ratio::channel_count() const
+{
+	return this->entry.value.rows();
+}
+
+Range<f64> numerov::Ratio::grid_range()
+{
+	static constexpr usize HEADER_OFFSET = 2*sizeof(Range<f64>);
+
+	this->input.seek_set(RATIO_FILE_HEADER - HEADER_OFFSET);
+
+	CHECK_FILE_END(this->input)
+
+	Range<f64> range;
+	this->input.read(range);
+
+	return range;
+}
+
+Range<f64> numerov::Ratio::energy_range()
+{
+	static constexpr usize HEADER_OFFSET = sizeof(Range<f64>);
+
+	this->input.seek_set(RATIO_FILE_HEADER - HEADER_OFFSET);
+
+	CHECK_FILE_END(this->input)
+
+	Range<f64> range;
+	this->input.read(range);
+
+	return range;
+}
+
+const numerov::RatioEntry& numerov::Ratio::operator()(usize grid_index,
+                                                      usize energy_index)
+{
+	// NOTE: The file layout of Numerov solutions is of a matrix of ratio matrices
+	// stored in a row-major fashion. Rows store R-dependent entries, and columns
+	// are for total-energy-dependent ones. Thus, the size of a row (in bytes) is
+	// the number of energies (called stride) times the byte count of one element,
+	// which is the size of a RatioEntry struct plus two usize indices tracking the
+	// grid and energy indices.
+	usize offset = (grid_index*this->stride + energy_index)*this->entry.size();
+
+	this->input.seek_set(RATIO_FILE_HEADER + offset);
+
+	CHECK_DATA_INDEX(this->input, grid_index, "grid index")
+	CHECK_DATA_INDEX(this->input, energy_index, "energy index")
+
+	this->input.read(this->entry.R);
+	this->input.read(this->entry.energy);
+	this->input.read(this->entry.value);
+
+	return this->entry;
 }
 
 //
