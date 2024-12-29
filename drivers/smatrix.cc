@@ -1,12 +1,6 @@
 #include "modules/essentials.h"
 #include "modules/numerov.h"
-#include "modules/input.h"
-#include "modules/file.h"
-#include "modules/fgh.h"
-
-// Internals
-#include "filename.h"
-#include "key.h"
+#include "user.h"
 
 constexpr u8 PAD = 24;
 constexpr u8 FORMAT_VERSION = 3;
@@ -24,51 +18,55 @@ int main()
 	// S-matrix output:
 	//
 
-	String bufname = input::keyword(key::smatrix_output_filename, filename::smatrix);
+	String filename = user::smatrix_output_file();
 
-	file::Output smatrix(bufname);
+	file::Output smatrix(filename);
 
 	//
 	// Numerov ratio matrices:
 	//
 
-	bufname = input::keyword(key::smatrix_input_filename, filename::ratio_matrix);
+	filename = user::smatrix_input_file();
 
-	auto solution = numerov::open_ratio_file(bufname);
+	numerov::Ratio solution(filename.as_cstr());
 
-	u32 channel_count = as_u32(solution[0].rows());
+	const Range<f64> R_list = solution.grid_range();
+
+	usize channel_count = solution.channel_count();
+
+	f64 mass = solution.reduced_mass();
 
 	//
 	// Scattering basis set:
 	//
 
-	bufname = input::keyword(key::basis_input_filename, filename::fgh_basis);
+	filename = user::fgh_basis_input();
 
-	const auto basis = numerov::open_basis_file(bufname);
+	const numerov::Basis basis(filename);
 
 	//
 	// Collision energy:
 	//
 
-	u32 energy_count = as_u32((solution.E_max - solution.E_min)/solution.E_step);
+	usize energy_count = solution.energy_range().count();
 
-	f64 shift = input::keyword(key::energy_shift, -f64_max, f64_max, 0.0);
+	f64 shift = user::energy_shift();
 
-	f64 scale = input::keyword(key::energy_scale, -f64_max, f64_max, 1.0);
+	f64 scale = user::energy_scale();
 
 	//
 	// Summary:
 	//
 
 	print::timestamp();
-	print::line("# Num. of channels: ", channel_count);
-	print::line("# Num. of energies: ", energy_count);
+	print::line("# Channel count: ", channel_count);
+	print::line("# Energy count: ", energy_count);
 	print::line("# Energy shift: ", shift);
 	print::line("# Energy scale: ", scale);
-	print::line("# Reduced mass: ", solution.mass, " a.u.");
+	print::line("# Reduced mass: ", mass, " a.u.");
 	print::line("# Output file: ", smatrix.filename.as_cstr());
-	print::line("# Scatt. basis: ", bufname.as_cstr());
-	print::line("# Numerov solutions: ", solution.input.filename.as_cstr());
+	print::line("# Scatt. basis: ", basis.filename.as_cstr());
+	print::line("# Numerov solutions: ", solution.filename());
 	print::line("# Note: grep -A ", energy_count + 1, " \"# (Ch. = $1,\" $filename | grep -A ", energy_count + 1, " \"> (Ch. = $2,\"");
 	print::line("#");
 
@@ -76,18 +74,20 @@ int main()
 	// Step 1: Compute the augmented K-matrix and S-matrix for every energy.
 	//
 
-	Vec<Job> task(energy_count);
+	Vec<Job> list(energy_count);
 
-	for (mut<u32> n = 0; n < energy_count; ++n) {
-		const Mat<f64> &ratio = solution[n];
+	for (mut<usize> task = 0; task < energy_count; ++task) {
+		// NOTE: As of now, the Numerov driver only writes the energy-dependent
+		// ratio matrices at the final R value.
+		auto &ratio = solution(0, task);
 
 		Mat<f64> k(channel_count, channel_count);
 
-		usize open_count = numerov::build_react_matrix(solution.mass,
-		                                               solution.R_step,
-		                                               solution.R_max,
-		                                               solution.energy,
-		                                               ratio, basis, k);
+		usize open_count = numerov::build_react_matrix(mass,
+		                                               R_list.step,
+		                                               R_list.max,
+		                                               ratio.energy,
+		                                               ratio.value, basis, k);
 
 		Mat<f64> re_s(open_count, open_count), im_s(open_count, open_count);
 
@@ -96,12 +96,10 @@ int main()
 			numerov::build_scatt_matrix(k, re_s, im_s);
 		}
 
-		task[n].k.swap(k);
-		task[n].re_s.swap(re_s);
-		task[n].im_s.swap(im_s);
-
-		// NOTE: We copy the total energy to avoid streaming it from the disk again later.
-		task[n].total_energy = solution.energy;
+		list[task].k.swap(k);
+		list[task].re_s.swap(re_s);
+		list[task].im_s.swap(im_s);
+		list[task].total_energy = ratio.energy;
 	}
 
 	//
@@ -112,51 +110,51 @@ int main()
 	smatrix.write(FORMAT_VERSION);
 	smatrix.write(channel_count);
 	smatrix.write(energy_count);
-	smatrix.write(solution.mass);
+	smatrix.write(mass);
 
-	for (mut<u32> channel_a = 0; channel_a < channel_count; ++channel_a) {
-		for (mut<u32> channel_b = 0; channel_b < channel_count; ++channel_b) {
+	for (mut<usize> channel_a = 0; channel_a < channel_count; ++channel_a) {
+		for (mut<usize> channel_b = 0; channel_b < channel_count; ++channel_b) {
 			bool was_closed = true;
 
-			// NOTE: (x12 u32, 48 bytes) + (x2 s32, 8 bytes) + (x2 f64, 16 bytes).
-			// It gives a total of 72 initial bytes for each pair of channels, ab.
+			// NOTE: (x2 usize, 16 bytes) + (x10 u32, 40 bytes) + (x2 s32, 8 bytes) + (x2 f64, 16 bytes).
+			// It gives a total of 80 initial bytes for each pair of channels, ab.
 
 			smatrix.write(channel_a);
 			smatrix.write(channel_b);
 
-			smatrix.write(basis[channel_a].j);
-			smatrix.write(basis[channel_a].v);
-			smatrix.write(basis[channel_a].J);
-			smatrix.write(basis[channel_a].l);
-			smatrix.write(basis[channel_a].p);
-			smatrix.write(basis[channel_a].comp);
-			smatrix.write(basis[channel_a].eigenval);
+			smatrix.write(basis.list[channel_a].j);
+			smatrix.write(basis.list[channel_a].v);
+			smatrix.write(basis.list[channel_a].J);
+			smatrix.write(basis.list[channel_a].l);
+			smatrix.write(basis.list[channel_a].p);
+			smatrix.write(basis.list[channel_a].n);
+			smatrix.write(basis.list[channel_a].eigenval);
 
-			smatrix.write(basis[channel_b].j);
-			smatrix.write(basis[channel_b].v);
-			smatrix.write(basis[channel_b].J);
-			smatrix.write(basis[channel_b].l);
-			smatrix.write(basis[channel_b].p);
-			smatrix.write(basis[channel_b].comp);
-			smatrix.write(basis[channel_b].eigenval);
+			smatrix.write(basis.list[channel_b].j);
+			smatrix.write(basis.list[channel_b].v);
+			smatrix.write(basis.list[channel_b].J);
+			smatrix.write(basis.list[channel_b].l);
+			smatrix.write(basis.list[channel_b].p);
+			smatrix.write(basis.list[channel_b].n);
+			smatrix.write(basis.list[channel_b].eigenval);
 
 			// NOTE: Shifted and/or scaled energies are for printing. Only the
 			// original values in atomic units are written to binary files.
-			f64 eigenval_a = (basis[channel_a].eigenval + shift)*scale;
-			f64 eigenval_b = (basis[channel_b].eigenval + shift)*scale;
+			f64 eigenval_a = (basis.list[channel_a].eigenval + shift)*scale;
+			f64 eigenval_b = (basis.list[channel_b].eigenval + shift)*scale;
 
-			for (mut<u32> n = 0; n < energy_count; ++n) {
-				f64 total_energy = (task[n].total_energy + shift)*scale;
+			for (mut<usize> task = 0; task < energy_count; ++task) {
+				f64 total_energy = (list[task].total_energy + shift)*scale;
 
-				// NOTE: (x1 u32, 4 bytes) + (x3 f64, 24 bytes).
-				// For each chunk of 72 bytes, we add more energy_count*28 bytes.
+				// NOTE: (x1 usize, 8 bytes) + (x3 f64, 24 bytes).
+				// For each chunk of 80 bytes, we add more energy_count*32 bytes.
 
-				smatrix.write(n);
-				smatrix.write(task[n].total_energy);
+				smatrix.write(task);
+				smatrix.write(list[task].total_energy);
 
 				if ((total_energy > eigenval_a) && (total_energy > eigenval_b)) {
-					smatrix.write(task[n].re_s(channel_a, channel_b));
-					smatrix.write(task[n].im_s(channel_a, channel_b));
+					smatrix.write(list[task].re_s(channel_a, channel_b));
+					smatrix.write(list[task].im_s(channel_a, channel_b));
 				} else {
 					smatrix.write(0.0);
 					smatrix.write(0.0);
@@ -164,34 +162,47 @@ int main()
 				}
 
 				if (was_closed) {
+					was_closed = false;
+
 					print::line("# (",
 					            "Ch. = ", channel_a,
-					            ", v = ", basis[channel_a].v,
-					            ", j = ", basis[channel_a].j,
-					            ", l = ", basis[channel_a].l,
-					            ", J = ", basis[channel_a].J,
+					            ", v = ", basis.list[channel_a].v,
+					            ", j = ", basis.list[channel_a].j,
+					            ", l = ", basis.list[channel_a].l,
+					            ", n = ", basis.list[channel_a].n,
+					            ", J = ", basis.list[channel_a].J,
 					            ", eigenvalue = ", eigenval_a,
 					            ") --> (",
 					            "Ch. = ", channel_b,
-					            ", v' = ", basis[channel_b].v,
-					            ", j' = ", basis[channel_b].j,
-					            ", l' = ", basis[channel_b].l,
-					            ", J' = ", basis[channel_b].J,
+					            ", v' = ", basis.list[channel_b].v,
+					            ", j' = ", basis.list[channel_b].j,
+					            ", l' = ", basis.list[channel_b].l,
+					            ", n' = ", basis.list[channel_b].n,
+					            ", J' = ", basis.list[channel_b].J,
 					            ", eigenvalue = ", eigenval_b, ')');
 
 					print::line<PAD>("# Coll. energy", "Tot. energy", "k (a.u.)", "k' (a.u.)", "|S|^2", "re(S)", "im(S)", "K (open-open block)");
-					was_closed = false;
 				}
 
-				f64 k = task[n].k(channel_a, channel_b);
+				f64 k = list[task].k(channel_a, channel_b);
 
-				c64 s = c64(task[n].re_s(channel_a, channel_b), task[n].im_s(channel_a, channel_b));
+				c64 s = c64(
+					list[task].re_s(channel_a, channel_b),
+					list[task].im_s(channel_a, channel_b)
+				);
 
-				f64 wavenum_a = numerov::wavenumber(solution.mass, task[n].total_energy, basis[channel_a].eigenval);
+				c64 ss = std::conj(s)*s;
 
-				f64 wavenum_b = numerov::wavenumber(solution.mass, task[n].total_energy, basis[channel_b].eigenval);
+				f64 wavenum_a = numerov::wavenumber(mass,
+				                                    list[task].total_energy,
+				                                    basis.list[channel_a].eigenval);
 
-				print::line<PAD>(total_energy - eigenval_a, total_energy, wavenum_a, wavenum_b, std::abs(s*s), s.real(), s.imag(), k);
+				f64 wavenum_b = numerov::wavenumber(mass,
+				                                    list[task].total_energy,
+				                                    basis.list[channel_b].eigenval);
+
+				print::line<PAD>(total_energy - eigenval_a, total_energy,
+				                 wavenum_a, wavenum_b, ss.real(), s.real(), s.imag(), k);
 			}
 
 			print::line();
