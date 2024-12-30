@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 	Mat<f64> workspace(channel_count, channel_count);
 	Mat<f64> prev_ratio(channel_count, channel_count);
 
-	for (auto R : R_list.as_range_inclusive().indexed()) {
+	for (auto R : R_list.indexed()) {
 		Timer<2> clock;
 
 		clock.start();
@@ -115,9 +115,11 @@ int main(int argc, char *argv[])
 			extra_step:
 
 			if (R.index == 0) {
-				list(0, count).dereference<usize>(0) = R.index;
+				// NOTE: Only the Numerov ratio matrices at the final R value are
+				// stored in the output file.
+				list(0, count).dereference<usize>(0) = usize(0);
 				list(0, count).dereference<usize>(1) = task;
-				list(0, count).dereference<f64>(2) = R.value;
+				list(0, count).dereference<f64>(2) = R_list.max - R_list.step;
 				list(0, count).dereference<f64>(3) = energy_list[task];
 			}
 
@@ -176,9 +178,7 @@ int main(int argc, char *argv[])
 		solution.write(FORMAT_VERSION);
 		solution.write(channel_count);
 		solution.write(mass);
-		solution.write(R_list.max);
-		solution.write(R_list.max);
-		solution.write(R_list.step);
+		solution.write(R_list);
 		solution.write(energy_list);
 
 		for (mut<u32> rank = 0; rank < mpi.world_size(); ++rank) {
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
 				mut<usize> energy_index = list(rank, task).dereference<usize>(1);
 
 				if (energy_index != count) {
-					// NOTE: This is a logic error in the MPI communication and can never happen.
+					// NOTE: This is a logic error in the MPI communication and must never happen.
 					print::error(WHERE, "Unexpected energy index ", count, "/", chunk_count, " for process ", rank, ": ", energy_index);
 				}
 
@@ -195,20 +195,17 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		//
-		// Step 4: The remainder energies, if any, are only written after, so to
-		// have all energies sorted in ascending order.
-		//
-
+		// NOTE: The remainder energies from each MPI process are only written
+		// after, so to have all energies sorted in ascending order.
 		usize extra_task = chunk_count - 1;
 
 		for (mut<u32> rank = 0; rank < mpi.world_size(); ++rank) {
 			mut<usize> energy_index = list(rank, extra_task).dereference<usize>(1);
 
 			if (energy_index == 0) {
-				// NOTE: Remainder task indices can be zero, meaning that they
-				// are unused and outside the energy grid. All work is done at
-				// the first occurrence.
+				// NOTE: Remainder tasks can have zeroed indices, meaning that
+				// they are unused and outside the energy grid. All work is
+				// done at the first occurrence.
 				break;
 			}
 
