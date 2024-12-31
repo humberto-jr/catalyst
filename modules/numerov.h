@@ -11,7 +11,7 @@
 		constexpr u32 MAGIC_NUMBER = 1701998454u;
 
 		struct Basis {
-			String filename;
+			const String filename;
 			Vec<fgh::BasisEntry> list;
 
 			Basis(String &filename);
@@ -78,7 +78,7 @@
 
 		struct ScattMatrixEntry {
 			mut<usize> size;
-			mut<u32> channel_count;
+			mut<usize> channel_count;
 
 			mut<f64> mass;
 
@@ -87,7 +87,7 @@
 			mut<u32> J_in;
 			mut<u32> l_in;
 			mut<s32> p_in;
-			mut<u32> comp_in;
+			mut<u32> n_in;
 			mut<f64> eigenval_in;
 
 			mut<u32> j_out;
@@ -95,7 +95,7 @@
 			mut<u32> J_out;
 			mut<u32> l_out;
 			mut<s32> p_out;
-			mut<u32> comp_out;
+			mut<u32> n_out;
 			mut<f64> eigenval_out;
 
 			Vec<f64> total_energy;
@@ -110,11 +110,11 @@
 
 			f64 reduced_mass() const;
 
-			u32 channel_count() const;
+			usize channel_count() const;
 
-			u32 energy_count() const;
+			usize energy_count() const;
 
-			const ScattMatrixEntry* operator()(u32 channel_a, u32 channel_b);
+			const ScattMatrixEntry& operator()(usize channel_a, usize channel_b);
 
 			private:
 			file::Input input;
@@ -129,27 +129,25 @@
 
 		class ScattAmplitude {
 			public:
-			ScattAmplitude(u32 j_in, u32 j_out, u32 theta_count, u32 energy_count);
+			ScattAmplitude(u32 j_in, u32 j_out, usize theta_count, usize energy_count);
 
-			u32 mm_count() const;
+			usize mm_count() const;
 
-			u32 theta_count() const;
+			usize theta_count() const;
 
-			u32 energy_count() const;
+			usize energy_count() const;
 
-			c64 mm_sum(u32 theta_index, u32 energy_index) const;
+			c64 mm_sum(usize theta_index, usize energy_index) const;
 
-			ScattAmplitudeEntry& operator()(u32 mm_index) const;
+			const ScattAmplitudeEntry& operator()(usize mm_index) const;
 
-			Vec<c64>& operator()(u32 mm_index, u32 theta_index) const;
+			Vec<c64>& operator()(usize mm_index, usize theta_index) const;
 
-			c64& operator()(u32 mm_index, u32 theta_index, u32 energy_index) const;
+			c64& operator()(usize mm_index, usize theta_index, usize energy_index) const;
 
 			private:
 			Vec<ScattAmplitudeEntry> entry;
 		};
-
-		numerov::Solution open_ratio_file(String &filename, u8 fmt_ver = 2);
 
 		void renormalized(f64 mass,
 		                  f64 step,

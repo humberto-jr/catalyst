@@ -269,8 +269,9 @@ const numerov::RatioEntry& numerov::Ratio::operator()(usize grid_index,
 // numerov::ScattMatrix:
 //
 
-static constexpr usize SMATRIX_HEADER_OFFSET
-	= sizeof(numerov::FORMAT_VERSION) + sizeof(numerov::MAGIC_NUMBER) + 2*sizeof(u32) + sizeof(f64);
+static constexpr usize SMATRIX_HEADER_OFFSET = sizeof(numerov::FORMAT_VERSION)
+                                             + sizeof(numerov::MAGIC_NUMBER)
+                                             + 2*sizeof(usize) + sizeof(f64);
 
 numerov::ScattMatrix::ScattMatrix(c_str filename, u8 fmt_ver):
 	input(filename), entry(type_zeroed<numerov::ScattMatrixEntry>())
@@ -279,7 +280,7 @@ numerov::ScattMatrix::ScattMatrix(c_str filename, u8 fmt_ver):
 
 	this->input.read(this->entry.channel_count);
 
-	mut<u32> energy_count = 0;
+	mut<usize> energy_count = 0;
 	this->input.read(energy_count);
 
 	this->input.read(this->entry.mass);
@@ -292,8 +293,9 @@ numerov::ScattMatrix::ScattMatrix(c_str filename, u8 fmt_ver):
 	// NOTE: For every pair of channels, ab, there must be this number of bytes
 	// written in the input file. That is, the size of a numerov::ScattMatrixEntry
 	// object (without the 'size' and 'channel_count' members) plus three extra
-	// integers stored for internal checks (channels and energy indices, all u32).
-	this->entry.size = 12*sizeof(u32) + 2*sizeof(s32) + 2*sizeof(f64) + energy_count*(sizeof(u32) + 3*sizeof(f64));
+	// integers stored for internal checks (channels and energy indices, all usize).
+	this->entry.size = 2*sizeof(usize) + 10*sizeof(u32) + 2*sizeof(s32)
+	                 + 2*sizeof(f64) + energy_count*(sizeof(usize) + 3*sizeof(f64));
 }
 
 c_str numerov::ScattMatrix::filename() const
@@ -306,42 +308,33 @@ f64 numerov::ScattMatrix::reduced_mass() const
 	return this->entry.mass;
 }
 
-u32 numerov::ScattMatrix::channel_count() const
+usize numerov::ScattMatrix::channel_count() const
 {
 	return this->entry.channel_count;
 }
 
-u32 numerov::ScattMatrix::energy_count() const
+usize numerov::ScattMatrix::energy_count() const
 {
-	return as_u32(this->entry.value.length());
+	return this->entry.value.length();
 }
 
-const numerov::ScattMatrixEntry* numerov::ScattMatrix::operator()(u32 channel_a, u32 channel_b)
+const numerov::ScattMatrixEntry& numerov::ScattMatrix::operator()(usize channel_a,
+                                                                  usize channel_b)
 {
-	CHECK_FILE_END(this->input)
-
-	// NOTE: Using a row-major layout, where each element is this->entry.size bytes long.
+	// NOTE: Using a row-major layout, where each element is this->entry.size long.
 	usize stride = (channel_a*this->entry.channel_count + channel_b)*this->entry.size;
 
 	this->input.seek_set(SMATRIX_HEADER_OFFSET + stride);
 
-	mut<u32> saved_a = u32_max;
-	this->input.read(saved_a);
-
-	mut<u32> saved_b = u32_max;
-	this->input.read(saved_b);
-
-	CHECK_FILE_END(this->input)
-
-	assert(saved_a == channel_a);
-	assert(saved_b == channel_b);
+	CHECK_DATA_INDEX(this->input, channel_a, "channel a")
+	CHECK_DATA_INDEX(this->input, channel_b, "channel b")
 
 	this->input.read(this->entry.j_in);
 	this->input.read(this->entry.v_in);
 	this->input.read(this->entry.J_in);
 	this->input.read(this->entry.l_in);
 	this->input.read(this->entry.p_in);
-	this->input.read(this->entry.comp_in);
+	this->input.read(this->entry.n_in);
 	this->input.read(this->entry.eigenval_in);
 
 	this->input.read(this->entry.j_out);
@@ -349,16 +342,11 @@ const numerov::ScattMatrixEntry* numerov::ScattMatrix::operator()(u32 channel_a,
 	this->input.read(this->entry.J_out);
 	this->input.read(this->entry.l_out);
 	this->input.read(this->entry.p_out);
-	this->input.read(this->entry.comp_out);
+	this->input.read(this->entry.n_out);
 	this->input.read(this->entry.eigenval_out);
 
-	for (mut<u32> n = 0; n < this->entry.value.length(); ++n) {
-		mut<u32> saved_n = u32_max;
-		this->input.read(saved_n);
-
-		CHECK_FILE_END(this->input)
-
-		assert(saved_n == n);
+	for (mut<usize> n = 0; n < this->entry.value.length(); ++n) {
+		CHECK_DATA_INDEX(this->input, n, "energy index")
 
 		this->input.read(this->entry.total_energy[n]);
 
@@ -371,17 +359,17 @@ const numerov::ScattMatrixEntry* numerov::ScattMatrix::operator()(u32 channel_a,
 		this->entry.value[n] = c64(re_s, im_s);
 	}
 
-	return &this->entry;
+	return this->entry;
 }
 
 //
 // numerov::ScattAmplitude:
 //
 
-numerov::ScattAmplitude::ScattAmplitude(u32 j_in, u32 j_out, u32 theta_count, u32 energy_count):
+numerov::ScattAmplitude::ScattAmplitude(u32 j_in, u32 j_out, usize theta_count, usize energy_count):
 	entry((2*j_in + 1)*(2*j_out + 1))
 {
-	mut<u32> mm_index = 0;
+	mut<usize> mm_index = 0;
 
 	for (mut<s32> m_in = -as_s32(j_in); m_in <= as_s32(j_in); ++m_in) {
 		for (mut<s32> m_out = -as_s32(j_out); m_out <= as_s32(j_out); ++m_out) {
@@ -391,7 +379,7 @@ numerov::ScattAmplitude::ScattAmplitude(u32 j_in, u32 j_out, u32 theta_count, u3
 			this->entry[mm_index].m_out = m_out;
 			this->entry[mm_index].value.swap(theta_list);
 
-			for (mut<u32> theta_index = 0; theta_index < theta_count; ++theta_index) {
+			for (mut<usize> theta_index = 0; theta_index < theta_count; ++theta_index) {
 				Vec<c64> energy_list(energy_count);
 
 				this->entry[mm_index].value[theta_index].swap(energy_list);
@@ -402,43 +390,43 @@ numerov::ScattAmplitude::ScattAmplitude(u32 j_in, u32 j_out, u32 theta_count, u3
 	}
 }
 
-u32 numerov::ScattAmplitude::mm_count() const
+usize numerov::ScattAmplitude::mm_count() const
 {
-	return as_u32(this->entry.length());
+	return this->entry.length();
 }
 
-u32 numerov::ScattAmplitude::theta_count() const
+usize numerov::ScattAmplitude::theta_count() const
 {
-	return as_u32(this->entry[0].value.length());
+	return this->entry[0].value.length();
 }
 
-u32 numerov::ScattAmplitude::energy_count() const
+usize numerov::ScattAmplitude::energy_count() const
 {
-	return as_u32(this->entry[0].value[0].length());
+	return this->entry[0].value[0].length();
 }
 
-c64 numerov::ScattAmplitude::mm_sum(u32 theta_index, u32 energy_index) const
+c64 numerov::ScattAmplitude::mm_sum(usize theta_index, usize energy_index) const
 {
 	mut<c64> sum = c64(0.0, 0.0);
 
-	for (mut<u32> mm_index = 0; mm_index < this->mm_count(); ++mm_index) {
+	for (mut<usize> mm_index = 0; mm_index < this->mm_count(); ++mm_index) {
 		sum += this->entry[mm_index].value[theta_index][energy_index];
 	}
 
 	return sum;
 }
 
-numerov::ScattAmplitudeEntry& numerov::ScattAmplitude::operator()(u32 mm_index) const
+const numerov::ScattAmplitudeEntry& numerov::ScattAmplitude::operator()(usize mm_index) const
 {
 	return this->entry[mm_index];
 }
 
-Vec<c64>& numerov::ScattAmplitude::operator()(u32 mm_index, u32 theta_index) const
+Vec<c64>& numerov::ScattAmplitude::operator()(usize mm_index, usize theta_index) const
 {
 	return this->entry[mm_index].value[theta_index];
 }
 
-c64& numerov::ScattAmplitude::operator()(u32 mm_index, u32 theta_index, u32 energy_index) const
+c64& numerov::ScattAmplitude::operator()(usize mm_index, usize theta_index, usize energy_index) const
 {
 	return this->entry[mm_index].value[theta_index][energy_index];
 }
@@ -736,11 +724,11 @@ void numerov::build_cross_section(const numerov::ScattAmplitude &f, u32 j_in,
 
 	// NOTE: Assuming there are N+1 theta points, which includes both 0 and 180
 	// degrees (pi). The theta step size, however, only depends on N.
-	u32 theta_count = f.theta_count() - 1u;
+	usize theta_count = f.theta_count() - 1;
 
-	u32 energy_count = f.energy_count();
+	usize energy_count = f.energy_count();
 
-	assert((theta_count + 1u) == f_sum.rows());
+	assert((theta_count + 1) == f_sum.rows());
 
 	assert(energy_count == f_sum.cols());
 
@@ -752,7 +740,7 @@ void numerov::build_cross_section(const numerov::ScattAmplitude &f, u32 j_in,
 
 	f64 j_mult = as_f64(2*j_in + 1);
 
-	Vec<f64> integrand(theta_count + 1u);
+	Vec<f64> integrand(theta_count + 1);
 
 	f64 theta_step = (THETA_MAX - THETA_MIN)/as_f64(theta_count);
 

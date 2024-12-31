@@ -76,8 +76,8 @@ Job read_arguments(s32 argc, char* argv[])
 }
 
 void print_channel_header(const Job &params,
-                          const Range<u32> &channel_in,
-                          const Range<u32> &channel_out,
+                          const Range<usize> &channel_in,
+                          const Range<usize> &channel_out,
                           f64 eigenval_in, f64 eigenval_out,
                           s32 m_in = s32_max, s32 m_out = s32_max)
 {
@@ -122,7 +122,7 @@ bool print_cross_section(const Job &params, numerov::ScattMatrix &s)
 
 	Vec<f64> energy_list(s.energy_count());
 
-	const Range<u32> channel_list(0u, s.channel_count());
+	const Range<usize> channel_list(0, s.channel_count());
 
 	//
 	// Entrance channel:
@@ -132,7 +132,7 @@ bool print_cross_section(const Job &params, numerov::ScattMatrix &s)
 
 	Vec<f64> wavenum_in(s.energy_count());
 
-	Range<u32> entrance_channel(u32_max, u32_max);
+	Range<usize> entrance_channel(usize_max, usize_max);
 
 	//
 	// Exit channel:
@@ -142,62 +142,62 @@ bool print_cross_section(const Job &params, numerov::ScattMatrix &s)
 
 	Vec<f64> wavenum_out(s.energy_count());
 
-	Range<u32> exit_channel(u32_max, u32_max);
+	Range<usize> exit_channel(usize_max, usize_max);
 
 	//
 	// Step 1: Find the range of channel indices containing the lowest and highest
 	// values of the orbital angular momentum l for both entrance and exit channels.
 	//
 
-	for (u32 channel_index : channel_list) {
-		const auto entry = s(channel_index, channel_index);
+	for (usize channel_index : channel_list) {
+		const auto &entry = s(channel_index, channel_index);
 
-		if ((params.J_in < entry->J_in) || (params.J_out < entry->J_out)) {
+		if ((params.J_in < entry.J_in) || (params.J_out < entry.J_out)) {
 			// NOTE: In this case, the actual J (J') value was not found, but may
 			// still be stored in the file. Thus, let's just pretend it is all
 			// done, return and go to the next J.
 			return true;
 		}
 
-		if ((entry->v_in == params.v_in) && (entry->j_in == params.j_in) && (entry->comp_in == params.n_in) && (entry->J_in == params.J_in)) {
+		if ((entry.v_in == params.v_in) && (entry.j_in == params.j_in) && (entry.n_in == params.n_in) && (entry.J_in == params.J_in)) {
 			if (channel_index < entrance_channel.min) {
 				entrance_channel.min = channel_index;
-				eigenval_in = entry->eigenval_in;
+				eigenval_in = entry.eigenval_in;
 			}
 
 			entrance_channel.max = channel_index;
 		}
 
-		if ((entry->v_out == params.v_out) && (entry->j_out == params.j_out) && (entry->comp_out == params.n_out) && (entry->J_out == params.J_out)) {
+		if ((entry.v_out == params.v_out) && (entry.j_out == params.j_out) && (entry.n_out == params.n_out) && (entry.J_out == params.J_out)) {
 			if (channel_index < exit_channel.min) {
 				exit_channel.min = channel_index;
-				eigenval_out = entry->eigenval_out;
+				eigenval_out = entry.eigenval_out;
 			}
 
 			exit_channel.max = channel_index;
 		}
 
-		if ((entry->v_in > params.v_in) && (entry->j_in > params.j_in) && (entry->comp_in >= params.n_in) && (entry->J_in >= params.J_in) && (entry->v_out > params.v_out) && (entry->j_out > params.j_out) && (entry->comp_out >= params.n_out) && (entry->J_out >= params.J_out)) {
+		if ((entry.v_in > params.v_in) && (entry.j_in > params.j_in) && (entry.n_in >= params.n_in) && (entry.J_in >= params.J_in) && (entry.v_out > params.v_out) && (entry.j_out > params.j_out) && (entry.n_out >= params.n_out) && (entry.J_out >= params.J_out)) {
 			// NOTE: We now leave the loop early and take this opportunity to backup
 			// the total energy and to compute the incoming and outgoing wavenumbers
 			// from the last S-matrix entry. Assuming all entries are defined for
 			// the same values of energy.
 
 			for (auto energy : energy_list) {
-				energy.value = entry->total_energy[energy.index];
-				wavenum_in[energy.index] = numerov::wavenumber(s.reduced_mass(), entry->total_energy[energy.index], eigenval_in);
-				wavenum_out[energy.index] = numerov::wavenumber(s.reduced_mass(), entry->total_energy[energy.index], eigenval_out);
+				energy.value = entry.total_energy[energy.index];
+				wavenum_in[energy.index] = numerov::wavenumber(s.reduced_mass(), entry.total_energy[energy.index], eigenval_in);
+				wavenum_out[energy.index] = numerov::wavenumber(s.reduced_mass(), entry.total_energy[energy.index], eigenval_out);
 			}
 
 			break;
 		}
 	}
 
-	if ((entrance_channel.min == u32_max) || (entrance_channel.max == u32_max)) {
+	if ((entrance_channel.min == usize_max) || (entrance_channel.max == usize_max)) {
 		return false;
 	}
 
-	if ((exit_channel.min == u32_max) || (exit_channel.max == u32_max)) {
+	if ((exit_channel.min == usize_max) || (exit_channel.max == usize_max)) {
 		return false;
 	}
 
@@ -222,36 +222,36 @@ bool print_cross_section(const Job &params, numerov::ScattMatrix &s)
 
 	numerov::ScattAmplitude f_list(params.j_in,
 	                               params.j_out,
-	                               params.theta_list.count<u32>() + 1u, s.energy_count());
+	                               params.theta_list.count() + 1, s.energy_count());
 
-	const Range<u32> mm_list(0u, f_list.mm_count());
+	const Range<usize> mm_list(0, f_list.mm_count());
 
-	for (u32 mm_index : mm_list) {
+	for (usize mm_index : mm_list) {
 		s32 m_in = f_list(mm_index).m_in;
 
 		s32 m_out = f_list(mm_index).m_out;
 
-		for (auto theta : params.theta_list.as_range_inclusive().indexed<u32>()) {
+		for (auto theta : params.theta_list.as_range_inclusive().indexed()) {
 			Vec<c64> &f_mm = f_list(mm_index, theta.index);
 
-			for (u32 channel_in : entrance_channel.as_range_inclusive()) {
-				for (u32 channel_out : exit_channel.as_range_inclusive()) {
-					const auto entry = s(channel_in, channel_out);
+			for (usize channel_in : entrance_channel.as_range_inclusive()) {
+				for (usize channel_out : exit_channel.as_range_inclusive()) {
+					const auto &entry = s(channel_in, channel_out);
 
-					assert(params.v_in == entry->v_in);
-					assert(params.j_in == entry->j_in);
-					assert(params.J_in == entry->J_in);
-					assert(params.n_in == entry->comp_in);
-					assert(eigenval_in == entry->eigenval_in);
+					assert(params.v_in == entry.v_in);
+					assert(params.j_in == entry.j_in);
+					assert(params.J_in == entry.J_in);
+					assert(params.n_in == entry.n_in);
+					assert(eigenval_in == entry.eigenval_in);
 
-					assert(params.v_out == entry->v_out);
-					assert(params.j_out == entry->j_out);
-					assert(params.J_out == entry->J_out);
-					assert(params.n_out == entry->comp_out);
-					assert(eigenval_out == entry->eigenval_out);
+					assert(params.v_out == entry.v_out);
+					assert(params.j_out == entry.j_out);
+					assert(params.J_out == entry.J_out);
+					assert(params.n_out == entry.n_out);
+					assert(eigenval_out == entry.eigenval_out);
 
 					// NOTE: Here, f is accumulating l- and l'-dependent results for fixed m and m'.
-					numerov::build_scatt_amplitude(*entry, m_in, m_out, theta.value, 0.0, f_mm);
+					numerov::build_scatt_amplitude(entry, m_in, m_out, theta.value, 0.0, f_mm);
 				}
 			}
 		}
@@ -304,7 +304,7 @@ bool print_cross_section(const Job &params, numerov::ScattMatrix &s)
 
 	print::line<PAD>("# theta", "Coll. energy", "Tot. energy", "Dif. cross-section", "|f|^2", "re(f)", "im(f)");
 
-	for (auto theta : params.theta_list.as_range_inclusive().indexed<u32>()) {
+	for (auto theta : params.theta_list.as_range_inclusive().indexed()) {
 		for (auto energy : energy_list) {
 			c64 f = f_sum(theta.index, energy.index);
 
@@ -327,19 +327,19 @@ bool print_cross_section(const Job &params, numerov::ScattMatrix &s)
 	// cross-section summed over l and l' values.
 	//
 
-	for (u32 mm_index : mm_list) {
+	for (usize mm_index : mm_list) {
 		print_channel_header(params, entrance_channel, exit_channel,
 		                     eigenval_in, eigenval_out, f_list(mm_index).m_in, f_list(mm_index).m_out);
 
 		print::line<PAD>("# theta", "Coll. energy", "Tot. energy", "Dif. cross-section", "|f|^2", "re(f)", "im(f)");;
 
-		for (auto theta : params.theta_list.as_range_inclusive().indexed<u32>()) {
+		for (auto theta : params.theta_list.as_range_inclusive().indexed()) {
 			for (auto energy : energy_list) {
 				// NOTE: m-dependent results are not averaged over the initial
 				// 2j + 1 projections of j.
 				f64 fact = wavenum_out[energy.index]/wavenum_in[energy.index];
 
-				c64 f_mm = f_list(mm_index, theta.index, as_u32(energy.index));
+				c64 f_mm = f_list(mm_index, theta.index, energy.index);
 
 				c64 fxf_abs = std::conj(f_mm)*f_mm;
 
