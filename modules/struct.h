@@ -94,7 +94,7 @@
 			// is not allowed to resize, since the Struct member size is fixed and
 			// allocated contiguously in memory. The Struct object must outlive that
 			// of the Vec<T> itself, otherwise it will be referencing garbage data.
-			return Vec(this->block.length[n], ptr);
+			return Vec<T>(this->block.length[n], ptr);
 		}
 
 		template<typename T>
@@ -102,7 +102,7 @@
 		{
 			Vec<T> raw = this->dereference_as_vec<T>(n);
 
-			return Mat(max_row, max_col, raw);
+			return Mat<T>(max_row, max_col, raw);
 		}
 
 		inline mut<byte>& operator[](usize n) const
