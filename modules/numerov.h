@@ -151,8 +151,8 @@
 
 		void renormalized(f64 mass,
 		                  f64 step,
-		                  f64 tot_energy,
-		                  const Mat<f64> &pot_energy,
+		                  f64 total_energy,
+		                  const Mat<f64> &potential,
 		                  Mat<f64> &workspace,
 		                  Mat<f64> &old_ratio,
 		                  Mat<f64> &new_ratio);
@@ -160,7 +160,7 @@
 		usize build_react_matrix(f64 mass,
 		                         f64 step,
 		                         f64 R_max,
-		                         f64 tot_energy,
+		                         f64 total_energy,
 		                         const Mat<f64> &ratio,
 		                         const numerov::Basis &level, Mat<f64> &k);
 

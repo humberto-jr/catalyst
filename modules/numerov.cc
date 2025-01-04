@@ -437,8 +437,8 @@ c64& numerov::ScattAmplitude::operator()(usize mm_index, usize theta_index, usiz
 
 void numerov::renormalized(f64 mass,
                            f64 step,
-                           f64 tot_energy,
-                           const Mat<f64> &pot_energy,
+                           f64 total_energy,
+                           const Mat<f64> &potential,
                            Mat<f64> &workspace,
                            Mat<f64> &old_ratio,
                            Mat<f64> &new_ratio)
@@ -449,21 +449,21 @@ void numerov::renormalized(f64 mass,
 	// Quantities cited below such as T, I, U and R (ratio) are defined in Johnson's
 	// paper.
 
-	usize ch_count = pot_energy.rows();
+	usize channel_count = potential.rows();
 
-	assert(workspace.rows() == ch_count);
-	assert(workspace.cols() == ch_count);
-	assert(old_ratio.rows() == ch_count);
-	assert(old_ratio.cols() == ch_count);
-	assert(new_ratio.rows() == ch_count);
-	assert(new_ratio.cols() == ch_count);
+	assert(workspace.rows() == channel_count);
+	assert(workspace.cols() == channel_count);
+	assert(old_ratio.rows() == channel_count);
+	assert(old_ratio.cols() == channel_count);
+	assert(new_ratio.rows() == channel_count);
+	assert(new_ratio.cols() == channel_count);
 
 	//
 	// Step 1: Invert the previous R matrix.
 	//
 
-	for (mut<usize> ch = 0; ch < ch_count*ch_count; ++ch) {
-		if (old_ratio[ch] != 0.0) {
+	for (mut<usize> channel = 0; channel < channel_count*channel_count; ++channel) {
+		if (old_ratio[channel] != 0.0) {
 			lapack::sytri(old_ratio);
 			break;
 		}
@@ -475,17 +475,20 @@ void numerov::renormalized(f64 mass,
 
 	f64 fact = -step*step*2.0*mass/12.0;
 
-	for (mut<usize> ch_a = 0; ch_a < ch_count; ++ch_a) {
-		f64 T = fact*(tot_energy - pot_energy(ch_a, ch_a));
+	for (mut<usize> channel_a = 0; channel_a < channel_count; ++channel_a) {
+		f64 T = fact*(total_energy - potential(channel_a, channel_a));
 
-		workspace(ch_a, ch_a) = 1.0 - T;
-		new_ratio(ch_a, ch_a) = 2.0 + 10.0*T;
+		workspace(channel_a, channel_a) = 1.0 - T;
+		new_ratio(channel_a, channel_a) = 2.0 + 10.0*T;
 
-		for (mut<usize> ch_b = (ch_a + 1); ch_b < ch_count; ++ch_b) {
-			f64 T = fact*(0.0 - pot_energy(ch_a, ch_b));
+		for (mut<usize> channel_b = (channel_a + 1); channel_b < channel_count; ++channel_b) {
+			f64 T = fact*(0.0 - potential(channel_a, channel_b));
 
-			workspace(ch_a, ch_b) = workspace(ch_b, ch_a) = 0.0 - T;
-			new_ratio(ch_a, ch_b) = new_ratio(ch_b, ch_a) = 0.0 + 10.0*T;
+			workspace(channel_a, channel_b)
+				= workspace(channel_b, channel_a) = 0.0 - T;
+
+			new_ratio(channel_a, channel_b)
+				= new_ratio(channel_b, channel_a) = 0.0 + 10.0*T;
 		}
 	}
 
@@ -500,12 +503,12 @@ void numerov::renormalized(f64 mass,
 	// Step 4: Solve Eq. (22) for R = U - R'.
 	//
 
-	for (mut<usize> ch_a = 0; ch_a < ch_count; ++ch_a) {
-		new_ratio(ch_a, ch_a) -= old_ratio(ch_a, ch_a);
+	for (mut<usize> channel_a = 0; channel_a < channel_count; ++channel_a) {
+		new_ratio(channel_a, channel_a) -= old_ratio(channel_a, channel_a);
 
-		for (mut<usize> ch_b = (ch_a + 1); ch_b < ch_count; ++ch_b) {
-			new_ratio(ch_a, ch_b) -= old_ratio(ch_a, ch_b);
-			new_ratio(ch_b, ch_a) -= old_ratio(ch_b, ch_a);
+		for (mut<usize> channel_b = (channel_a + 1); channel_b < channel_count; ++channel_b) {
+			new_ratio(channel_a, channel_b) -= old_ratio(channel_a, channel_b);
+			new_ratio(channel_b, channel_a) -= old_ratio(channel_b, channel_a);
 		}
 	}
 }
@@ -513,7 +516,7 @@ void numerov::renormalized(f64 mass,
 usize numerov::build_react_matrix(f64 mass,
                                   f64 step,
                                   f64 R_max,
-                                  f64 tot_energy,
+                                  f64 total_energy,
                                   const Mat<f64> &ratio,
                                   const numerov::Basis &level, Mat<f64> &k)
 {
@@ -522,11 +525,11 @@ usize numerov::build_react_matrix(f64 mass,
 	// Appendix A, Eq. (A19). The products Rn and Rj in the paper are named rn and
 	// rj below, where R is the ratio of the wavefunction at R_max.
 
-	usize ch_count = ratio.rows();
+	usize channel_count = ratio.rows();
 
-	assert(k.rows() == ch_count);
-	assert(k.cols() == ch_count);
-	assert(level.list.length() == ch_count);
+	assert(k.rows() == channel_count);
+	assert(k.cols() == channel_count);
+	assert(level.list.length() == channel_count);
 
 	mut<usize> count = 0;
 
@@ -535,48 +538,48 @@ usize numerov::build_react_matrix(f64 mass,
 	// NOTE: Eq. (17) combined with Eq. (2).
 	f64 fact = -step*step*2.0*mass/12.0;
 
-	Mat<f64> n(ch_count, ch_count), j(ch_count, ch_count);
+	Mat<f64> n(channel_count, channel_count), j(channel_count, channel_count);
 
-	Mat<f64> rn(ch_count, ch_count), rj(ch_count, ch_count);
+	Mat<f64> rn(channel_count, channel_count), rj(channel_count, channel_count);
 
 	//
 	// Step 1: Build the diagonal Riccati-Bessel matrices using Eq. (A16), (A17)
 	// and (A20-23).
 	//
 
-	for (mut<usize> ch = 0; ch < ch_count; ++ch) {
-		f64 l = as_f64(level.list[ch].l);
+	for (mut<usize> channel = 0; channel < channel_count; ++channel) {
+		f64 l = as_f64(level.list[channel].l);
 
 		f64 T_max = fact*(
-			tot_energy - (level.list[ch].eigenval + numerov::centrifugal_term(l, mass, R_max))
+			total_energy - (level.list[channel].eigenval + numerov::centrifugal_term(l, mass, R_max))
 		);
 
 		f64 T_inf = fact*(
-			tot_energy - (level.list[ch].eigenval + numerov::centrifugal_term(l, mass, R_inf))
+			total_energy - (level.list[channel].eigenval + numerov::centrifugal_term(l, mass, R_inf))
 		);
 
-		f64 wavenum = numerov::wavenumber(mass, tot_energy, level.list[ch].eigenval);
+		f64 wavenum = numerov::wavenumber(mass, total_energy, level.list[channel].eigenval);
 
 		f64 x_max = wavenum*R_max;
 
 		f64 x_inf = wavenum*R_inf;
 
-		if (level.list[ch].eigenval < tot_energy) {
+		if (level.list[channel].eigenval < total_energy) {
 			++count;
 
-			n(ch, ch) = (1.0 - T_max)*math::riccati_bessel('n', l, x_max);
-			j(ch, ch) = (1.0 - T_max)*math::riccati_bessel('j', l, x_max);
+			n(channel, channel) = (1.0 - T_max)*math::riccati_bessel('n', l, x_max);
+			j(channel, channel) = (1.0 - T_max)*math::riccati_bessel('j', l, x_max);
 
-			rn(ch, ch) = (1.0 - T_inf)*math::riccati_bessel('n', l, x_inf);
-			rj(ch, ch) = (1.0 - T_inf)*math::riccati_bessel('j', l, x_inf);
+			rn(channel, channel) = (1.0 - T_inf)*math::riccati_bessel('n', l, x_inf);
+			rj(channel, channel) = (1.0 - T_inf)*math::riccati_bessel('j', l, x_inf);
 		} else {
-			n(ch, ch) = 1.0;
-			j(ch, ch) = 1.0;
+			n(channel, channel) = 1.0;
+			j(channel, channel) = 1.0;
 
-			rn(ch, ch) = (1.0 - T_inf)*math::riccati_bessel('n', l, x_inf)/
+			rn(channel, channel) = (1.0 - T_inf)*math::riccati_bessel('n', l, x_inf)/
 			             (1.0 - T_max)*math::riccati_bessel('n', l, x_max);
 
-			rj(ch, ch) = (1.0 - T_inf)*math::riccati_bessel('j', l, x_inf)/
+			rj(channel, channel) = (1.0 - T_inf)*math::riccati_bessel('j', l, x_inf)/
 			             (1.0 - T_max)*math::riccati_bessel('j', l, x_max);
 		}
 	}
@@ -611,18 +614,18 @@ void numerov::build_scatt_matrix(const Mat<f64> &k,
 	// the reaction matrix K, as in B.R. Johnson. J. Com. Phys. 13, 445-449 (1973).
 	// See Eq. (20).
 
-	usize ch_count = k.rows();
+	usize channel_count = k.rows();
 
-	assert(re_s.rows() == ch_count);
-	assert(re_s.cols() == ch_count);
-	assert(im_s.rows() == ch_count);
-	assert(im_s.cols() == ch_count);
+	assert(re_s.rows() == channel_count);
+	assert(re_s.cols() == channel_count);
+	assert(im_s.rows() == channel_count);
+	assert(im_s.cols() == channel_count);
 
 	//
 	// Step 1: Compute the square of the K matrix.
 	//
 
-	Mat<f64> workspace(ch_count, ch_count);
+	Mat<f64> workspace(channel_count, channel_count);
 
 	blas::gemm<f64>('n', 'n', k, k, workspace);
 
@@ -630,18 +633,18 @@ void numerov::build_scatt_matrix(const Mat<f64> &k,
 	// Step 2: Build the (I + K^2) and 2K matrices with re(S) = I temporarily.
 	//
 
-	for (mut<usize> ch_a = 0; ch_a < ch_count; ++ch_a) {
-		workspace(ch_a, ch_a) += 1.0;
+	for (mut<usize> channel_a = 0; channel_a < channel_count; ++channel_a) {
+		workspace(channel_a, channel_a) += 1.0;
 
-		re_s(ch_a, ch_a) = 1.0;
-		im_s(ch_a, ch_a) = 2.0*k(ch_a, ch_a);
+		re_s(channel_a, channel_a) = 1.0;
+		im_s(channel_a, channel_a) = 2.0*k(channel_a, channel_a);
 
-		for (mut<usize> ch_b = (ch_a + 1); ch_b < ch_count; ++ch_b) {
-			re_s(ch_a, ch_b) = 0.0;
-			re_s(ch_b, ch_a) = 0.0;
+		for (mut<usize> channel_b = (channel_a + 1); channel_b < channel_count; ++channel_b) {
+			re_s(channel_a, channel_b) = 0.0;
+			re_s(channel_b, channel_a) = 0.0;
 
-			im_s(ch_a, ch_b) = 2.0*k(ch_a, ch_b);
-			im_s(ch_b, ch_a) = 2.0*k(ch_b, ch_a);
+			im_s(channel_a, channel_b) = 2.0*k(channel_a, channel_b);
+			im_s(channel_b, channel_a) = 2.0*k(channel_b, channel_a);
 		}
 	}
 
@@ -722,8 +725,8 @@ void numerov::build_cross_section(const numerov::ScattAmplitude &f, u32 j_in,
 	constexpr f64 THETA_MIN = 0.0;
 	constexpr f64 THETA_MAX = math::PI;
 
-	// NOTE: Assuming there are N+1 theta points, which includes both 0 and 180
-	// degrees (pi). The theta step size, however, only depends on N.
+	// NOTE: Assuming there are N+1 theta points, which includes both 0 and pi.
+	// The theta step size, however, only depends on N.
 	usize theta_count = f.theta_count() - 1;
 
 	usize energy_count = f.energy_count();
