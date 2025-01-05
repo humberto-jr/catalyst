@@ -934,6 +934,149 @@ FRONTEND_VECTOR_BROADCAST_IMPL(f128)
 
 #undef FRONTEND_VECTOR_BROADCAST_IMPL
 
+//
+// Gathers:
+//
+
+#define CALL_MPI_GATHER(rank, count, buf, datatype)                                                               \
+{                                                                                                                 \
+  mut<u32> sendcount = 0, recvcount = 0;                                                                          \
+                                                                                                                  \
+  void *recvbuf = nullptr, *sendbuf = nullptr;                                                                    \
+                                                                                                                  \
+  if (this->rank() == (rank)) {                                                                                   \
+    recvbuf = (buf);                                                                                              \
+    recvcount = (count);                                                                                          \
+  } else {                                                                                                        \
+    sendbuf = (buf);                                                                                              \
+    sendcount = (count);                                                                                          \
+  }                                                                                                               \
+                                                                                                                  \
+  auto info = MPI_Gather(sendbuf, sendcount, (datatype), recvbuf, recvcount, (datatype), (rank), MPI_COMM_WORLD); \
+                                                                                                                  \
+  CHECK_MPI_ERROR("MPI_Gather()", info)                                                                           \
+}
+
+void mpi::Frontend::gather([[maybe_unused]] u32 rank,
+                           [[maybe_unused]] u32 count,
+                           [[maybe_unused]] mut<u8> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_GATHER(rank, count, data, MPI_UINT8_T)
+	#endif
+}
+
+void mpi::Frontend::gather([[maybe_unused]] u32 rank,
+                           [[maybe_unused]] u32 count,
+                           [[maybe_unused]] mut<u16> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_GATHER(rank, count, data, MPI_UINT16_T)
+	#endif
+}
+
+void mpi::Frontend::gather([[maybe_unused]] u32 rank,
+                           [[maybe_unused]] u32 count,
+                           [[maybe_unused]] mut<u32> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_GATHER(rank, count, data, MPI_UINT32_T)
+	#endif
+}
+
+void mpi::Frontend::gather([[maybe_unused]] u32 rank,
+                           [[maybe_unused]] u32 count,
+                           [[maybe_unused]] mut<u64> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_GATHER(rank, count, data, MPI_UINT64_T)
+	#endif
+}
+
+void mpi::Frontend::gather([[maybe_unused]] u32 rank,
+                           [[maybe_unused]] u32 count,
+                           [[maybe_unused]] mut<s8> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_GATHER(rank, count, data, MPI_INT8_T)
+	#endif
+}
+
+void mpi::Frontend::gather([[maybe_unused]] u32 rank,
+                           [[maybe_unused]] u32 count,
+                           [[maybe_unused]] mut<s16> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_GATHER(rank, count, data, MPI_INT16_T)
+	#endif
+}
+
+void mpi::Frontend::gather([[maybe_unused]] u32 rank,
+                           [[maybe_unused]] u32 count,
+                           [[maybe_unused]] mut<s32> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_GATHER(rank, count, data, MPI_INT32_T)
+	#endif
+}
+
+void mpi::Frontend::gather([[maybe_unused]] u32 rank,
+                           [[maybe_unused]] u32 count,
+                           [[maybe_unused]] mut<s64> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_GATHER(rank, count, data, MPI_INT64_T)
+	#endif
+}
+
+void mpi::Frontend::gather([[maybe_unused]] u32 rank,
+                           [[maybe_unused]] u32 count,
+                           [[maybe_unused]] char data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_GATHER(rank, count, data, MPI_CHAR)
+	#endif
+}
+
+void mpi::Frontend::gather([[maybe_unused]] u32 rank,
+                           [[maybe_unused]] u32 count,
+                           [[maybe_unused]] mut<f32> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_GATHER(rank, count, data, MPI_FLOAT)
+	#endif
+}
+
+void mpi::Frontend::gather([[maybe_unused]] u32 rank,
+                           [[maybe_unused]] u32 count,
+                           [[maybe_unused]] mut<f64> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_GATHER(rank, count, data, MPI_DOUBLE)
+	#endif
+}
+
+void mpi::Frontend::gather([[maybe_unused]] u32 rank,
+                           [[maybe_unused]] u32 count,
+                           [[maybe_unused]] mut<f128> data[]) const
+{
+	#if defined(USE_MPI)
+		#pragma omp critical
+		CALL_MPI_GATHER(rank, count, data, MPI_LONG_DOUBLE)
+	#endif
+}
+
 void mpi::Frontend::wait() const
 {
 	#if defined(USE_MPI)
