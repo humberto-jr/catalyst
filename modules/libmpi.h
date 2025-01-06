@@ -154,6 +154,30 @@
 
 			void send(u32 rank, const Struct &data) const;
 
+			void send(u32 rank, const Range<u8> &data) const;
+
+			void send(u32 rank, const Range<u16> &data) const;
+
+			void send(u32 rank, const Range<u32> &data) const;
+
+			void send(u32 rank, const Range<u64> &data) const;
+
+			void send(u32 rank, const Range<s8> &data) const;
+
+			void send(u32 rank, const Range<s16> &data) const;
+
+			void send(u32 rank, const Range<s32> &data) const;
+
+			void send(u32 rank, const Range<s64> &data) const;
+
+			void send(u32 rank, const Range<char> &data) const;
+
+			void send(u32 rank, const Range<f32> &data) const;
+
+			void send(u32 rank, const Range<f64> &data) const;
+
+			void send(u32 rank, const Range<f128> &data) const;
+
 			template<u8 PAD, usize LEN>
 			void send(u32 rank, const print::Fmt<PAD, LEN> &data) const
 			{
@@ -241,6 +265,30 @@
 			void receive(u32 rank, String &data) const;
 
 			void receive(u32 rank, Struct &data) const;
+
+			void receive(u32 rank, Range<u8> &data) const;
+
+			void receive(u32 rank, Range<u16> &data) const;
+
+			void receive(u32 rank, Range<u32> &data) const;
+
+			void receive(u32 rank, Range<u64> &data) const;
+
+			void receive(u32 rank, Range<s8> &data) const;
+
+			void receive(u32 rank, Range<s16> &data) const;
+
+			void receive(u32 rank, Range<s32> &data) const;
+
+			void receive(u32 rank, Range<s64> &data) const;
+
+			void receive(u32 rank, Range<char> &data) const;
+
+			void receive(u32 rank, Range<f32> &data) const;
+
+			void receive(u32 rank, Range<f64> &data) const;
+
+			void receive(u32 rank, Range<f128> &data) const;
 
 			template<u8 PAD, usize LEN>
 			void receive(u32 rank, print::Fmt<PAD, LEN> &data) const

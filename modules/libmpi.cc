@@ -326,12 +326,6 @@ void mpi::Frontend::send([[maybe_unused]] u32 rank,
 	this->send(rank, 1, &data);
 }
 
-void mpi::Frontend::send([[maybe_unused]] u32 rank,
-                         [[maybe_unused]] const Struct &data) const
-{
-	this->send(rank, as_u32(data.size()), &data[0]);
-}
-
 // NOTE: For use inside mpi::Frontend::send() methods only.
 #define SEND_VECTOR_DATA(rank, data)         \
 {                                            \
@@ -407,6 +401,33 @@ void mpi::Frontend::send(u32 rank, const String &data) const
 	this->send(rank, 1, &len);
 	this->send(rank, as_u32(len + 1), data.as_ptr());
 }
+
+void mpi::Frontend::send(u32 rank, const Struct &data) const
+{
+	this->send(rank, as_u32(data.size()), &data[0]);
+}
+
+#define FRONTEND_SEND_RANGE_IMPL(type)                            \
+void mpi::Frontend::send(u32 rank, const Range<type> &data) const \
+{                                                                 \
+  type buf[3] = {data.min, data.max, data.step};                  \
+  this->send(rank, 3, buf);                                       \
+}
+
+FRONTEND_SEND_RANGE_IMPL(u8)
+FRONTEND_SEND_RANGE_IMPL(u16)
+FRONTEND_SEND_RANGE_IMPL(u32)
+FRONTEND_SEND_RANGE_IMPL(u64)
+FRONTEND_SEND_RANGE_IMPL(s8)
+FRONTEND_SEND_RANGE_IMPL(s16)
+FRONTEND_SEND_RANGE_IMPL(s32)
+FRONTEND_SEND_RANGE_IMPL(s64)
+FRONTEND_SEND_RANGE_IMPL(char)
+FRONTEND_SEND_RANGE_IMPL(f32)
+FRONTEND_SEND_RANGE_IMPL(f64)
+FRONTEND_SEND_RANGE_IMPL(f128)
+
+#undef FRONTEND_SEND_RANGE_IMPL
 
 //
 // Receives:
@@ -679,13 +700,6 @@ void mpi::Frontend::receive([[maybe_unused]] u32 rank,
 	assert((info == 0) || (info == 1));
 }
 
-void mpi::Frontend::receive([[maybe_unused]] u32 rank,
-                            [[maybe_unused]] Struct &data) const
-{
-	usize info = this->receive(rank, as_u32(data.size()), &data[0]);
-	assert(info == data.size());
-}
-
 // NOTE: For use inside mpi::Frontend::receive() methods only.
 #define RECEIVE_VECTOR_DATA(rank, data)                    \
 {                                                          \
@@ -779,6 +793,44 @@ void mpi::Frontend::receive(u32 rank, String &data) const
 
 	assert(as_u32(new_len) == info);
 }
+
+void mpi::Frontend::receive(u32 rank, Struct &data) const
+{
+	usize info = this->receive(rank, as_u32(data.size()), &data[0]);
+	assert(info == data.size());
+}
+
+#define FRONTEND_RECEIVE_RANGE_IMPL(type)                      \
+void mpi::Frontend::receive(u32 rank, Range<type> &data) const \
+{                                                              \
+  mut<type> buf[3];                                            \
+  auto info = this->receive(rank, 3, buf);                     \
+                                                               \
+  if (info == 0) {                                             \
+    return;                                                    \
+  } else {                                                     \
+    assert(info == 3);                                         \
+  }                                                            \
+                                                               \
+  data.min = buf[0];                                           \
+  data.max = buf[1];                                           \
+  data.step = buf[2];                                          \
+}
+
+FRONTEND_RECEIVE_RANGE_IMPL(u8)
+FRONTEND_RECEIVE_RANGE_IMPL(u16)
+FRONTEND_RECEIVE_RANGE_IMPL(u32)
+FRONTEND_RECEIVE_RANGE_IMPL(u64)
+FRONTEND_RECEIVE_RANGE_IMPL(s8)
+FRONTEND_RECEIVE_RANGE_IMPL(s16)
+FRONTEND_RECEIVE_RANGE_IMPL(s32)
+FRONTEND_RECEIVE_RANGE_IMPL(s64)
+FRONTEND_RECEIVE_RANGE_IMPL(char)
+FRONTEND_RECEIVE_RANGE_IMPL(f32)
+FRONTEND_RECEIVE_RANGE_IMPL(f64)
+FRONTEND_RECEIVE_RANGE_IMPL(f128)
+
+#undef FRONTEND_RECEIVE_RANGE_IMPL
 
 //
 // Broadcasts:
