@@ -254,6 +254,12 @@ void mpi::Frontend::send([[maybe_unused]] u32 rank,
 
 #undef CALL_SYNC_MPI_SEND
 
+void mpi::Frontend::send(u32 rank, u32 count, const nist::Isotope data[]) const
+{
+	u16 *buf = reinterpret_cast<u16*>(&data[0]);
+	this->send(rank, count, buf);
+}
+
 void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] u8 data) const
 {
@@ -322,6 +328,11 @@ void mpi::Frontend::send([[maybe_unused]] u32 rank,
 
 void mpi::Frontend::send([[maybe_unused]] u32 rank,
                          [[maybe_unused]] f128 data) const
+{
+	this->send(rank, 1, &data);
+}
+
+void mpi::Frontend::send(u32 rank, const nist::Isotope data) const
 {
 	this->send(rank, 1, &data);
 }
@@ -616,6 +627,12 @@ u32 mpi::Frontend::receive([[maybe_unused]] u32 rank,
 
 #undef CALL_SYNC_MPI_RECEIVE
 
+u32 mpi::Frontend::receive(u32 rank, u32 count, nist::Isotope data[]) const
+{
+	mut<u16> *buf = reinterpret_cast<mut<u16>*>(&data[0]);
+	return this->receive(rank, count, buf);
+}
+
 void mpi::Frontend::receive([[maybe_unused]] u32 rank,
                             [[maybe_unused]] mut<u8> &data) const
 {
@@ -695,6 +712,12 @@ void mpi::Frontend::receive([[maybe_unused]] u32 rank,
 
 void mpi::Frontend::receive([[maybe_unused]] u32 rank,
                             [[maybe_unused]] mut<f128> &data) const
+{
+	u32 info = this->receive(rank, 1, &data);
+	assert((info == 0) || (info == 1));
+}
+
+void mpi::Frontend::receive(u32 rank, nist::Isotope &data) const
 {
 	u32 info = this->receive(rank, 1, &data);
 	assert((info == 0) || (info == 1));
@@ -965,6 +988,12 @@ void mpi::Frontend::broadcast([[maybe_unused]] u32 rank,
 
 #undef CALL_MPI_BROADCAST
 
+void mpi::Frontend::broadcast(u32 rank, u32 count, nist::Isotope data[]) const
+{
+	mut<u16> *buf = reinterpret_cast<mut<u16>*>(&data[0]);
+	this->broadcast(rank, count, buf);
+}
+
 #define FRONTEND_VECTOR_BROADCAST_IMPL(type)                   \
 void mpi::Frontend::broadcast(u32 rank, Vec<type> &data) const \
 {                                                              \
@@ -983,6 +1012,7 @@ FRONTEND_VECTOR_BROADCAST_IMPL(char)
 FRONTEND_VECTOR_BROADCAST_IMPL(f32)
 FRONTEND_VECTOR_BROADCAST_IMPL(f64)
 FRONTEND_VECTOR_BROADCAST_IMPL(f128)
+FRONTEND_VECTOR_BROADCAST_IMPL(nist::Isotope)
 
 #undef FRONTEND_VECTOR_BROADCAST_IMPL
 

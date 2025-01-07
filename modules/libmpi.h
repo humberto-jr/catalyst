@@ -3,6 +3,7 @@
 	#include "essentials.h"
 	#include "struct.h"
 	#include "input.h"
+	#include "nist.h"
 	#include <optional>
 
 	namespace mpi {
@@ -102,6 +103,8 @@
 
 			void send(u32 rank, u32 count, f128 data[]) const;
 
+			void send(u32 rank, u32 count, const nist::Isotope data[]) const;
+
 			void send(u32 rank, u8 data) const;
 
 			void send(u32 rank, u16 data) const;
@@ -125,6 +128,8 @@
 			void send(u32 rank, f64 data) const;
 
 			void send(u32 rank, f128 data) const;
+
+			void send(u32 rank, const nist::Isotope data) const;
 
 			void send(u32 rank, const Vec<u8> &data) const;
 
@@ -214,6 +219,8 @@
 
 			u32 receive(u32 rank, u32 count, mut<f128> data[]) const;
 
+			u32 receive(u32 rank, u32 count, nist::Isotope data[]) const;
+
 			void receive(u32 rank, mut<u8> &data) const;
 
 			void receive(u32 rank, mut<u16> &data) const;
@@ -237,6 +244,8 @@
 			void receive(u32 rank, mut<f64> &data) const;
 
 			void receive(u32 rank, mut<f128> &data) const;
+
+			void receive(u32 rank, nist::Isotope &data) const;
 
 			u32 receive(u32 rank, Vec<u8> &data) const;
 
@@ -331,6 +340,8 @@
 
 			void broadcast(u32 rank, u32 count, mut<f128> data[]) const;
 
+			void broadcast(u32 rank, u32 count, nist::Isotope data[]) const;
+
 			void broadcast(u32 rank, Vec<u8> &data) const;
 
 			void broadcast(u32 rank, Vec<u16> &data) const;
@@ -354,6 +365,8 @@
 			void broadcast(u32 rank, Vec<f64> &data) const;
 
 			void broadcast(u32 rank, Vec<f128> &data) const;
+
+			void broadcast(u32 rank, Vec<nist::Isotope> &data) const;
 
 			void gather(u32 rank, u32 count, mut<u8> data[]) const;
 
