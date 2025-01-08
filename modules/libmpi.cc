@@ -1016,6 +1016,11 @@ FRONTEND_VECTOR_BROADCAST_IMPL(nist::Isotope)
 
 #undef FRONTEND_VECTOR_BROADCAST_IMPL
 
+void mpi::Frontend::broadcast(u32 rank, Struct &data) const
+{
+	this->broadcast(rank, as_u32(data.size()), &data[0]);
+}
+
 //
 // Gathers:
 //

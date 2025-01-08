@@ -368,6 +368,8 @@
 
 			void broadcast(u32 rank, Vec<nist::Isotope> &data) const;
 
+			void broadcast(u32 rank, Struct &data) const;
+
 			void gather(u32 rank, u32 count, mut<u8> data[]) const;
 
 			void gather(u32 rank, u32 count, mut<u16> data[]) const;
