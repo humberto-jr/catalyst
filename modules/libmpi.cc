@@ -282,73 +282,29 @@ FRONTEND_SEND_IMPL(const nist::Isotope)
 
 #undef FRONTEND_SEND_IMPL
 
-// NOTE: For use inside mpi::Frontend::send() methods only.
-#define SEND_VECTOR_DATA(rank, data)         \
-{                                            \
-  usize len = data.length();                 \
-  this->send((rank), 1, &len);               \
-  this->send((rank), as_u32(len), &data[0]); \
+#define FRONTEND_SEND_IMPL(type)                                \
+void mpi::Frontend::send(u32 rank, const Vec<type> &data) const \
+{                                                               \
+  usize len = data.length();                                    \
+  this->send(rank, 1, &len);                                    \
+  this->send(rank, as_u32(len), &data[0]);                      \
 }
 
-void mpi::Frontend::send(u32 rank, const Vec<u8> &data) const
-{
-	SEND_VECTOR_DATA(rank, data)
-}
+FRONTEND_SEND_IMPL(u8)
+FRONTEND_SEND_IMPL(u16)
+FRONTEND_SEND_IMPL(u32)
+FRONTEND_SEND_IMPL(u64)
+FRONTEND_SEND_IMPL(s8)
+FRONTEND_SEND_IMPL(s16)
+FRONTEND_SEND_IMPL(s32)
+FRONTEND_SEND_IMPL(s64)
+FRONTEND_SEND_IMPL(char)
+FRONTEND_SEND_IMPL(f32)
+FRONTEND_SEND_IMPL(f64)
+FRONTEND_SEND_IMPL(f128)
+FRONTEND_SEND_IMPL(nist::Isotope)
 
-void mpi::Frontend::send(u32 rank, const Vec<u16> &data) const
-{
-	SEND_VECTOR_DATA(rank, data)
-}
-
-void mpi::Frontend::send(u32 rank, const Vec<u32> &data) const
-{
-	SEND_VECTOR_DATA(rank, data)
-}
-
-void mpi::Frontend::send(u32 rank, const Vec<u64> &data) const
-{
-	SEND_VECTOR_DATA(rank, data)
-}
-
-void mpi::Frontend::send(u32 rank, const Vec<s8> &data) const
-{
-	SEND_VECTOR_DATA(rank, data)
-}
-
-void mpi::Frontend::send(u32 rank, const Vec<s16> &data) const
-{
-	SEND_VECTOR_DATA(rank, data)
-}
-
-void mpi::Frontend::send(u32 rank, const Vec<s32> &data) const
-{
-	SEND_VECTOR_DATA(rank, data)
-}
-
-void mpi::Frontend::send(u32 rank, const Vec<s64> &data) const
-{
-	SEND_VECTOR_DATA(rank, data)
-}
-
-void mpi::Frontend::send(u32 rank, const Vec<char> &data) const
-{
-	SEND_VECTOR_DATA(rank, data)
-}
-
-void mpi::Frontend::send(u32 rank, const Vec<f32> &data) const
-{
-	SEND_VECTOR_DATA(rank, data)
-}
-
-void mpi::Frontend::send(u32 rank, const Vec<f64> &data) const
-{
-	SEND_VECTOR_DATA(rank, data)
-}
-
-void mpi::Frontend::send(u32 rank, const Vec<f128> &data) const
-{
-	SEND_VECTOR_DATA(rank, data)
-}
+#undef FRONTEND_SEND_IMPL
 
 void mpi::Frontend::send(u32 rank, const String &data) const
 {
@@ -601,81 +557,37 @@ FRONTEND_RECEIVE_IMPL(nist::Isotope)
 
 #undef FRONTEND_RECEIVE_IMPL
 
-// NOTE: For use inside mpi::Frontend::receive() methods only.
-#define RECEIVE_VECTOR_DATA(rank, data)                    \
-{                                                          \
-  mut<usize> new_len = 0;                                  \
-                                                           \
-  mut<u32> info = this->receive((rank), 1, &new_len);      \
-                                                           \
-  if (new_len > data.length()) {                           \
-    data.resize(new_len);                                  \
-  }                                                        \
-                                                           \
-  info = this->receive((rank), as_u32(new_len), &data[0]); \
-                                                           \
-  return info;                                             \
+#define FRONTEND_RECEIVE_IMPL(type)                         \
+u32 mpi::Frontend::receive(u32 rank, Vec<type> &data) const \
+{                                                           \
+  mut<usize> new_len = 0;                                   \
+                                                            \
+  mut<u32> info = this->receive(rank, 1, &new_len);         \
+                                                            \
+  if (new_len > data.length()) {                            \
+    data.resize(new_len);                                   \
+  }                                                         \
+                                                            \
+  info = this->receive(rank, as_u32(new_len), &data[0]);    \
+                                                            \
+  return info;                                              \
 }
 
-u32 mpi::Frontend::receive(u32 rank, Vec<u8> &data) const
-{
-	RECEIVE_VECTOR_DATA(rank, data)
-}
+FRONTEND_RECEIVE_IMPL(u8)
+FRONTEND_RECEIVE_IMPL(u16)
+FRONTEND_RECEIVE_IMPL(u32)
+FRONTEND_RECEIVE_IMPL(u64)
+FRONTEND_RECEIVE_IMPL(s8)
+FRONTEND_RECEIVE_IMPL(s16)
+FRONTEND_RECEIVE_IMPL(s32)
+FRONTEND_RECEIVE_IMPL(s64)
+FRONTEND_RECEIVE_IMPL(char)
+FRONTEND_RECEIVE_IMPL(f32)
+FRONTEND_RECEIVE_IMPL(f64)
+FRONTEND_RECEIVE_IMPL(f128)
+FRONTEND_RECEIVE_IMPL(nist::Isotope)
 
-u32 mpi::Frontend::receive(u32 rank, Vec<u16> &data) const
-{
-	RECEIVE_VECTOR_DATA(rank, data)
-}
-
-u32 mpi::Frontend::receive(u32 rank, Vec<u32> &data) const
-{
-	RECEIVE_VECTOR_DATA(rank, data)
-}
-
-u32 mpi::Frontend::receive(u32 rank, Vec<u64> &data) const
-{
-	RECEIVE_VECTOR_DATA(rank, data)
-}
-
-u32 mpi::Frontend::receive(u32 rank, Vec<s8> &data) const
-{
-	RECEIVE_VECTOR_DATA(rank, data)
-}
-
-u32 mpi::Frontend::receive(u32 rank, Vec<s16> &data) const
-{
-	RECEIVE_VECTOR_DATA(rank, data)
-}
-
-u32 mpi::Frontend::receive(u32 rank, Vec<s32> &data) const
-{
-	RECEIVE_VECTOR_DATA(rank, data)
-}
-
-u32 mpi::Frontend::receive(u32 rank, Vec<s64> &data) const
-{
-	RECEIVE_VECTOR_DATA(rank, data)
-}
-
-u32 mpi::Frontend::receive(u32 rank, Vec<char> &data) const
-{
-	RECEIVE_VECTOR_DATA(rank, data);
-}
-
-u32 mpi::Frontend::receive(u32 rank, Vec<f32> &data) const
-{
-	RECEIVE_VECTOR_DATA(rank, data);
-}
-
-u32 mpi::Frontend::receive(u32 rank, Vec<f64> &data) const
-{
-	RECEIVE_VECTOR_DATA(rank, data);
-}
-
-u32 mpi::Frontend::receive(u32 rank, Vec<f128> &data) const
-{
-	RECEIVE_VECTOR_DATA(rank, data);
-}
+#undef FRONTEND_RECEIVE_IMPL
 
 void mpi::Frontend::receive(u32 rank, String &data) const
 {
@@ -697,8 +609,8 @@ void mpi::Frontend::receive(u32 rank, String &data) const
 
 void mpi::Frontend::receive(u32 rank, Struct &data) const
 {
-	usize info = this->receive(rank, as_u32(data.size()), &data[0]);
-	assert(info == data.size());
+	u32 info = this->receive(rank, as_u32(data.size()), &data[0]);
+	assert((info == 0) || (as_usize(info) == data.size()));
 }
 
 #define FRONTEND_RECEIVE_RANGE_IMPL(type)                      \

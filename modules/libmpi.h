@@ -155,6 +155,8 @@
 
 			void send(u32 rank, const Vec<f128> &data) const;
 
+			void send(u32 rank, const Vec<nist::Isotope> &data) const;
+
 			void send(u32 rank, const String &data) const;
 
 			void send(u32 rank, const Struct &data) const;
@@ -270,6 +272,8 @@
 			u32 receive(u32 rank, Vec<f64> &data) const;
 
 			u32 receive(u32 rank, Vec<f128> &data) const;
+
+			u32 receive(u32 rank, Vec<nist::Isotope> &data) const;
 
 			void receive(u32 rank, String &data) const;
 
