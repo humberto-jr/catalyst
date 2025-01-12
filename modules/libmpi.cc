@@ -306,6 +306,30 @@ FRONTEND_SEND_IMPL(nist::Isotope)
 
 #undef FRONTEND_SEND_IMPL
 
+#define FRONTEND_SEND_IMPL(type)                                \
+void mpi::Frontend::send(u32 rank, const Mat<type> &data) const \
+{                                                               \
+  usize len = data.length();                                    \
+  this->send(rank, 1, &len);                                    \
+  this->send(rank, as_u32(len), &data[0]);                      \
+}
+
+FRONTEND_SEND_IMPL(u8)
+FRONTEND_SEND_IMPL(u16)
+FRONTEND_SEND_IMPL(u32)
+FRONTEND_SEND_IMPL(u64)
+FRONTEND_SEND_IMPL(s8)
+FRONTEND_SEND_IMPL(s16)
+FRONTEND_SEND_IMPL(s32)
+FRONTEND_SEND_IMPL(s64)
+FRONTEND_SEND_IMPL(char)
+FRONTEND_SEND_IMPL(f32)
+FRONTEND_SEND_IMPL(f64)
+FRONTEND_SEND_IMPL(f128)
+FRONTEND_SEND_IMPL(nist::Isotope)
+
+#undef FRONTEND_SEND_IMPL
+
 void mpi::Frontend::send(u32 rank, const String &data) const
 {
 	// NOTE: The string and the null-terminator character are sent.
@@ -319,27 +343,27 @@ void mpi::Frontend::send(u32 rank, const Struct &data) const
 	this->send(rank, as_u32(data.size()), &data[0]);
 }
 
-#define FRONTEND_SEND_RANGE_IMPL(type)                            \
+#define FRONTEND_SEND_IMPL(type)                                  \
 void mpi::Frontend::send(u32 rank, const Range<type> &data) const \
 {                                                                 \
   type buf[3] = {data.min, data.max, data.step};                  \
   this->send(rank, 3, buf);                                       \
 }
 
-FRONTEND_SEND_RANGE_IMPL(u8)
-FRONTEND_SEND_RANGE_IMPL(u16)
-FRONTEND_SEND_RANGE_IMPL(u32)
-FRONTEND_SEND_RANGE_IMPL(u64)
-FRONTEND_SEND_RANGE_IMPL(s8)
-FRONTEND_SEND_RANGE_IMPL(s16)
-FRONTEND_SEND_RANGE_IMPL(s32)
-FRONTEND_SEND_RANGE_IMPL(s64)
-FRONTEND_SEND_RANGE_IMPL(char)
-FRONTEND_SEND_RANGE_IMPL(f32)
-FRONTEND_SEND_RANGE_IMPL(f64)
-FRONTEND_SEND_RANGE_IMPL(f128)
+FRONTEND_SEND_IMPL(u8)
+FRONTEND_SEND_IMPL(u16)
+FRONTEND_SEND_IMPL(u32)
+FRONTEND_SEND_IMPL(u64)
+FRONTEND_SEND_IMPL(s8)
+FRONTEND_SEND_IMPL(s16)
+FRONTEND_SEND_IMPL(s32)
+FRONTEND_SEND_IMPL(s64)
+FRONTEND_SEND_IMPL(char)
+FRONTEND_SEND_IMPL(f32)
+FRONTEND_SEND_IMPL(f64)
+FRONTEND_SEND_IMPL(f128)
 
-#undef FRONTEND_SEND_RANGE_IMPL
+#undef FRONTEND_SEND_IMPL
 
 //
 // Receives:
@@ -613,7 +637,7 @@ void mpi::Frontend::receive(u32 rank, Struct &data) const
 	assert((info == 0) || (as_usize(info) == data.size()));
 }
 
-#define FRONTEND_RECEIVE_RANGE_IMPL(type)                      \
+#define FRONTEND_RECEIVE_IMPL(type)                            \
 void mpi::Frontend::receive(u32 rank, Range<type> &data) const \
 {                                                              \
   mut<type> buf[3];                                            \
@@ -630,20 +654,20 @@ void mpi::Frontend::receive(u32 rank, Range<type> &data) const \
   data.step = buf[2];                                          \
 }
 
-FRONTEND_RECEIVE_RANGE_IMPL(u8)
-FRONTEND_RECEIVE_RANGE_IMPL(u16)
-FRONTEND_RECEIVE_RANGE_IMPL(u32)
-FRONTEND_RECEIVE_RANGE_IMPL(u64)
-FRONTEND_RECEIVE_RANGE_IMPL(s8)
-FRONTEND_RECEIVE_RANGE_IMPL(s16)
-FRONTEND_RECEIVE_RANGE_IMPL(s32)
-FRONTEND_RECEIVE_RANGE_IMPL(s64)
-FRONTEND_RECEIVE_RANGE_IMPL(char)
-FRONTEND_RECEIVE_RANGE_IMPL(f32)
-FRONTEND_RECEIVE_RANGE_IMPL(f64)
-FRONTEND_RECEIVE_RANGE_IMPL(f128)
+FRONTEND_RECEIVE_IMPL(u8)
+FRONTEND_RECEIVE_IMPL(u16)
+FRONTEND_RECEIVE_IMPL(u32)
+FRONTEND_RECEIVE_IMPL(u64)
+FRONTEND_RECEIVE_IMPL(s8)
+FRONTEND_RECEIVE_IMPL(s16)
+FRONTEND_RECEIVE_IMPL(s32)
+FRONTEND_RECEIVE_IMPL(s64)
+FRONTEND_RECEIVE_IMPL(char)
+FRONTEND_RECEIVE_IMPL(f32)
+FRONTEND_RECEIVE_IMPL(f64)
+FRONTEND_RECEIVE_IMPL(f128)
 
-#undef FRONTEND_RECEIVE_RANGE_IMPL
+#undef FRONTEND_RECEIVE_IMPL
 
 //
 // Broadcasts:
@@ -784,27 +808,27 @@ void mpi::Frontend::broadcast(u32 rank, u32 count, nist::Isotope data[]) const
 	this->broadcast(rank, count, buf);
 }
 
-#define FRONTEND_VECTOR_BROADCAST_IMPL(type)                   \
+#define FRONTEND_BROADCAST_IMPL(type)                          \
 void mpi::Frontend::broadcast(u32 rank, Vec<type> &data) const \
 {                                                              \
   this->broadcast(rank, as_u32(data.length()), &data[0]);      \
 }
 
-FRONTEND_VECTOR_BROADCAST_IMPL(u8)
-FRONTEND_VECTOR_BROADCAST_IMPL(u16)
-FRONTEND_VECTOR_BROADCAST_IMPL(u32)
-FRONTEND_VECTOR_BROADCAST_IMPL(u64)
-FRONTEND_VECTOR_BROADCAST_IMPL(s8)
-FRONTEND_VECTOR_BROADCAST_IMPL(s16)
-FRONTEND_VECTOR_BROADCAST_IMPL(s32)
-FRONTEND_VECTOR_BROADCAST_IMPL(s64)
-FRONTEND_VECTOR_BROADCAST_IMPL(char)
-FRONTEND_VECTOR_BROADCAST_IMPL(f32)
-FRONTEND_VECTOR_BROADCAST_IMPL(f64)
-FRONTEND_VECTOR_BROADCAST_IMPL(f128)
-FRONTEND_VECTOR_BROADCAST_IMPL(nist::Isotope)
+FRONTEND_BROADCAST_IMPL(u8)
+FRONTEND_BROADCAST_IMPL(u16)
+FRONTEND_BROADCAST_IMPL(u32)
+FRONTEND_BROADCAST_IMPL(u64)
+FRONTEND_BROADCAST_IMPL(s8)
+FRONTEND_BROADCAST_IMPL(s16)
+FRONTEND_BROADCAST_IMPL(s32)
+FRONTEND_BROADCAST_IMPL(s64)
+FRONTEND_BROADCAST_IMPL(char)
+FRONTEND_BROADCAST_IMPL(f32)
+FRONTEND_BROADCAST_IMPL(f64)
+FRONTEND_BROADCAST_IMPL(f128)
+FRONTEND_BROADCAST_IMPL(nist::Isotope)
 
-#undef FRONTEND_VECTOR_BROADCAST_IMPL
+#undef FRONTEND_BROADCAST_IMPL
 
 void mpi::Frontend::broadcast(u32 rank, Struct &data) const
 {

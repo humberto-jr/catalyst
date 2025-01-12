@@ -157,6 +157,32 @@
 
 			void send(u32 rank, const Vec<nist::Isotope> &data) const;
 
+			void send(u32 rank, const Mat<u8> &data) const;
+
+			void send(u32 rank, const Mat<u16> &data) const;
+
+			void send(u32 rank, const Mat<u32> &data) const;
+
+			void send(u32 rank, const Mat<u64> &data) const;
+
+			void send(u32 rank, const Mat<s8> &data) const;
+
+			void send(u32 rank, const Mat<s16> &data) const;
+
+			void send(u32 rank, const Mat<s32> &data) const;
+
+			void send(u32 rank, const Mat<s64> &data) const;
+
+			void send(u32 rank, const Mat<char> &data) const;
+
+			void send(u32 rank, const Mat<f32> &data) const;
+
+			void send(u32 rank, const Mat<f64> &data) const;
+
+			void send(u32 rank, const Mat<f128> &data) const;
+
+			void send(u32 rank, const Mat<nist::Isotope> &data) const;
+
 			void send(u32 rank, const String &data) const;
 
 			void send(u32 rank, const Struct &data) const;
