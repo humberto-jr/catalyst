@@ -217,12 +217,6 @@
 				this->send(rank, as_u32(data.len), &data.buf[0]);
 			}
 
-			template<typename T>
-			void send(u32 rank, const Mat<T> &data) const
-			{
-				this->send(rank, as_u32(data.rows()*data.cols()), &data[0]);
-			}
-
 			u32 receive(u32 rank, u32 count, mut<u8> data[]) const;
 
 			u32 receive(u32 rank, u32 count, mut<u16> data[]) const;
