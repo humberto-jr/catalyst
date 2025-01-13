@@ -309,9 +309,11 @@ FRONTEND_SEND_IMPL(nist::Isotope)
 #define FRONTEND_SEND_IMPL(type)                                \
 void mpi::Frontend::send(u32 rank, const Mat<type> &data) const \
 {                                                               \
-  usize len = data.length();                                    \
-  this->send(rank, 1, &len);                                    \
-  this->send(rank, as_u32(len), &data[0]);                      \
+  usize rows = data.rows();                                     \
+  usize cols = data.cols();                                     \
+  this->send(rank, 1, &rows);                                   \
+  this->send(rank, 1, &cols);                                   \
+  this->send(rank, as_u32(rows*cols), &data[0]);                \
 }
 
 FRONTEND_SEND_IMPL(u8)
@@ -584,15 +586,58 @@ FRONTEND_RECEIVE_IMPL(nist::Isotope)
 #define FRONTEND_RECEIVE_IMPL(type)                         \
 u32 mpi::Frontend::receive(u32 rank, Vec<type> &data) const \
 {                                                           \
+  mut<u32> info = 0;                                        \
   mut<usize> new_len = 0;                                   \
                                                             \
-  mut<u32> info = this->receive(rank, 1, &new_len);         \
+  info = this->receive(rank, 1, &new_len);                  \
+                                                            \
+  if (info == 0) {                                          \
+    return 0;                                               \
+  }                                                         \
                                                             \
   if (new_len > data.length()) {                            \
     data.resize(new_len);                                   \
   }                                                         \
                                                             \
   info = this->receive(rank, as_u32(new_len), &data[0]);    \
+                                                            \
+  return info;                                              \
+}
+
+FRONTEND_RECEIVE_IMPL(u8)
+FRONTEND_RECEIVE_IMPL(u16)
+FRONTEND_RECEIVE_IMPL(u32)
+FRONTEND_RECEIVE_IMPL(u64)
+FRONTEND_RECEIVE_IMPL(s8)
+FRONTEND_RECEIVE_IMPL(s16)
+FRONTEND_RECEIVE_IMPL(s32)
+FRONTEND_RECEIVE_IMPL(s64)
+FRONTEND_RECEIVE_IMPL(char)
+FRONTEND_RECEIVE_IMPL(f32)
+FRONTEND_RECEIVE_IMPL(f64)
+FRONTEND_RECEIVE_IMPL(f128)
+FRONTEND_RECEIVE_IMPL(nist::Isotope)
+
+#undef FRONTEND_RECEIVE_IMPL
+
+#define FRONTEND_RECEIVE_IMPL(type)                         \
+u32 mpi::Frontend::receive(u32 rank, Mat<type> &data) const \
+{                                                           \
+  mut<u32> info = 0;                                        \
+  mut<usize> rows = 0, cols = 0;                            \
+                                                            \
+  info = this->receive(rank, 1, &rows);                     \
+  info = this->receive(rank, 1, &cols);                     \
+                                                            \
+  if (info == 0) {                                          \
+    return 0;                                               \
+  }                                                         \
+                                                            \
+  if ((rows > data.rows()) || (cols > data.cols())) {       \
+    data.resize(rows, cols);                                \
+  }                                                         \
+                                                            \
+  info = this->receive(rank, as_u32(rows*cols), &data[0]);  \
                                                             \
   return info;                                              \
 }

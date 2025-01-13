@@ -295,6 +295,32 @@
 
 			u32 receive(u32 rank, Vec<nist::Isotope> &data) const;
 
+			u32 receive(u32 rank, Mat<u8> &data) const;
+
+			u32 receive(u32 rank, Mat<u16> &data) const;
+
+			u32 receive(u32 rank, Mat<u32> &data) const;
+
+			u32 receive(u32 rank, Mat<u64> &data) const;
+
+			u32 receive(u32 rank, Mat<s8> &data) const;
+
+			u32 receive(u32 rank, Mat<s16> &data) const;
+
+			u32 receive(u32 rank, Mat<s32> &data) const;
+
+			u32 receive(u32 rank, Mat<s64> &data) const;
+
+			u32 receive(u32 rank, Mat<char> &data) const;
+
+			u32 receive(u32 rank, Mat<f32> &data) const;
+
+			u32 receive(u32 rank, Mat<f64> &data) const;
+
+			u32 receive(u32 rank, Mat<f128> &data) const;
+
+			u32 receive(u32 rank, Mat<nist::Isotope> &data) const;
+
 			void receive(u32 rank, String &data) const;
 
 			void receive(u32 rank, Struct &data) const;
