@@ -355,13 +355,6 @@
 				data.len = as_usize(this->receive(rank, LEN, &data.buf[0]));
 			}
 
-			template<typename T>
-			void receive(u32 rank, Mat<T> &data) const
-			{
-				auto info = this->receive(rank, as_u32(data.rows()*data.cols()), &data[0]);
-				assert(as_usize(info) == data.rows()*data.cols());
-			}
-
 			// NOTE: While the MPI broadcasts and gathers appear to be thread-safe,
 			// they are used herein with the same group communicator and, therefore,
 			// are also bound to OpenMP critical regions.
