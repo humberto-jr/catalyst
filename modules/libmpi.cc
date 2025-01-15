@@ -875,6 +875,38 @@ FRONTEND_BROADCAST_IMPL(nist::Isotope)
 
 #undef FRONTEND_BROADCAST_IMPL
 
+#define FRONTEND_BROADCAST_IMPL(type)                                             \
+void mpi::Frontend::broadcast(u32 rank, Mat<type> &data) const                    \
+{                                                                                 \
+  mut<usize> rows = (this->rank() == rank? data.rows() : 0);                      \
+  mut<usize> cols = (this->rank() == rank? data.cols() : 0);                      \
+                                                                                  \
+  this->broadcast(rank, 1, &rows);                                                \
+  this->broadcast(rank, 1, &cols);                                                \
+                                                                                  \
+  if ((this->rank() != rank) && ((rows > data.rows()) || (cols > data.cols()))) { \
+    data.resize(rows, cols);                                                      \
+  }                                                                               \
+                                                                                  \
+  this->broadcast(rank, as_u32(rows*cols), &data[0]);                             \
+}
+
+FRONTEND_BROADCAST_IMPL(u8)
+FRONTEND_BROADCAST_IMPL(u16)
+FRONTEND_BROADCAST_IMPL(u32)
+FRONTEND_BROADCAST_IMPL(u64)
+FRONTEND_BROADCAST_IMPL(s8)
+FRONTEND_BROADCAST_IMPL(s16)
+FRONTEND_BROADCAST_IMPL(s32)
+FRONTEND_BROADCAST_IMPL(s64)
+FRONTEND_BROADCAST_IMPL(char)
+FRONTEND_BROADCAST_IMPL(f32)
+FRONTEND_BROADCAST_IMPL(f64)
+FRONTEND_BROADCAST_IMPL(f128)
+FRONTEND_BROADCAST_IMPL(nist::Isotope)
+
+#undef FRONTEND_BROADCAST_IMPL
+
 void mpi::Frontend::broadcast(u32 rank, Struct &data) const
 {
 	this->broadcast(rank, as_u32(data.size()), &data[0]);
