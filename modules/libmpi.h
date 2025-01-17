@@ -437,6 +437,8 @@
 
 			void broadcast(u32 rank, Mat<nist::Isotope> &data) const;
 
+			void broadcast(u32 rank, String &data) const;
+
 			void broadcast(u32 rank, Struct &data) const;
 
 			void gather(u32 rank, u32 count, mut<u8> data[]) const;

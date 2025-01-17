@@ -907,6 +907,23 @@ FRONTEND_BROADCAST_IMPL(nist::Isotope)
 
 #undef FRONTEND_BROADCAST_IMPL
 
+void mpi::Frontend::broadcast(u32 rank, String &data) const
+{
+	mut<usize> len = (this->rank() == rank? data.length() + 1 : 0);
+
+	this->broadcast(rank, 1, &len);
+
+	if (this->rank() != rank) {
+		data.clear();
+
+		if (len > data.capacity()) {
+			data.resize(len);
+		}
+	}
+
+	this->broadcast(rank, as_u32(len), data.as_ptr());
+}
+
 void mpi::Frontend::broadcast(u32 rank, Struct &data) const
 {
 	this->broadcast(rank, as_u32(data.size()), &data[0]);
