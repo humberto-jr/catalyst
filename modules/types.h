@@ -367,6 +367,18 @@
 	}
 
 	template<typename T>
+	static constexpr bool is_unsigned()
+	{
+		return (
+		        is_u8<T>()
+		     || is_u16<T>()
+		     || is_u32<T>()
+		     || is_u64<T>()
+		     || is_usize<T>()
+		);
+	}
+
+	template<typename T>
 	static constexpr bool is_floating_point()
 	{
 		return (
