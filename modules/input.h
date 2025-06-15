@@ -276,6 +276,21 @@
 			return input;
 		}
 
+		static inline auto toml_node(c_str block0)
+		{
+			return toml_table()[block0];
+		}
+
+		static inline auto toml_node(c_str block0, c_str block1)
+		{
+			return toml_table()[block0][block1];
+		}
+
+		static inline auto toml_node(c_str block0, c_str block1, c_str block2)
+		{
+			return toml_table()[block0][block1][block2];
+		}
+
 		template<typename T>
 		static T toml(c_str block, c_str key, T min, T max, T val)
 		{
