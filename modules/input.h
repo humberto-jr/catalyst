@@ -292,6 +292,114 @@
 		}
 
 		template<typename T>
+		static T toml_value(c_str block0, T val)
+		{
+			static_assert(is_integer<T>() || is_floating_point<T>());
+
+			auto node = toml_node(block0);
+
+			if (node.type() == toml::node_type::none) {
+				return val;
+			}
+
+			mut<T> entry = static_cast<T>(0);
+
+			if constexpr(is_integer<T>()) {
+				if (node.type() != toml::node_type::integer) {
+					print::error(WHERE, "Expecting an integer value at ", block0);
+				}
+
+				if (is_unsigned<T>() && (node.ref<s64>() < 0)) {
+					print::error(WHERE, "Expecting an unsigned value at ", block0);
+				}
+
+				entry = static_cast<T>(node.ref<s64>());
+			}
+
+			if constexpr(is_floating_point<T>()) {
+				if (node.type() != toml::node_type::floating_point) {
+					print::error(WHERE, "Expecting a floating point value at ", block0);
+				}
+
+				entry = static_cast<T>(node.ref<f64>());
+			}
+
+			return entry;
+		}
+
+		template<typename T>
+		static T toml_value(c_str block0, c_str block1, T val)
+		{
+			static_assert(is_integer<T>() || is_floating_point<T>());
+
+			auto node = toml_node(block0, block1);
+
+			if (node.type() == toml::node_type::none) {
+				return val;
+			}
+
+			mut<T> entry = static_cast<T>(0);
+
+			if constexpr(is_integer<T>()) {
+				if (node.type() != toml::node_type::integer) {
+					print::error(WHERE, "Expecting an integer value at ", block0, '.', block1);
+				}
+
+				if (is_unsigned<T>() && (node.ref<s64>() < 0)) {
+					print::error(WHERE, "Expecting an unsigned value at ", block0, '.', block1);
+				}
+
+				entry = static_cast<T>(node.ref<s64>());
+			}
+
+			if constexpr(is_floating_point<T>()) {
+				if (node.type() != toml::node_type::floating_point) {
+					print::error(WHERE, "Expecting a floating point value at ", block0, '.', block1);
+				}
+
+				entry = static_cast<T>(node.ref<f64>());
+			}
+
+			return entry;
+		}
+
+		template<typename T>
+		static T toml_value(c_str block0, c_str block1, c_str block2, T val)
+		{
+			static_assert(is_integer<T>() || is_floating_point<T>());
+
+			auto node = toml_node(block0, block1, block2);
+
+			if (node.type() == toml::node_type::none) {
+				return val;
+			}
+
+			mut<T> entry = static_cast<T>(0);
+
+			if constexpr(is_integer<T>()) {
+				if (node.type() != toml::node_type::integer) {
+					print::error(WHERE, "Expecting an integer value at ", block0, '.', block1, '.', block2);
+				}
+
+				if (is_unsigned<T>() && (node.ref<s64>() < 0)) {
+					print::error(WHERE, "Expecting an unsigned value at ", block0, '.', block1, '.', block2);
+				}
+
+				entry = static_cast<T>(node.ref<s64>());
+			}
+
+			if constexpr(is_floating_point<T>()) {
+				if (node.type() != toml::node_type::floating_point) {
+					print::error(WHERE, "Expecting a floating point value at ", block0, '.', block1, '.', block2);
+				}
+
+				entry = static_cast<T>(node.ref<f64>());
+			}
+
+			return entry;
+		}
+
+		template<typename T>
 		static T toml(c_str block, c_str key, T min, T max, T val)
 		{
 			static_assert(is_integer<T>() || is_floating_point<T>());
