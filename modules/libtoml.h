@@ -4,7 +4,7 @@
 
 	#define TOML_EXCEPTIONS 0
 
-	#define TOML_ENABLE_FORMATTERS 0
+	#define TOML_ENABLE_FORMATTERS 1
 
 	#define TOML_ASSERT(expr)                                    \
 	{                                                            \
