@@ -1,6 +1,7 @@
 #if !defined(LIBTOML_HEADER)
 	#define LIBTOML_HEADER
 	#include "essentials.h"
+	#include "file.h"
 	#include "nist.h"
 	#include <iostream>
 
@@ -40,17 +41,17 @@
 			#define MEMBER_VALUE_IMPL(type)                                               \
 			inline type value(c_str block0, type dummy) const                             \
 			{                                                                             \
-				return this->node_value<type>(block0, dummy);                              \
+				return this->node_value<type>(block0, dummy);                             \
 			}                                                                             \
 			                                                                              \
 			inline type value(c_str block0, c_str block1, type dummy) const               \
 			{                                                                             \
-				return this->node_value<type>(block0, block1, dummy);                      \
+				return this->node_value<type>(block0, block1, dummy);                     \
 			}                                                                             \
 			                                                                              \
 			inline type value(c_str block0, c_str block1, c_str block2, type dummy) const \
 			{                                                                             \
-				return this->node_value<type>(block0, block1, block2, dummy);              \
+				return this->node_value<type>(block0, block1, block2, dummy);             \
 			}
 
 			MEMBER_VALUE_IMPL(bool)
@@ -73,41 +74,41 @@
 			#define MEMBER_VALUE_IMPL(type)                                                            \
 			type value(c_str block0, type min, type max, type dummy) const                             \
 			{                                                                                          \
-				type entry = this->value(block0, dummy);                                                \
-				                                                                                        \
-				if (entry < min) {                                                                      \
-					return min;                                                                          \
-				} else if (entry > max) {                                                               \
-					return max;                                                                          \
-				} else {                                                                                \
-					return entry;                                                                        \
-				}                                                                                       \
+				type entry = this->value(block0, dummy);                                               \
+				                                                                                       \
+				if (entry < min) {                                                                     \
+					return min;                                                                        \
+				} else if (entry > max) {                                                              \
+					return max;                                                                        \
+				} else {                                                                               \
+					return entry;                                                                      \
+				}                                                                                      \
 			}                                                                                          \
-                                                                                                    \
+                                                                                                       \
 			type value(c_str block0, c_str block1, type min, type max, type dummy) const               \
 			{                                                                                          \
-				type entry = this->value(block0, block1, dummy);                                        \
-				                                                                                        \
-				if (entry < min) {                                                                      \
-					return min;                                                                          \
-				} else if (entry > max) {                                                               \
-					return max;                                                                          \
-				} else {                                                                                \
-					return entry;                                                                        \
-				}                                                                                       \
+				type entry = this->value(block0, block1, dummy);                                       \
+				                                                                                       \
+				if (entry < min) {                                                                     \
+					return min;                                                                        \
+				} else if (entry > max) {                                                              \
+					return max;                                                                        \
+				} else {                                                                               \
+					return entry;                                                                      \
+				}                                                                                      \
 			}                                                                                          \
-                                                                                                    \
+                                                                                                       \
 			type value(c_str block0, c_str block1, c_str block2, type min, type max, type dummy) const \
 			{                                                                                          \
-				type entry = this->value(block0, block1, block2, dummy);                                \
-				                                                                                        \
-				if (entry < min) {                                                                      \
-					return min;                                                                          \
-				} else if (entry > max) {                                                               \
-					return max;                                                                          \
-				} else {                                                                                \
-					return entry;                                                                        \
-				}                                                                                       \
+				type entry = this->value(block0, block1, block2, dummy);                               \
+				                                                                                       \
+				if (entry < min) {                                                                     \
+					return min;                                                                        \
+				} else if (entry > max) {                                                              \
+					return max;                                                                        \
+				} else {                                                                               \
+					return entry;                                                                      \
+				}                                                                                      \
 			}
 
 			MEMBER_VALUE_IMPL(u8)
@@ -219,23 +220,51 @@
 				return nist::isotope_enum(symbol);
 			}
 
-			#define MEMBER_RANGE_IMPL(type)                                                                     \
-			Range<type> range(c_str block0, type min, type max, type step = static_cast<type>(1))               \
-			{                                                                                                   \
-				type new_min = this->value(block0, "min", min, max, min);                                        \
-				type new_max = this->value(block0, "max", new_min, max, new_min);                                \
-				type new_step = this->value(block0, "step", step);                                               \
-				                                                                                                 \
-				return Range<type>(new_min, new_max, new_step);                                                  \
-			}                                                                                                   \
-                                                                                                             \
-			Range<type> range(c_str block0, c_str block1, type min, type max, type step = static_cast<type>(1)) \
-			{                                                                                                   \
-				type new_min = this->value(block0, block1, "min", min, max, min);                                \
-				type new_max = this->value(block0, block1, "max", new_min, max, new_min);                        \
-				type new_step = this->value(block0, block1, "step", step);                                       \
-				                                                                                                 \
-				return Range<type>(new_min, new_max, new_step);                                                  \
+			inline file::Output output_filename(c_str block0, c_str dummy) const
+			{
+				c_str filename = this->string(block0, "filename", dummy);
+
+				return file::Output(filename);
+			}
+
+			inline file::Output output_filename(c_str block0, c_str block1, c_str dummy) const
+			{
+				c_str filename = this->string(block0, block1, "filename", dummy);
+
+				return file::Output(filename);
+			}
+
+			inline file::Input input_filename(c_str block0, c_str dummy) const
+			{
+				c_str filename = this->string(block0, "filename", dummy);
+
+				return file::Input(filename);
+			}
+
+			inline file::Input input_filename(c_str block0, c_str block1, c_str dummy) const
+			{
+				c_str filename = this->string(block0, block1, "filename", dummy);
+
+				return file::Input(filename);
+			}
+
+			#define MEMBER_RANGE_IMPL(type)                                                                           \
+			Range<type> range(c_str block0, type min, type max, type step = static_cast<type>(1)) const               \
+			{                                                                                                         \
+				type new_min = this->value(block0, "min", min, max, min);                                             \
+				type new_max = this->value(block0, "max", new_min, max, new_min);                                     \
+				type new_step = this->value(block0, "step", step);                                                    \
+				                                                                                                      \
+				return Range<type>(new_min, new_max, new_step);                                                       \
+			}                                                                                                         \
+                                                                                                                      \
+			Range<type> range(c_str block0, c_str block1, type min, type max, type step = static_cast<type>(1)) const \
+			{                                                                                                         \
+				type new_min = this->value(block0, block1, "min", min, max, min);                                     \
+				type new_max = this->value(block0, block1, "max", new_min, max, new_min);                             \
+				type new_step = this->value(block0, block1, "step", step);                                            \
+				                                                                                                      \
+				return Range<type>(new_min, new_max, new_step);                                                       \
 			}
 
 			MEMBER_RANGE_IMPL(u8)
