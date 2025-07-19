@@ -59,10 +59,14 @@
 				return &this->buf[0];
 			}
 
-			void flush(std::FILE *stream = stdout) const
+			void flush(const char prefix = ' ', std::FILE *stream = stdout) const
 			{
 				#pragma omp critical(stream)
-				std::fprintf(stream, "%s\n", this->as_cstr());
+				if (prefix == ' ') {
+					std::fprintf(stream, "%s\n", this->as_cstr());
+				} else {
+					std::fprintf(stream, "%c%s\n", prefix, this->as_cstr());
+				}
 			}
 
 			template<typename T>
@@ -92,59 +96,59 @@
 			blank.flush();
 		}
 
-		template<u8 PAD, usize LEN>
+		template<u8 PAD, char PREFIX = ' ', usize LEN>
 		static void line(const print::Fmt<PAD, LEN> &content)
 		{
-			content.flush();
+			content.flush(PREFIX);
 		}
 
-		template<u8 PAD, usize LEN, typename T>
+		template<u8 PAD, char PREFIX = ' ', usize LEN, typename T>
 		static void line(const print::Fmt<PAD, LEN> &prev, T last)
 		{
 			print::Fmt<PAD> end(last);
-			line(prev + end);
+			line<PAD, PREFIX>(prev + end);
 		}
 
-		template<u8 PAD, usize LEN, typename T, typename... Ts>
+		template<u8 PAD, char PREFIX = ' ', usize LEN, typename T, typename... Ts>
 		static void line(const print::Fmt<PAD, LEN> &prev, T first, Ts... remainder)
 		{
 			print::Fmt<PAD> next(first);
-			line(prev + next, remainder...);
+			line<PAD, PREFIX>(prev + next, remainder...);
 		}
 
-		template<u8 PAD = 1, typename T, typename... Ts>
+		template<u8 PAD = 1, char PREFIX = ' ', typename T, typename... Ts>
 		static void line(T first, Ts... remainder)
 		{
 			print::Fmt<PAD> start(first);
-			line(start, remainder...);
+			line<PAD, PREFIX>(start, remainder...);
 		}
 
-		template<u8 PAD, usize LEN>
+		template<u8 PAD, char PREFIX = ' ', usize LEN>
 		static void error(const print::Fmt<PAD, LEN> &content)
 		{
-			content.flush(stderr);
+			content.flush(PREFIX, stderr);
 			std::exit(EXIT_FAILURE);
 		}
 
-		template<u8 PAD, usize LEN, typename T>
+		template<u8 PAD, char PREFIX = ' ', usize LEN, typename T>
 		static void error(const print::Fmt<PAD, LEN> &prev, T last)
 		{
 			print::Fmt<PAD> end(last);
-			error(prev + end);
+			error<PAD, PREFIX>(prev + end);
 		}
 
-		template<u8 PAD, usize LEN, typename T, typename... Ts>
+		template<u8 PAD, char PREFIX = ' ', usize LEN, typename T, typename... Ts>
 		static void error(const print::Fmt<PAD, LEN> &prev, T first, Ts... remainder)
 		{
 			print::Fmt<PAD> next(first);
-			error(prev + next, remainder...);
+			error<PAD, PREFIX>(prev + next, remainder...);
 		}
 
-		template<u8 PAD = 1, typename T, typename... Ts>
+		template<u8 PAD = 1, char PREFIX = ' ', typename T, typename... Ts>
 		static void error(T first, Ts... remainder)
 		{
 			print::Fmt<PAD> start(first);
-			error(start, remainder...);
+			error<PAD, PREFIX>(start, remainder...);
 		}
 
 		[[maybe_unused]]
