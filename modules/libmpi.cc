@@ -694,9 +694,7 @@ void mpi::Frontend::receive(u32 rank, Range<type> &data) const \
     assert(info == 3);                                         \
   }                                                            \
                                                                \
-  data.min = buf[0];                                           \
-  data.max = buf[1];                                           \
-  data.step = buf[2];                                          \
+  data = Range<type>(buf[0], buf[1], buf[2]);                  \
 }
 
 FRONTEND_RECEIVE_IMPL(u8)

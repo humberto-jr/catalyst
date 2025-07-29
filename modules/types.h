@@ -648,9 +648,9 @@
 
 	template<typename T = usize>
 	struct Range {
-		mut<T> min;
-		mut<T> max;
-		mut<T> step;
+		T min;
+		T max;
+		T step;
 
 		constexpr Range(T start = static_cast<T>(0), T end = static_cast<T>(0), T step = static_cast<T>(1)):
 			min(start), max(end), step(step)
@@ -681,6 +681,11 @@
 		constexpr bool operator==(const Range<T> &rhs) const
 		{
 			return (this->min == rhs.min) && (this->max == rhs.max) && (this->step == rhs.step);
+		}
+
+		constexpr void operator=(const Range<T> &rhs)
+		{
+			*this = Range<T>(rhs.min, rhs.max, rhs.step);
 		}
 
 		constexpr T operator[](usize n) const

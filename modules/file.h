@@ -357,9 +357,7 @@
 
 				this->read_raw<mut<T>>(3, list);
 
-				data.min = list[0];
-				data.max = list[1];
-				data.step = list[2];
+				data = Range<T>(list[0], list[1], list[2]);
 			}
 
 			inline void read(Range<char> &data)
