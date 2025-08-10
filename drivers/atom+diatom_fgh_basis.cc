@@ -1,48 +1,53 @@
 #include "modules/essentials.h"
 #include "modules/liblapack.h"
-#include "user.h"
+#include "modules/libtoml.h"
+#include "modules/fgh.h"
 
 constexpr usize PLACEHOLDER = 0;
 
-int main()
+int main(int argc, char *argv[])
 {
-	//
-	// Rotor quantum numbers:
-	//
+	print::line("# ", argv[0]);
+	print::timestamp();
+	print::line();
 
-	const Range<u32> J_list = user::total_angular_momentum();
-
-	const Range<u32> j_list = user::rotation_quantum_numbers();
-
-	Range<u32> l_list = user::orbital_angular_momentum();
-
-	s32 J_parity = user::parity();
+	toml::Cin toml;
 
 	//
-	// Vibrational grid:
+	// Total angular momentum:
 	//
 
-	const Range<u32> v_list = user::vibration_quantum_numbers();
+	Range<u32> J_list = toml.range("total_angular_momentum", 0u, u32_max);
 
-	const Range<f64> r_list = user::vibration_grid();
-
-	usize size = r_list.count();
+	s32 J_parity = toml.value("total_angular_momentum", "parity", -1, 1, 0);
 
 	//
-	// Arrangement (a = 1, b = 2, c = 3) and PES:
+	// Rovibration diatomic basis:
 	//
 
-	const char arrang = user::arrangement();
+	Range<u32> j_list = toml.range("diatom", "rotation", 0u, u32_max);
 
-	pes::Frontend pes = user::extern_pes();
+	Range<u32> v_list = toml.range("diatom", "vibration", 0u, u32_max);
+
+	//
+	// PES:
+	//
+
+	const char arrang = toml.pes_arrangement();
+
+	pes::Frontend pes = toml.pes_extern_lib();
 
 	f64 mass = (arrang == 'a'? pes.mass_bc() : (arrang == 'b'? pes.mass_ac() : pes.mass_ab()));
 
 	//
-	// Output:
+	// FGH:
 	//
 
-	file::Output basis = user::basis_output_file();
+	Range<f64> r_list = toml.range("fgh", 0.0, f64_max, 0.25);
+
+	file::Output basis = toml.output_filename("fgh", "fgh_basis.bin");
+
+	usize size = r_list.count();
 
 	basis.write(fgh::MAGIC_NUMBER);
 	basis.write(fgh::FORMAT_VERSION);
@@ -53,17 +58,11 @@ int main()
 	// Summary:
 	//
 
-	print::timestamp();
-	print::line("# Atom a: ", pes.atom_a());
-	print::line("# Atom b: ", pes.atom_b());
-	print::line("# Atom c: ", pes.atom_c());
-	print::line("# Arrangement: ", arrang);
-	print::line("# Output file: ", basis.filename.as_cstr());
-	print::line("# PES shared library: ", pes.filename());
+	print::line();
 	print::line("# Diatomic reduc. mass: ", mass, " a.u.");
 	print::line("#");
-	print::line("#     Ch.      J       v       j       l       p         E (a.u.)                      E (cm-1)                      E (eV)");
-	print::line("# ----------------------------------------------------------------------------------------------------------------------------------------");
+	print::line("#      Ch.      J       v       j       l       p         E (a.u.)                      E (cm-1)                      E (eV)");
+	print::line("# -----------------------------------------------------------------------------------------------------------------------------------------");
 
 	//
 	// Resolve the diatomic eigenvalue problem for each j in a given arrangement:
@@ -94,8 +93,7 @@ int main()
 			f64 norm = fgh::norm(r_list.step, eigenvec);
 
 			for (u32 J : J_list.as_range_inclusive()) {
-				l_list.min = std::abs(as_s32(J - j));
-				l_list.max = J + j;
+				Range<u32> l_list(std::abs(as_s32(J - j)), J + j, 1);
 
 				for (u32 l : l_list.as_range_inclusive()) {
 					s32 p = as_s32(std::pow(-1.0, j + l));
@@ -112,10 +110,10 @@ int main()
 						basis.write(eigenval[v]);
 						basis.write(eigenvec);
 
-						print::line<8>(count, J, v, j, l, p,
-						               ' ', eigenval[v],
-						               ' ', eigenval[v]*nist::HARTREE_TO_WAVENUM,
-						               ' ', eigenval[v]*nist::HARTREE_TO_EV);
+						print::line<8, '#'>(count, J, v, j, l, p,
+						                    ' ', eigenval[v],
+						                    ' ', eigenval[v]*nist::HARTREE_TO_WAVENUM,
+						                    ' ', eigenval[v]*nist::HARTREE_TO_EV);
 						++count;
 					}
 				}
