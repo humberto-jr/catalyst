@@ -3,6 +3,7 @@
 	#include "essentials.h"
 	#include "file.h"
 	#include "nist.h"
+	#include "pes.h"
 	#include <iostream>
 
 	#define TOML_EXCEPTIONS 0
@@ -246,6 +247,26 @@
 				c_str filename = this->string(block0, block1, "filename", dummy);
 
 				return file::Input(filename);
+			}
+
+			inline char pes_arrangement() const
+			{
+				return as_char(96 + this->value("pes", "arrang", 1, 3, 1));
+			}
+
+			pes::Frontend pes_extern_lib() const
+			{
+				auto atom_a = this->isotope("pes", "atom_a");
+				auto atom_b = this->isotope("pes", "atom_b");
+				auto atom_c = this->isotope("pes", "atom_c");
+
+				c_str filename = this->string("pes", "extern_lib", "\0");
+
+				if (filename[0] == '\0') {
+					print::error(WHERE, "Expecting the filename of the PES shared library at pes.extern_lib");
+				}
+
+				return pes::Frontend(filename, atom_a, atom_b, atom_c);
 			}
 
 			#define MEMBER_RANGE_IMPL(type)                                                                           \
