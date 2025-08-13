@@ -14,6 +14,16 @@ int main(int argc, char *argv[])
 	toml::Cin toml;
 
 	//
+	// Fine structure:
+	//
+
+	f64 gamma = toml.value("diatom", "fine_struct", "spin_rotation_const", 0.0, f64_max, 0.0);
+
+	f64 lambda = toml.value("diatom", "fine_struct", "spin_spin_const", 0.0, f64_max, 0.0);
+
+	u8 spin_mult = ((gamma > 0.0) && (lambda > 0.0)? 3 : (gamma > 0.0? 2 : 1));
+
+	//
 	// Total angular momentum:
 	//
 
@@ -25,7 +35,7 @@ int main(int argc, char *argv[])
 	// Rovibration diatomic basis:
 	//
 
-	Range<u32> j_list = toml.range("diatom", "rotation", 0u, u32_max);
+	Range<u32> j_list = toml.range("diatom", "rotation", (spin_mult == 1? 0 : 1), u32_max);
 
 	Range<u32> v_list = toml.range("diatom", "vibration", 0u, u32_max);
 
@@ -53,12 +63,15 @@ int main(int argc, char *argv[])
 	basis.write(fgh::FORMAT_VERSION);
 	basis.write(PLACEHOLDER);
 	basis.write(r_list);
+	basis.write(spin_mult);
 
 	//
 	// Summary:
 	//
 
 	print::line();
+	print::line("# Hund's case: (b)");
+	print::line("# Elec. spin multiplicity: ", spin_mult);
 	print::line("# Diatomic reduc. mass: ", mass, " a.u.");
 	print::line("#");
 	print::line("#      Ch.      J       v       j       l       p         E (a.u.)                      E (cm-1)                      E (eV)");
@@ -96,7 +109,7 @@ int main(int argc, char *argv[])
 				Range<u32> l_list(std::abs(as_s32(J - j)), J + j, 1);
 
 				for (u32 l : l_list.as_range_inclusive()) {
-					s32 p = as_s32(std::pow(-1.0, j + l));
+					s32 p = ((j + l)%2 == 0? 1 : -1);
 
 					if ((p == J_parity) || (J_parity == 0)) {
 						basis.write(count);
