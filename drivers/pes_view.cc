@@ -1,50 +1,55 @@
 #include "modules/essentials.h"
-#include "user.h"
+#include "modules/libtoml.h"
+#include "modules/print.h"
 
 #define SHIFT_AND_SCALE(val) (((val) + shift)*scale)
 
 constexpr u8 PAD = 24;
 
-int main()
+int main(int argc, char *argv[])
 {
+	print::line("# ", argv[0]);
+	print::timestamp();
+
+	toml::Cin toml(false);
+
 	//
 	// (r, R, theta)-grid:
 	//
 
-	const Range<f64> r_list = user::vibration_grid();
+	Range<f64> r_list = toml.range("jacobi", "r", 0.0, f64_max);
 
-	const Range<f64> R_list = user::scattering_grid();
+	Range<f64> R_list = toml.range("jacobi", "R", 0.0, f64_max);
 
-	const Range<f64> theta_list = user::polar_angle_grid();
+	Range<f64> theta_list = toml.range("jacobi", "theta", 0.0, 180.0);
 
 	//
 	// Diatomic rotation quantum numbers:
 	//
 
-	const Range<u32> j_list = user::rotation_quantum_numbers();
+	Range<u32> j_list = toml.range("diatom", "rotation", 0u, u32_max);
 
 	//
-	// Arrangement (a = 1, b = 2, c = 3) and PES:
+	// PES:
 	//
 
-	const char arrang = user::arrangement();
+	const char arrang = toml.pes_arrangement();
 
-	pes::Frontend pes = user::extern_pes();
+	pes::Frontend pes = toml.pes_extern_lib();
 
-	const Range<u32> lambda_list = user::multipole_terms(0u);
+	Range<u32> lambda_list = toml.pes_legendre_expansion();
 
 	//
 	// Energy scale and shift:
 	//
 
-	f64 shift = user::energy_shift();
-	f64 scale = user::energy_scale();
+	f64 shift = toml.value("energy", "shift", -f64_max, f64_max, 0.0);
+	f64 scale = toml.value("energy", "scale", -f64_max, f64_max, 1.0);
 
 	//
 	// Summary:
 	//
 
-	print::timestamp();
 	print::line("# Atom a: ", pes.atom_a());
 	print::line("# Atom b: ", pes.atom_b());
 	print::line("# Atom c: ", pes.atom_c());
@@ -62,7 +67,7 @@ int main()
 	//
 
 	if ((lambda_list.count() == 0) && (r_list.count() == 0) && (R_list.count() == 0) && (theta_list.count() > 0)) {
-		print::line<PAD>("# theta", "PES");
+		print::line<PAD, '#'>("theta", "PES");
 
 		for (f64 theta : theta_list.as_range_inclusive()) {
 			f64 v = pes.value(arrang, r_list.min, R_list.min, theta);
@@ -76,7 +81,7 @@ int main()
 	//
 
 	else if ((lambda_list.count() == 0) && (r_list.count() == 0) && (R_list.count() > 0) && (theta_list.count() == 0)) {
-		print::line<PAD>("# R (a.u.)", "PES");
+		print::line<PAD, '#'>("R (a.u.)", "PES");
 
 		for (f64 R : R_list) {
 			f64 v = pes.value(arrang, r_list.min, R, theta_list.min);
@@ -92,7 +97,7 @@ int main()
 	else if ((lambda_list.count() == 0) && (r_list.count() > 0) && (R_list.count() == 0) && (theta_list.count() == 0)) {
 		for (u32 j : j_list) {
 			print::line("# j = ", j);
-			print::line<PAD>("# r (a.u.)", "PES");
+			print::line<PAD, '#'>("r (a.u.)", "PES");
 
 			for (f64 r : r_list) {
 				mut<f64> v = 0.0;
@@ -115,7 +120,7 @@ int main()
 	//
 
 	else if ((lambda_list.count() == 0) && (r_list.count() == 0) && (R_list.count() > 0) && (theta_list.count() > 0)) {
-		print::line<PAD>("# R (a.u.)", "theta", "PES");
+		print::line<PAD, '#'>("R (a.u.)", "theta", "PES");
 
 		for (f64 R : R_list) {
 			for (f64 theta : theta_list.as_range_inclusive()) {
@@ -133,7 +138,7 @@ int main()
 	//
 
 	else if ((lambda_list.count() == 0) && (r_list.count() > 0) && (R_list.count() == 0) && (theta_list.count() > 0)) {
-		print::line<PAD>("# r (a.u.)", "theta", "PES");
+		print::line<PAD, '#'>("r (a.u.)", "theta", "PES");
 
 		for (f64 r : r_list) {
 			for (f64 theta : theta_list.as_range_inclusive()) {
@@ -151,7 +156,7 @@ int main()
 	//
 
 	else if ((lambda_list.count() == 0) && (r_list.count() > 0) && (R_list.count() > 0) && (theta_list.count() == 0)) {
-		print::line<PAD>("# r (a.u.)", "R (a.u.)", "PES");
+		print::line<PAD, '#'>("r (a.u.)", "R (a.u.)", "PES");
 
 		for (f64 r : r_list) {
 			for (f64 R : R_list) {
@@ -172,7 +177,7 @@ int main()
 		for (u32 lambda : lambda_list.as_range_inclusive()) {
 			for (f64 r : r_list) {
 				print::line("# lambda = ", lambda, ", r = ", r, " a.u.");
-				print::line<PAD>("# R (a.u.)", "PES");
+				print::line<PAD, '#'>("R (a.u.)", "PES");
 
 				for (f64 R : R_list) {
 					f64 v = pes.legendre_multipole_term(arrang, lambda, r, R);
@@ -190,7 +195,7 @@ int main()
 	//
 
 	else {
-		print::line<PAD>("# r (a.u.)", "R (a.u.)", "theta", "PES");
+		print::line<PAD, '#'>("r (a.u.)", "R (a.u.)", "theta", "PES");
 
 		for (f64 r : r_list) {
 			for (f64 R : R_list) {
