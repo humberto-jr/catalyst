@@ -269,6 +269,11 @@
 				return pes::Frontend(filename, atom_a, atom_b, atom_c);
 			}
 
+			inline Range<u32> pes_legendre_expansion() const
+			{
+				return this->range("pes", "legendre_expansion", 0u, u32_max);
+			}
+
 			#define MEMBER_RANGE_IMPL(type)                                                                           \
 			Range<type> range(c_str block0, type min, type max, type step = static_cast<type>(1)) const               \
 			{                                                                                                         \
