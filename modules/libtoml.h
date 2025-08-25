@@ -1,6 +1,7 @@
 #if !defined(LIBTOML_HEADER)
 	#define LIBTOML_HEADER
 	#include "essentials.h"
+	#include "libmpi.h"
 	#include "file.h"
 	#include "nist.h"
 	#include "pes.h"
@@ -26,6 +27,11 @@
 			public:
 			Cin(bool verbose = true)
 			{
+				// NOTE: Since the MPI runtime redirects the stdin to rank 0 only, the methods below will allow the
+				// MPI frontend object to broadcast the TOML configuration entries to other ranks. A raw pointer of
+				// the frontend is used instead of a reference so as not to duplicate each version of these methods
+				// unnecessarily. All the logic is handled at runtime, but since we are reading files and sending
+				// data over a network, any extra time added due to the use of raw pointers is likely meaningless.
 				auto parsing = toml::parse(std::cin);
 
 				if (parsing.failed()) {
@@ -39,20 +45,20 @@
 				}
 			}
 
-			#define MEMBER_VALUE_IMPL(type)                                               \
-			inline type value(c_str block0, type dummy) const                             \
-			{                                                                             \
-				return this->node_value<type>(block0, dummy);                             \
-			}                                                                             \
-			                                                                              \
-			inline type value(c_str block0, c_str block1, type dummy) const               \
-			{                                                                             \
-				return this->node_value<type>(block0, block1, dummy);                     \
-			}                                                                             \
-			                                                                              \
-			inline type value(c_str block0, c_str block1, c_str block2, type dummy) const \
-			{                                                                             \
-				return this->node_value<type>(block0, block1, block2, dummy);             \
+			#define MEMBER_VALUE_IMPL(type)                                                                             \
+			inline type value(c_str block0, type dummy, mpi::Frontend *mpi = nullptr) const                             \
+			{                                                                                                           \
+				return this->node_value<type>(block0, dummy, mpi);                                                      \
+			}                                                                                                           \
+			                                                                                                            \
+			inline type value(c_str block0, c_str block1, type dummy, mpi::Frontend *mpi = nullptr) const               \
+			{                                                                                                           \
+				return this->node_value<type>(block0, block1, dummy, mpi);                                              \
+			}                                                                                                           \
+			                                                                                                            \
+			inline type value(c_str block0, c_str block1, c_str block2, type dummy, mpi::Frontend *mpi = nullptr) const \
+			{                                                                                                           \
+				return this->node_value<type>(block0, block1, block2, dummy, mpi);                                      \
 			}
 
 			MEMBER_VALUE_IMPL(bool)
@@ -72,44 +78,44 @@
 			// NOTE: Below, if type is unsigned and any of min, max, or entry were negative,
 			// they are overflown in here and may cause bugs. See more cases below.
 
-			#define MEMBER_VALUE_IMPL(type)                                                            \
-			type value(c_str block0, type min, type max, type dummy) const                             \
-			{                                                                                          \
-				type entry = this->value(block0, dummy);                                               \
-				                                                                                       \
-				if (entry < min) {                                                                     \
-					return min;                                                                        \
-				} else if (entry > max) {                                                              \
-					return max;                                                                        \
-				} else {                                                                               \
-					return entry;                                                                      \
-				}                                                                                      \
-			}                                                                                          \
-                                                                                                       \
-			type value(c_str block0, c_str block1, type min, type max, type dummy) const               \
-			{                                                                                          \
-				type entry = this->value(block0, block1, dummy);                                       \
-				                                                                                       \
-				if (entry < min) {                                                                     \
-					return min;                                                                        \
-				} else if (entry > max) {                                                              \
-					return max;                                                                        \
-				} else {                                                                               \
-					return entry;                                                                      \
-				}                                                                                      \
-			}                                                                                          \
-                                                                                                       \
-			type value(c_str block0, c_str block1, c_str block2, type min, type max, type dummy) const \
-			{                                                                                          \
-				type entry = this->value(block0, block1, block2, dummy);                               \
-				                                                                                       \
-				if (entry < min) {                                                                     \
-					return min;                                                                        \
-				} else if (entry > max) {                                                              \
-					return max;                                                                        \
-				} else {                                                                               \
-					return entry;                                                                      \
-				}                                                                                      \
+			#define MEMBER_VALUE_IMPL(type)                                                                                          \
+			type value(c_str block0, type min, type max, type dummy, mpi::Frontend *mpi = nullptr) const                             \
+			{                                                                                                                        \
+				type entry = this->value(block0, dummy, mpi);                                                                        \
+				                                                                                                                     \
+				if (entry < min) {                                                                                                   \
+					return min;                                                                                                      \
+				} else if (entry > max) {                                                                                            \
+					return max;                                                                                                      \
+				} else {                                                                                                             \
+					return entry;                                                                                                    \
+				}                                                                                                                    \
+			}                                                                                                                        \
+                                                                                                                                     \
+			type value(c_str block0, c_str block1, type min, type max, type dummy, mpi::Frontend *mpi = nullptr) const               \
+			{                                                                                                                        \
+				type entry = this->value(block0, block1, dummy, mpi);                                                                \
+				                                                                                                                     \
+				if (entry < min) {                                                                                                   \
+					return min;                                                                                                      \
+				} else if (entry > max) {                                                                                            \
+					return max;                                                                                                      \
+				} else {                                                                                                             \
+					return entry;                                                                                                    \
+				}                                                                                                                    \
+			}                                                                                                                        \
+                                                                                                                                     \
+			type value(c_str block0, c_str block1, c_str block2, type min, type max, type dummy, mpi::Frontend *mpi = nullptr) const \
+			{                                                                                                                        \
+				type entry = this->value(block0, block1, block2, dummy, mpi);                                                        \
+				                                                                                                                     \
+				if (entry < min) {                                                                                                   \
+					return min;                                                                                                      \
+				} else if (entry > max) {                                                                                            \
+					return max;                                                                                                      \
+				} else {                                                                                                             \
+					return entry;                                                                                                    \
+				}                                                                                                                    \
 			}
 
 			MEMBER_VALUE_IMPL(u8)
@@ -274,23 +280,23 @@
 				return this->range("pes", "legendre_expansion", 0u, u32_max);
 			}
 
-			#define MEMBER_RANGE_IMPL(type)                                                                           \
-			Range<type> range(c_str block0, type min, type max, type step = static_cast<type>(1)) const               \
-			{                                                                                                         \
-				type new_min = this->value(block0, "min", min, max, min);                                             \
-				type new_max = this->value(block0, "max", new_min, max, new_min);                                     \
-				type new_step = this->value(block0, "step", step);                                                    \
-				                                                                                                      \
-				return Range<type>(new_min, new_max, new_step);                                                       \
-			}                                                                                                         \
-                                                                                                                      \
-			Range<type> range(c_str block0, c_str block1, type min, type max, type step = static_cast<type>(1)) const \
-			{                                                                                                         \
-				type new_min = this->value(block0, block1, "min", min, max, min);                                     \
-				type new_max = this->value(block0, block1, "max", new_min, max, new_min);                             \
-				type new_step = this->value(block0, block1, "step", step);                                            \
-				                                                                                                      \
-				return Range<type>(new_min, new_max, new_step);                                                       \
+			#define MEMBER_RANGE_IMPL(type)                                                                                  \
+			Range<type> range(c_str block0, type min, type max, type step, mpi::Frontend *mpi = nullptr) const               \
+			{                                                                                                                \
+				type new_min = this->value(block0, "min", min, max, min, mpi);                                               \
+				type new_max = this->value(block0, "max", new_min, max, new_min, mpi);                                       \
+				type new_step = this->value(block0, "step", step, mpi);                                                      \
+				                                                                                                             \
+				return Range<type>(new_min, new_max, new_step);                                                              \
+			}                                                                                                                \
+                                                                                                                             \
+			Range<type> range(c_str block0, c_str block1, type min, type max, type step, mpi::Frontend *mpi = nullptr) const \
+			{                                                                                                                \
+				type new_min = this->value(block0, block1, "min", min, max, min, mpi);                                       \
+				type new_max = this->value(block0, block1, "max", new_min, max, new_min, mpi);                               \
+				type new_step = this->value(block0, block1, "step", step, mpi);                                              \
+				                                                                                                             \
+				return Range<type>(new_min, new_max, new_step);                                                              \
 			}
 
 			MEMBER_RANGE_IMPL(u8)
@@ -310,12 +316,18 @@
 			toml::table input;
 
 			template<typename T>
-			T node_value(c_str block0, mut<T> entry = static_cast<T>(0)) const
+			T node_value(c_str block0, mut<T> entry, mpi::Frontend *mpi = nullptr) const
 			{
 				auto node = this->input[block0];
 
+				if (mpi != nullptr) {
+					if (mpi->rank() != mpi::MASTER_PROCESS_RANK) {
+						goto meeting_point;
+					}
+				}
+
 				if (node.type() == toml::node_type::none) {
-					return entry;
+					goto meeting_point;
 				}
 
 				if constexpr(::is_integer<T>()) {
@@ -338,16 +350,27 @@
 					entry = static_cast<T>(node.ref<f64>());
 				}
 
+				meeting_point:
+				if (mpi != nullptr) {
+					mpi->broadcast(mpi::MASTER_PROCESS_RANK, 1, &entry);
+				}
+
 				return entry;
 			}
 
 			template<typename T>
-			T node_value(c_str block0, c_str block1, mut<T> entry = static_cast<T>(0)) const
+			T node_value(c_str block0, c_str block1, mut<T> entry, mpi::Frontend *mpi = nullptr) const
 			{
 				auto node = this->input[block0][block1];
 
+				if (mpi != nullptr) {
+					if (mpi->rank() != mpi::MASTER_PROCESS_RANK) {
+						goto meeting_point;
+					}
+				}
+
 				if (node.type() == toml::node_type::none) {
-					return entry;
+					goto meeting_point;
 				}
 
 				if constexpr(::is_integer<T>()) {
@@ -370,16 +393,27 @@
 					entry = static_cast<T>(node.ref<f64>());
 				}
 
+				meeting_point:
+				if (mpi != nullptr) {
+					mpi->broadcast(mpi::MASTER_PROCESS_RANK, 1, &entry);
+				}
+
 				return entry;
 			}
 
 			template<typename T>
-			T node_value(c_str block0, c_str block1, c_str block2, mut<T> entry = static_cast<T>(0)) const
+			T node_value(c_str block0, c_str block1, c_str block2, mut<T> entry, mpi::Frontend *mpi = nullptr) const
 			{
 				auto node = this->input[block0][block1][block2];
 
+				if (mpi != nullptr) {
+					if (mpi->rank() != mpi::MASTER_PROCESS_RANK) {
+						goto meeting_point;
+					}
+				}
+
 				if (node.type() == toml::node_type::none) {
-					return entry;
+					goto meeting_point;
 				}
 
 				if constexpr(::is_integer<T>()) {
@@ -400,6 +434,11 @@
 					}
 
 					entry = static_cast<T>(node.ref<f64>());
+				}
+
+				meeting_point:
+				if (mpi != nullptr) {
+					mpi->broadcast(mpi::MASTER_PROCESS_RANK, 1, &entry);
 				}
 
 				return entry;

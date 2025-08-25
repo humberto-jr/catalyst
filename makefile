@@ -323,9 +323,9 @@ numerov.o: $(MOD_DIR)/numerov.cc $(ESSENTIALS)
 
 DRIVER_DIR = drivers
 
-atom+diatom_fgh_basis.out: $(DRIVER_DIR)/atom+diatom_fgh_basis.cc pes.o fgh.o math.o $(ESSENTIALS)
+atom+diatom_fgh_basis.out: $(DRIVER_DIR)/atom+diatom_fgh_basis.cc pes.o fgh.o math.o libmpi.o $(ESSENTIALS)
 	@echo "$<:"
-	$(CC) $(CFLAGS) $(LINEAR_ALGEBRA_INC) $< -o $@ pes.o fgh.o math.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
+	$(CC) $(CFLAGS) $(LINEAR_ALGEBRA_INC) $< -o $@ pes.o fgh.o math.o libmpi.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
 	@echo
 
 atom+diatom_coupling_matrix.out: $(DRIVER_DIR)/atom+diatom_coupling_matrix.cc numerov.o libmpi.o math.o pes.o fgh.o $(ESSENTIALS)
