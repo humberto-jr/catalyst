@@ -215,97 +215,130 @@
 				return this->buf.as_cstr();
 			}
 
-			nist::Isotope isotope(c_str block0, nist::Isotope dummy = nist::Isotope::atom_unknown) const
+			nist::Isotope isotope(c_str block0, nist::Isotope entry, mpi::Frontend *mpi = nullptr) const
 			{
 				auto node = this->input[block0];
 
+				if (mpi != nullptr) {
+					if (mpi->rank() != mpi::MASTER_PROCESS_RANK) {
+						goto meeting_point;
+					}
+				}
+
 				if (node.type() == toml::node_type::none) {
-					return dummy;
+					goto meeting_point;
 				}
 
 				if (node.type() != toml::node_type::string) {
 					print::error(WHERE, "Expecting an isotope symbol string at ", block0);
 				}
 
-				c_str symbol = node.ref<std::string>().c_str();
+				entry = nist::isotope_enum(node.ref<std::string>().c_str());
 
-				return nist::isotope_enum(symbol);
+				meeting_point:
+				if (mpi != nullptr) {
+					mpi->broadcast(mpi::MASTER_PROCESS_RANK, 1, &entry);
+				}
+
+				return entry;
 			}
 
-			nist::Isotope isotope(c_str block0, c_str block1, nist::Isotope dummy = nist::Isotope::atom_unknown) const
+			nist::Isotope isotope(c_str block0, c_str block1, nist::Isotope entry, mpi::Frontend *mpi = nullptr) const
 			{
 				auto node = this->input[block0][block1];
 
+				if (mpi != nullptr) {
+					if (mpi->rank() != mpi::MASTER_PROCESS_RANK) {
+						goto meeting_point;
+					}
+				}
+
 				if (node.type() == toml::node_type::none) {
-					return dummy;
+					goto meeting_point;
 				}
 
 				if (node.type() != toml::node_type::string) {
 					print::error(WHERE, "Expecting an isotope symbol string at ", block0, '.', block1);
 				}
 
-				c_str symbol = node.ref<std::string>().c_str();
+				entry = nist::isotope_enum(node.ref<std::string>().c_str());
 
-				return nist::isotope_enum(symbol);
+				meeting_point:
+				if (mpi != nullptr) {
+					mpi->broadcast(mpi::MASTER_PROCESS_RANK, 1, &entry);
+				}
+
+				return entry;
 			}
 
-			nist::Isotope isotope(c_str block0, c_str block1, c_str block2, nist::Isotope dummy = nist::Isotope::atom_unknown) const
+			nist::Isotope isotope(c_str block0, c_str block1, c_str block2, nist::Isotope entry, mpi::Frontend *mpi = nullptr) const
 			{
 				auto node = this->input[block0][block1][block2];
 
+				if (mpi != nullptr) {
+					if (mpi->rank() != mpi::MASTER_PROCESS_RANK) {
+						goto meeting_point;
+					}
+				}
+
 				if (node.type() == toml::node_type::none) {
-					return dummy;
+					goto meeting_point;
 				}
 
 				if (node.type() != toml::node_type::string) {
 					print::error(WHERE, "Expecting an isotope symbol string at ", block0, '.', block1, '.', block2);
 				}
 
-				c_str symbol = node.ref<std::string>().c_str();
+				entry = nist::isotope_enum(node.ref<std::string>().c_str());
 
-				return nist::isotope_enum(symbol);
+				meeting_point:
+				if (mpi != nullptr) {
+					mpi->broadcast(mpi::MASTER_PROCESS_RANK, 1, &entry);
+				}
+
+				return entry;
 			}
 
-			inline file::Output output_filename(c_str block0, c_str dummy)
+			inline file::Output output_filename(c_str block0, c_str dummy, mpi::Frontend *mpi = nullptr)
 			{
-				c_str filename = this->string(block0, "filename", dummy);
+				c_str filename = this->string(block0, "filename", dummy, mpi);
 
 				return file::Output(filename);
 			}
 
-			inline file::Output output_filename(c_str block0, c_str block1, c_str dummy)
+			inline file::Output output_filename(c_str block0, c_str block1, c_str dummy, mpi::Frontend *mpi = nullptr)
 			{
-				c_str filename = this->string(block0, block1, "filename", dummy);
+				c_str filename = this->string(block0, block1, "filename", dummy, mpi);
 
 				return file::Output(filename);
 			}
 
-			inline file::Input input_filename(c_str block0, c_str dummy)
+			inline file::Input input_filename(c_str block0, c_str dummy, mpi::Frontend *mpi = nullptr)
 			{
-				c_str filename = this->string(block0, "filename", dummy);
+				c_str filename = this->string(block0, "filename", dummy, mpi);
 
 				return file::Input(filename);
 			}
 
-			inline file::Input input_filename(c_str block0, c_str block1, c_str dummy)
+			inline file::Input input_filename(c_str block0, c_str block1, c_str dummy, mpi::Frontend *mpi = nullptr)
 			{
-				c_str filename = this->string(block0, block1, "filename", dummy);
+				c_str filename = this->string(block0, block1, "filename", dummy, mpi);
 
 				return file::Input(filename);
 			}
 
-			inline char pes_arrangement() const
+			inline char pes_arrangement(mpi::Frontend *mpi = nullptr) const
 			{
-				return as_char(96 + this->value("pes", "arrang", 1, 3, 1));
+				return as_char(96 + this->value("pes", "arrang", 1, 3, 1, mpi));
 			}
 
-			pes::Frontend pes_extern_lib()
+			pes::Frontend pes_extern_lib(mpi::Frontend *mpi = nullptr)
 			{
-				auto atom_a = this->isotope("pes", "atom_a");
-				auto atom_b = this->isotope("pes", "atom_b");
-				auto atom_c = this->isotope("pes", "atom_c");
+				nist::Isotope atom_a = this->isotope("pes", "atom_a", nist::Isotope::atom_unknown, mpi);
+				nist::Isotope atom_b = this->isotope("pes", "atom_b", nist::Isotope::atom_unknown, mpi);
+				nist::Isotope atom_c = this->isotope("pes", "atom_c", nist::Isotope::atom_unknown, mpi);
 
-				c_str filename = this->string("pes", "extern_lib", "\0");
+				c_str filename = this->string("pes", "extern_lib", "\0", mpi);
 
 				if (filename[0] == '\0') {
 					print::error(WHERE, "Expecting the filename of the PES shared library at pes.extern_lib");
@@ -314,9 +347,14 @@
 				return pes::Frontend(filename, atom_a, atom_b, atom_c);
 			}
 
-			inline Range<u32> pes_legendre_expansion() const
+			inline Range<u32> pes_legendre_expansion(mpi::Frontend *mpi = nullptr) const
 			{
-				return this->range("pes", "legendre_expansion", 0u, u32_max);
+				return this->range("pes", "legendre_expansion", 0u, u32_max, 1u, mpi);
+			}
+
+			inline bool omp_usage(mpi::Frontend *mpi = nullptr) const
+			{
+				return this->value("omp", "use", false, mpi);
 			}
 
 			#define MEMBER_RANGE_IMPL(type)                                                                                  \
