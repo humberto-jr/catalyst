@@ -131,9 +131,15 @@
 
 			#undef MEMBER_VALUE_IMPL
 
-			c_str string(c_str block0, c_str dummy) const
+			c_str string(c_str block0, c_str dummy, mpi::Frontend *mpi = nullptr)
 			{
 				auto node = this->input[block0];
+
+				if (mpi != nullptr) {
+					if (mpi->rank() != mpi::MASTER_PROCESS_RANK) {
+						goto meeting_point;
+					}
+				}
 
 				if (node.type() == toml::node_type::none) {
 					return dummy;
@@ -143,12 +149,25 @@
 					print::error(WHERE, "Expecting a string at ", block0);
 				}
 
-				return node.ref<std::string>().c_str();
+				this->buf = node.ref<std::string>().c_str();
+
+				meeting_point:
+				if (mpi != nullptr) {
+					mpi->broadcast(mpi::MASTER_PROCESS_RANK, this->buf);
+				}
+
+				return this->buf.as_cstr();
 			}
 
-			c_str string(c_str block0, c_str block1, c_str dummy) const
+			c_str string(c_str block0, c_str block1, c_str dummy, mpi::Frontend *mpi = nullptr)
 			{
 				auto node = this->input[block0][block1];
+
+				if (mpi != nullptr) {
+					if (mpi->rank() != mpi::MASTER_PROCESS_RANK) {
+						goto meeting_point;
+					}
+				}
 
 				if (node.type() == toml::node_type::none) {
 					return dummy;
@@ -158,12 +177,25 @@
 					print::error(WHERE, "Expecting a string at ", block0, '.', block1);
 				}
 
-				return node.ref<std::string>().c_str();
+				this->buf = node.ref<std::string>().c_str();
+
+				meeting_point:
+				if (mpi != nullptr) {
+					mpi->broadcast(mpi::MASTER_PROCESS_RANK, this->buf);
+				}
+
+				return this->buf.as_cstr();
 			}
 
-			c_str string(c_str block0, c_str block1, c_str block2, c_str dummy) const
+			c_str string(c_str block0, c_str block1, c_str block2, c_str dummy, mpi::Frontend *mpi = nullptr)
 			{
 				auto node = this->input[block0][block1][block2];
+
+				if (mpi != nullptr) {
+					if (mpi->rank() != mpi::MASTER_PROCESS_RANK) {
+						goto meeting_point;
+					}
+				}
 
 				if (node.type() == toml::node_type::none) {
 					return dummy;
@@ -173,7 +205,14 @@
 					print::error(WHERE, "Expecting a string at ", block0, '.', block1, '.', block2);
 				}
 
-				return node.ref<std::string>().c_str();
+				this->buf = node.ref<std::string>().c_str();
+
+				meeting_point:
+				if (mpi != nullptr) {
+					mpi->broadcast(mpi::MASTER_PROCESS_RANK, this->buf);
+				}
+
+				return this->buf.as_cstr();
 			}
 
 			nist::Isotope isotope(c_str block0, nist::Isotope dummy = nist::Isotope::atom_unknown) const
@@ -227,28 +266,28 @@
 				return nist::isotope_enum(symbol);
 			}
 
-			inline file::Output output_filename(c_str block0, c_str dummy) const
+			inline file::Output output_filename(c_str block0, c_str dummy)
 			{
 				c_str filename = this->string(block0, "filename", dummy);
 
 				return file::Output(filename);
 			}
 
-			inline file::Output output_filename(c_str block0, c_str block1, c_str dummy) const
+			inline file::Output output_filename(c_str block0, c_str block1, c_str dummy)
 			{
 				c_str filename = this->string(block0, block1, "filename", dummy);
 
 				return file::Output(filename);
 			}
 
-			inline file::Input input_filename(c_str block0, c_str dummy) const
+			inline file::Input input_filename(c_str block0, c_str dummy)
 			{
 				c_str filename = this->string(block0, "filename", dummy);
 
 				return file::Input(filename);
 			}
 
-			inline file::Input input_filename(c_str block0, c_str block1, c_str dummy) const
+			inline file::Input input_filename(c_str block0, c_str block1, c_str dummy)
 			{
 				c_str filename = this->string(block0, block1, "filename", dummy);
 
@@ -260,7 +299,7 @@
 				return as_char(96 + this->value("pes", "arrang", 1, 3, 1));
 			}
 
-			pes::Frontend pes_extern_lib() const
+			pes::Frontend pes_extern_lib()
 			{
 				auto atom_a = this->isotope("pes", "atom_a");
 				auto atom_b = this->isotope("pes", "atom_b");
@@ -314,6 +353,7 @@
 
 			private:
 			toml::table input;
+			String buf;
 
 			template<typename T>
 			T node_value(c_str block0, mut<T> entry, mpi::Frontend *mpi = nullptr) const
