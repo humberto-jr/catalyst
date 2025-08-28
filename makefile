@@ -333,9 +333,9 @@ atom+diatom_coupling_matrix.out: $(DRIVER_DIR)/atom+diatom_coupling_matrix.cc nu
 	$(CC) $(CFLAGS) $< -o $@ numerov.o libmpi.o math.o pes.o fgh.o $(LDFLAGS) $(LINEAR_ALGEBRA_LIB)
 	@echo
 
-pes_view.out: $(DRIVER_DIR)/pes_view.cc pes.o math.o $(ESSENTIALS)
+pes_view.out: $(DRIVER_DIR)/pes_view.cc pes.o math.o libmpi.o $(ESSENTIALS)
 	@echo "$<:"
-	$(CC) $(CFLAGS) $< -o $@ pes.o math.o $(LDFLAGS)
+	$(CC) $(CFLAGS) $< -o $@ pes.o math.o libmpi.o $(LDFLAGS)
 	@echo
 
 numerov.out: $(DRIVER_DIR)/numerov.cc numerov.o fgh.o libmpi.o math.o $(ESSENTIALS)
