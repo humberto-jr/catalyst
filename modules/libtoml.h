@@ -5,6 +5,7 @@
 	#include "file.h"
 	#include "nist.h"
 	#include "pes.h"
+	#include <sstream>
 	#include <iostream>
 
 	#define TOML_EXCEPTIONS 0
@@ -27,12 +28,17 @@
 			public:
 			Cin(bool verbose = true)
 			{
+				std::ostringstream backup;
+
+				backup << std::cin.rdbuf();
+
 				// NOTE: Since the MPI runtime redirects the stdin to rank 0 only, the methods below will allow the
 				// MPI frontend object to broadcast the TOML configuration entries to other ranks. A raw pointer of
 				// the frontend is used instead of a reference so as not to duplicate each version of these methods
 				// unnecessarily. All the logic is handled at runtime, but since we are reading files and sending
 				// data over a network, any extra time added due to the use of raw pointers is likely meaningless.
-				auto parsing = toml::parse(std::cin);
+				// Also notice that other MPI processes than the master are only parsing empty std::cin objects.
+				auto parsing = toml::parse(backup.str());
 
 				if (parsing.failed()) {
 					print::error(WHERE, "Unable to parse the standard input as a TOML configuration file");
@@ -40,7 +46,7 @@
 
 				this->input = std::move(parsing).table();
 
-				if (verbose) {
+				if (verbose && (this->input.empty() == false)) {
 					std::cout << this->input << "\n";
 				}
 			}
