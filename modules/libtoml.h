@@ -148,14 +148,14 @@
 				}
 
 				if (node.type() == toml::node_type::none) {
-					return dummy;
-				}
+					this->buf = dummy;
+				} else {
+					if (node.type() != toml::node_type::string) {
+						print::error(WHERE, "Expecting a string at ", block0);
+					}
 
-				if (node.type() != toml::node_type::string) {
-					print::error(WHERE, "Expecting a string at ", block0);
+					this->buf = node.ref<std::string>().c_str();
 				}
-
-				this->buf = node.ref<std::string>().c_str();
 
 				meeting_point:
 				if (mpi != nullptr) {
@@ -176,14 +176,14 @@
 				}
 
 				if (node.type() == toml::node_type::none) {
-					return dummy;
-				}
+					this->buf = dummy;
+				} else {
+					if (node.type() != toml::node_type::string) {
+						print::error(WHERE, "Expecting a string at ", block0, '.', block1);
+					}
 
-				if (node.type() != toml::node_type::string) {
-					print::error(WHERE, "Expecting a string at ", block0, '.', block1);
+					this->buf = node.ref<std::string>().c_str();
 				}
-
-				this->buf = node.ref<std::string>().c_str();
 
 				meeting_point:
 				if (mpi != nullptr) {
@@ -204,14 +204,14 @@
 				}
 
 				if (node.type() == toml::node_type::none) {
-					return dummy;
-				}
+					this->buf = dummy;
+				} else {
+					if (node.type() != toml::node_type::string) {
+						print::error(WHERE, "Expecting a string at ", block0, '.', block1, '.', block2);
+					}
 
-				if (node.type() != toml::node_type::string) {
-					print::error(WHERE, "Expecting a string at ", block0, '.', block1, '.', block2);
+					this->buf = node.ref<std::string>().c_str();
 				}
-
-				this->buf = node.ref<std::string>().c_str();
 
 				meeting_point:
 				if (mpi != nullptr) {
