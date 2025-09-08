@@ -366,8 +366,8 @@
 			#define MEMBER_RANGE_IMPL(type)                                                                                  \
 			Range<type> range(c_str block0, type min, type max, type step, mpi::Frontend *mpi = nullptr) const               \
 			{                                                                                                                \
-				type new_min = this->value(block0, "min", min, max, min, mpi);                                               \
-				type new_max = this->value(block0, "max", new_min, max, new_min, mpi);                                       \
+				type new_min = this->value(block0, "min", min, mpi);                                                         \
+				type new_max = this->value(block0, "max", max, mpi);                                                         \
 				type new_step = this->value(block0, "step", step, mpi);                                                      \
 				                                                                                                             \
 				return Range<type>(new_min, new_max, new_step);                                                              \
@@ -375,8 +375,8 @@
                                                                                                                              \
 			Range<type> range(c_str block0, c_str block1, type min, type max, type step, mpi::Frontend *mpi = nullptr) const \
 			{                                                                                                                \
-				type new_min = this->value(block0, block1, "min", min, max, min, mpi);                                       \
-				type new_max = this->value(block0, block1, "max", new_min, max, new_min, mpi);                               \
+				type new_min = this->value(block0, block1, "min", min, mpi);                                                 \
+				type new_max = this->value(block0, block1, "max", max, mpi);                                                 \
 				type new_step = this->value(block0, block1, "step", step, mpi);                                              \
 				                                                                                                             \
 				return Range<type>(new_min, new_max, new_step);                                                              \
