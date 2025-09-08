@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 	// Diatomic rotation quantum numbers:
 	//
 
-	Range<u32> j_list = toml.range("diatom", "rotation", 0u, 10u, 1u);
+	Range<u32> j_list = toml.range("diatom", "rotation", 0u, 0u, 1u);
 
 	//
 	// PES:
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
 	const auto atom_c = toml.isotope("pes", "atom_c", nist::Isotope::atom_unknown);
 
-	Range<u32> lambda_list = toml.range("pes", "legendre_expansion", 0u, 20u, 1u);
+	Range<u32> lambda_list = toml.range("pes", "legendre_expansion", 0u, 0u, 1u);
 
 	c_str pesname = toml.string("pes", "filename", "\0");
 
