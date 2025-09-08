@@ -1086,7 +1086,7 @@ mpi::Frontend::~Frontend()
 
 	#if defined(USE_MPI)
 		#pragma omp master
-		if (this->rank() == mpi::MASTER_PROCESS_RANK) {
+		{
 			auto info = 0;
 
 			#if defined(USE_PETSC)
