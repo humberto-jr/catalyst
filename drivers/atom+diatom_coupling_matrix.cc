@@ -1,57 +1,71 @@
 #include "modules/essentials.h"
+#include "modules/libtoml.h"
 #include "modules/numerov.h"
 #include "modules/timer.h"
 #include "modules/math.h"
-#include "modules/fgh.h"
-#include "user.h"
 
 // NOTE: Older GNU compilers appears to have used an OpenMP version in which constant objects
 // are shared by default and not required in the shared clause, even if default(none) is used.
-// Later versions seem to require. The behavior, however, was not consistent between GNU g++
-// and LLVM clang++. Here, we define the shared list in advance based on the compiler used.
-// Search for "_Pragma(OMP_PARALLEL_LOOP)" to see where this takes place below (only one loop).
+// Later versions seem to require. However, the behavior is not consistent between GNU g++ and
+// LLVM clang++. Here, we define the shared list in advance based on the compiler used. Search
+// for "_Pragma(OMP_PARALLEL_LOOP)" to see where this takes place below (only one loop).
 #if defined(USING_GNU_COMPILER) && (__GNUC__ < 9)
 	#define OMP_PARALLEL_LOOP "omp parallel for default(none) shared(lambda, multipole, result) schedule(static) if(use_omp)"
 #else
 	#define OMP_PARALLEL_LOOP "omp parallel for default(none) shared(mass, R, lambda_list, lambda, basis, multipole, result) schedule(static) if(use_omp)"
 #endif
 
-constexpr u8 PAD = 24;
 constexpr u8 FORMAT_VERSION = 1;
 
 int main(int argc, char *argv[])
 {
 	mpi::Frontend mpi(&argc, &argv);
 
+	if (mpi.rank() == mpi::MASTER_PROCESS_RANK) {
+		print::line("# ", argv[0]);
+		print::timestamp();
+		print::line();
+	}
+
+	toml::Cin toml;
+
 	//
 	// Scattering grid:
 	//
 
-	const Range<f64> R_list = user::scattering_grid(&mpi);
+	Range<f64> R_list = toml.range("jacobi", "R", 0.5, 100.0, 0.25, &mpi);
 
 	mpi.set_tasks(R_list.count());
 
 	//
-	// Arrangement (a = 1, b = 2, c = 3) and PES:
+	// PES:
 	//
 
-	const char arrang = user::arrangement(&mpi);
+	const char arrang = as_char(96 + toml.value("pes", "arrang", 1, 3, 1, &mpi));
 
-	pes::Frontend pes = user::extern_pes(&mpi);
+	const auto atom_a = toml.isotope("pes", "atom_a", nist::Isotope::atom_unknown, &mpi);
+
+	const auto atom_b = toml.isotope("pes", "atom_b", nist::Isotope::atom_unknown, &mpi);
+
+	const auto atom_c = toml.isotope("pes", "atom_c", nist::Isotope::atom_unknown, &mpi);
+
+	Range<u32> lambda_list = toml.range("pes", "legendre_expansion", 0u, 20u, 1u, &mpi);
+
+	c_str pesname = toml.string("pes", "filename", "\0", &mpi);
+
+	if (pesname[0] == '\0') {
+		print::error(WHERE, "Expecting the PES shared library (*.so) at pes.filename");
+	}
+
+	pes::Frontend pes(pesname, atom_a, atom_b, atom_c);
 
 	f64 mass = pes.mass_abc(arrang);
-
-	//
-	// Legendre multipole expansion terms:
-	//
-
-	const Range<u32> lambda_list = user::multipole_terms(20u, &mpi);
 
 	//
 	// Scattering basis set:
 	//
 
-	String filename = user::fgh_basis_input(&mpi);
+	String filename = toml.string("fgh", "filename", "atom+diatom_fgh_basis.bin", &mpi);
 
 	const numerov::Basis basis(filename);
 
@@ -65,13 +79,13 @@ int main(int argc, char *argv[])
 	// in the master's output at the end.
 	//
 
-	file::Output coupling = user::coupling_output_file(&mpi);
+	file::Output coupling = toml.output_filename("coupling_matrix", "atom+diatom_coupling_matrix.bin", &mpi);
 
 	//
 	// OpenMP:
 	//
 
-	const bool use_omp = user::use_omp(&mpi);
+	const bool use_omp = toml.value("omp", "use", false, &mpi);
 
 	//
 	// Summary:
@@ -84,21 +98,11 @@ int main(int argc, char *argv[])
 		coupling.write(R_list);
 		coupling.write(mass);
 
-		print::timestamp();
-		print::line("# Atom a: ", pes.atom_a());
-		print::line("# Atom b: ", pes.atom_b());
-		print::line("# Atom c: ", pes.atom_c());
-		print::line("# Arrangement: ", arrang);
-		print::line("# MPI procs.: ", mpi.world_size());
-		print::line("# Using OpenMP: ", (use_omp? "yes" : "no"));
-		print::line("# Basis count: ", basis.list.length());
-		print::line("# Lambda range: ", lambda_list.min, ", ", lambda_list.max, ", ", lambda_list.step);
-		print::line("# Basis input: ", basis.filename.as_cstr());
-		print::line("# Disk output: ", coupling.filename.as_cstr());
-		print::line("# PES shared library: ", pes.filename());
-		print::line("# Atom-diatom reduc. mass: ", mass, " a.u.");
+		print::line();
+		print::line("# Atom-diatom reduced mass: ", mass, " a.u.");
 		print::line('#');
-		print::line<PAD>("# proc.", "task", "R (a.u.)", "time (s)");
+		print::line("#    grid        MPI proc.                    R (a.u.)                     time (s)");
+		print::line("# ---------------------------------------------------------------------------------");
 	}
 
 	//
@@ -109,8 +113,6 @@ int main(int argc, char *argv[])
 		extra_step:
 		f64 R = R_list[task];
 
-		result = 0.0;
-
 		Timer<1> clock;
 		clock.start();
 
@@ -120,16 +122,19 @@ int main(int argc, char *argv[])
 			_Pragma(OMP_PARALLEL_LOOP)
 			for (mut<usize> channel_a = 0; channel_a < result.rows(); ++channel_a) {
 
-				f64 rot_term = basis.list[channel_a].eigenval
-				             + numerov::centrifugal_term(basis.list[channel_a].l, mass, R);
+				f64 barrier = basis.list[channel_a].eigenval
+				            + numerov::centrifugal_term(basis.list[channel_a].l, mass, R);
 
 				for (mut<usize> channel_b = channel_a; channel_b < result.cols(); ++channel_b) {
-					if (basis.list[channel_a].J != basis.list[channel_b].J) {
-						continue;
+					if (lambda == lambda_list.min) {
+						result(channel_a, channel_b) = (channel_b == channel_a? barrier : 0.0);
+
+						assert(basis.list[channel_a].r_list.min  == basis.list[channel_b].r_list.min);
+						assert(basis.list[channel_a].r_list.step == basis.list[channel_b].r_list.step);
 					}
 
-					if ((lambda == lambda_list.min) && (channel_b == channel_a)) {
-						result(channel_a, channel_a) += rot_term;
+					if (basis.list[channel_a].J != basis.list[channel_b].J) {
+						continue;
 					}
 
 					f64 f = math::percival_seaton_coeff(basis.list[channel_a].J,
@@ -140,9 +145,6 @@ int main(int argc, char *argv[])
 					if (f == 0.0) {
 						continue;
 					}
-
-					assert(basis.list[channel_a].r_list.min == basis.list[channel_b].r_list.min);
-					assert(basis.list[channel_a].r_list.step == basis.list[channel_b].r_list.step);
 
 					f64 overlap_ab = math::simpson(basis.list[channel_a].r_list.step,
 					                               multipole,
@@ -167,7 +169,7 @@ int main(int argc, char *argv[])
 		coupling.write(R);
 		coupling.write(result);
 
-		print::line<PAD>(mpi.rank(), task, R, clock[0]);
+		print::line<8, '#'>(task, ' ', mpi.rank(), ' ', R, ' ', clock[0]);
 
 		if (task == mpi.last_local_task()) {
 			auto index = mpi.extra_task();
