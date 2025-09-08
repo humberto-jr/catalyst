@@ -17,9 +17,9 @@ int main(int argc, char *argv[])
 	// (r, R, theta)-grid:
 	//
 
-	Range<f64> r_list = toml.range("jacobi", "r", 0.0, f64_max, 0.25);
+	Range<f64> r_list = toml.range("jacobi", "r", 0.5, 30.0, 0.25);
 
-	Range<f64> R_list = toml.range("jacobi", "R", 0.0, f64_max, 0.25);
+	Range<f64> R_list = toml.range("jacobi", "R", 0.5, 30.0, 0.25);
 
 	Range<f64> theta_list = toml.range("jacobi", "theta", 0.0, 180.0, 1.0);
 
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 	// Diatomic rotation quantum numbers:
 	//
 
-	Range<u32> j_list = toml.range("diatom", "rotation", 0u, u32_max, 1u);
+	Range<u32> j_list = toml.range("diatom", "rotation", 0u, 10u, 1u);
 
 	//
 	// PES:
