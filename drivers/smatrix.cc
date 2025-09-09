@@ -1,6 +1,6 @@
 #include "modules/essentials.h"
 #include "modules/numerov.h"
-#include "user.h"
+#include "modules/libtoml.h"
 
 constexpr u8 PAD = 24;
 constexpr u8 FORMAT_VERSION = 3;
@@ -12,21 +12,25 @@ struct Job {
 	mut<f64> total_energy;
 };
 
-int main()
+int main(int argc, char *argv[])
 {
+	print::line("# ", argv[0]);
+	print::timestamp();
+	print::line();
+
+	toml::Cin toml;
+
 	//
 	// S-matrix output:
 	//
 
-	String filename = user::smatrix_output_file();
-
-	file::Output smatrix(filename);
+	file::Output smatrix = toml.output_filename("smatrix", "smatrix.bin");
 
 	//
 	// Numerov ratio matrices:
 	//
 
-	filename = user::smatrix_input_file();
+	String filename = toml.string("numerov", "filename", "numerov_ratio_matrix.bin");
 
 	numerov::Ratio solution(filename.as_cstr());
 
@@ -40,7 +44,7 @@ int main()
 	// Scattering basis set:
 	//
 
-	filename = user::fgh_basis_input();
+	filename = toml.string("fgh", "filename", "atom+diatom_fgh_basis.bin");
 
 	const numerov::Basis basis(filename);
 
@@ -50,28 +54,23 @@ int main()
 
 	usize energy_count = solution.energy_range().count();
 
-	f64 shift = user::energy_shift();
-
-	f64 scale = user::energy_scale();
+	f64 shift = toml.value("energy", "shift", -f64_max, f64_max, 0.0);
+	f64 scale = toml.value("energy", "scale", -f64_max, f64_max, 1.0);
 
 	//
 	// Summary:
 	//
 
-	print::timestamp();
+	print::line();
 	print::line("# Channel count: ", channel_count);
 	print::line("# Energy count: ", energy_count);
-	print::line("# Energy shift: ", shift);
-	print::line("# Energy scale: ", scale);
+	print::line("# R value: ", R_list.max - R_list.step);
 	print::line("# Reduced mass: ", mass, " a.u.");
-	print::line("# Output file: ", smatrix.filename.as_cstr());
-	print::line("# Scatt. basis: ", basis.filename.as_cstr());
-	print::line("# Numerov solutions: ", solution.filename());
-	print::line("# Note: grep -A ", energy_count + 1, " \"# (Ch. = $1,\" $filename | grep -A ", energy_count + 1, " \"> (Ch. = $2,\"");
+	print::line("# NOTE: grep -A ", energy_count + 1, " \"# (Ch. = $1,\" $filename | grep -A ", energy_count + 1, " \"> (Ch. = $2,\"");
 	print::line("#");
 
 	//
-	// Step 1: Compute the augmented K-matrix and S-matrix for every energy.
+	// Compute the augmented K-matrix and S-matrix for every energy.
 	//
 
 	Vec<Job> list(energy_count);
@@ -103,7 +102,7 @@ int main()
 	}
 
 	//
-	// Step 2: Sort the result per a-->b transitions and print as a function of energy.
+	// Sort the result per a-->b transitions and print as a function of energy.
 	//
 
 	smatrix.write(numerov::MAGIC_NUMBER);
@@ -181,7 +180,7 @@ int main()
 					            ", J' = ", basis.list[channel_b].J,
 					            ", eigenvalue = ", eigenval_b, ')');
 
-					print::line<PAD>("# Coll. energy", "Tot. energy", "k (a.u.)", "k' (a.u.)", "|S|^2", "re(S)", "im(S)", "K (open-open block)");
+					print::line<PAD, '#'>("Coll. energy", "Tot. energy", "k (a.u.)", "k' (a.u.)", "|S|^2", "re(S)", "im(S)", "K (open-open block)");
 				}
 
 				f64 k = list[task].k(channel_a, channel_b);
