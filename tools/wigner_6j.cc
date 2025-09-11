@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 	s32 je = std::atoi(argv[5]);
 	s32 jf = std::atoi(argv[6]);
 
-	f64 c = math::wigner_6j(ja, jb, jc, jd, je, jf);
+	f64 c = math::wigner_6j(2*ja, 2*jb, 2*jc, 2*jd, 2*je, 2*jf);
 
 	//
 	// Output:

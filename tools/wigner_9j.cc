@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
 	s32 jh = std::atoi(argv[8]);
 	s32 ji = std::atoi(argv[9]);
 
-	f64 c = math::wigner_9j(ja, jb, jc, jd, je, jf, jg, jh, ji);
+	f64 c = math::wigner_9j(2*ja, 2*jb, 2*jc, 2*jd, 2*je, 2*jf, 2*jg, 2*jh, 2*ji);
 
 	//
 	// Output:
