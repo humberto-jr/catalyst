@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 	s32 lb = std::atoi(argv[5]);
 	s32 lambda = std::atoi(argv[6]);
 
-	f64 f = math::percival_seaton_coeff(J, ja, jb, la, lb, lambda);
+	f64 f = math::percival_seaton_coeff(J, 0, 0, ja, jb, la, lb, lambda, 1);
 
 	//
 	// Output:

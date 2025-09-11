@@ -285,29 +285,93 @@ f64 math::clebsch_gordan_coeff(s32 ja, s32 jb, s32 jc, s32 ma, s32 mb, s32 mc)
 }
 
 f64 math::percival_seaton_coeff(s32 J,
+                                s32 na,
+                                s32 nb,
                                 s32 ja,
                                 s32 jb,
                                 s32 la,
                                 s32 lb,
-                                s32 lambda)
+                                s32 lambda,
+                                u8 spin_mult)
 {
 	// References:
 	// [1] R. B. Bernstein et al. Proc. R. Soc. Lond. A, 274, 427-442 (1963)
 	// [2] A. E. DePristo et al. J. Phys. B: Atom. Molec. Phys., Vol. 9, No. 3 (1976)
 	// [3] D. D. Lopez-Duran et al. Com. Phys. Comm., 179, 821-838 (2008)
+	// [4] G. C. Corey et al. J. Phys. Chem., 87, 2723-2730 (1983)
+	// [5] I. C. Percival and M. J. Seaton. Math. Proc. Camb. Philos. Soc. 53, 3, 654-662 (1975)
 
-	f64 phase = std::pow(-1.0, ja + jb - J);
+	switch (spin_mult) {
+		case 1: {
+			// NOTE: Elec. spin is 0. Thus, n = j, n is unused and both
+			// j and J are integers.
 
-	f64 jj = math::wigner_3j(ja, jb, lambda, 0, 0, 0);
+			s32 expon = ja + jb - J;
 
-	f64 ll = math::wigner_3j(la, lb, lambda, 0, 0, 0);
+			f64 phase = (math::is_even(expon)? 1.0 : -1.0);
 
-	f64 jl = math::wigner_6j(ja, jb, lambda, lb, la, J);
+			f64 jj = math::wigner_3j(2*ja, 2*jb, 2*lambda, 0, 0, 0);
 
-	s32 prod = (2*ja + 1)*(2*jb + 1)*(2*la + 1)*(2*lb + 1);
+			f64 ll = math::wigner_3j(2*la, 2*lb, 2*lambda, 0, 0, 0);
 
-	// NOTE: Eq. (3) of Ref. [2], where mu is lambda here.
-	return phase*std::sqrt(as_f64(prod))*ll*jj*jl;
+			f64 jl = math::wigner_6j(2*ja, 2*jb, 2*lambda, 2*lb, 2*la, 2*J);
+
+			s64 prod = (2*ja + 1)*(2*jb + 1)*(2*la + 1)*(2*lb + 1);
+
+			// NOTE: Eq. (3) of Ref. [2], where mu is lambda here.
+			return phase*std::sqrt(as_f64(prod))*ll*jj*jl;
+		}
+
+		case 2: {
+			// NOTE: Elec. spin is 1/2 and, thus, j and J are half-integers too.
+			// We expect them to be scaled by two to avoid using floating-point
+			// numbers.
+
+			s32 expon = (1 - 2*lambda - J)/2;
+
+			f64 phase = (math::is_even(expon)? 1.0 : -1.0);
+
+			f64 nn = math::wigner_3j(2*nb, 2*lambda, 2*na, 0, 0, 0);
+
+			f64 ll = math::wigner_3j(2*lb, 2*lambda, 2*la, 0, 0, 0);
+
+			f64 jl = math::wigner_6j(ja - 1, jb - 1, 2*lambda, 2*lb, 2*la, J);
+
+			f64 jn = math::wigner_6j(ja - 1, jb - 1, 2*lambda, 2*nb, 2*na, 1);
+
+			s64 prod = ja*jb*(2*na + 1)*(2*nb + 1)*(2*la + 1)*(2*lb + 1);
+
+			// NOTE: Eq. (C.21) of Ref. [3], where [j - (1/2)] is [2j - 2(1/2)] here.
+			// See also Eq. (2.22) of Ref. [4] where S = 2(1/2) here.
+			return phase*std::sqrt(as_f64(prod))*nn*ll*jl*jn;
+		}
+
+		case 3: {
+			// NOTE: Elec. spin is 1. Thus, j and J are integers.
+
+			s32 expon = (1 - lambda - J);
+
+			f64 phase = (math::is_even(expon)? 1.0 : -1.0);
+
+			f64 nn = math::wigner_3j(2*nb, 2*lambda, 2*na, 0, 0, 0);
+
+			f64 ll = math::wigner_3j(2*lb, 2*lambda, 2*la, 0, 0, 0);
+
+			f64 jl = math::wigner_6j(2*ja, 2*jb, 2*lambda, 2*lb, 2*la, 2*J);
+
+			f64 jn = math::wigner_6j(2*ja, 2*jb, 2*lambda, 2*nb, 2*na, 2*1);
+
+			s64 prod = (2*ja)*(2*jb)*(2*na + 1)*(2*nb + 1)*(2*la + 1)*(2*lb + 1);
+
+			// NOTE: Eq. (C.22) of Ref. [3]. See also Eq. (2.22) of Ref. [4].
+			return phase*std::sqrt(as_f64(prod))*nn*ll*jl*jn;
+		}
+
+		default: {
+			print::error(WHERE, "Invalid spin multiplicity ", spin_mult);
+			return 0.0;
+		}
+	}
 }
 
 f64 math::gaunt_coeff(s32 q, s32 ja, s32 jb, s32 lambda)
