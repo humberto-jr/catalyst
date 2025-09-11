@@ -196,19 +196,23 @@ c64 math::sphe_harmonics(u32 l, s32 m, f64 theta, f64 phi)
 	return Pl*exp_my;
 }
 
-f64 math::wigner_3j(s32 ja, s32 jb, s32 jc, s32 ma, s32 mb, s32 mc)
+f64 math::wigner_3j(s32 two_ja, s32 two_jb, s32 two_jc,
+                    s32 two_ma, s32 two_mb, s32 two_mc)
 {
-	return gsl_sf_coupling_3j(2*ja, 2*jb, 2*jc, 2*ma, 2*mb, 2*mc);
+	return gsl_sf_coupling_3j(two_ja, two_jb, two_jc, two_ma, two_mb, two_mc);
 }
 
-f64 math::wigner_6j(s32 ja, s32 jb, s32 jc, s32 jd, s32 je, s32 jf)
+f64 math::wigner_6j(s32 two_ja, s32 two_jb, s32 two_jc,
+                    s32 two_jd, s32 two_je, s32 two_jf)
 {
-	return gsl_sf_coupling_6j(2*ja, 2*jb, 2*jc, 2*jd, 2*je, 2*jf);
+	return gsl_sf_coupling_6j(two_ja, two_jb, two_jc, two_jd, two_je, two_jf);
 }
 
-f64 math::wigner_9j(s32 ja, s32 jb, s32 jc, s32 jd, s32 je, s32 jf, s32 jg, s32 jh, s32 ji)
+f64 math::wigner_9j(s32 two_ja, s32 two_jb, s32 two_jc,
+                    s32 two_jd, s32 two_je, s32 two_jf,
+                    s32 two_jg, s32 two_jh, s32 two_ji)
 {
-	return gsl_sf_coupling_9j(2*ja, 2*jb, 2*jc, 2*jd, 2*je, 2*jf, 2*jg, 2*jh, 2*ji);
+	return gsl_sf_coupling_9j(two_ja, two_jb, two_jc, two_jd, two_je, two_jf, two_jg, two_jh, two_ji);
 }
 
 f64 math::sphe_bessel(const char type, u32 l, f64 x)
