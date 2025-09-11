@@ -153,7 +153,7 @@ f64 fgh::norm(f64 step, const Vec<f64> &eigenvec)
 
 static constexpr usize BASIS_FILE_HEADER = sizeof(fgh::MAGIC_NUMBER)
                                          + sizeof(fgh::FORMAT_VERSION)
-                                         + sizeof(usize) + 3*sizeof(f64);
+                                         + sizeof(usize) + 3*sizeof(f64) + sizeof(u8);
 
 fgh::Basis::Basis(c_str filename, u8 fmt_ver): len(0), stride(0), input(filename)
 {
@@ -161,23 +161,25 @@ fgh::Basis::Basis(c_str filename, u8 fmt_ver): len(0), stride(0), input(filename
 
 	this->input.read(this->len);
 
-	CHECK_FILE_END(this->input)
-
 	if (this->len == 0) {
-		print::error(WHERE, this->input.filename.as_cstr(), " has no FGH basis stored");
+		print::error(WHERE, this->input.filename.as_cstr(), " has no FGH components");
 	}
 
 	this->input.read(this->entry.r_list);
 
-	CHECK_FILE_END(this->input)
+	this->input.read(this->entry.spin_mult);
+
+	print::line("SPIN MULT. = ", this->entry.spin_mult);
 
 	this->entry.eigenvec.resize(this->entry.r_list.count());
 
 	// NOTE: There is an extra usize entry used for the basis indexing in each
 	// chunk of data stored in the file, which is not part of fgh::BasisEntry.
 	this->stride = sizeof(usize)
-	             + 5*sizeof(u32)
+	             + 6*sizeof(u32)
 	             + sizeof(s32) + 2*sizeof(f64) + this->entry.eigenvec.size();
+
+	CHECK_FILE_END(this->input)
 }
 
 const fgh::BasisEntry& fgh::Basis::operator[](usize index)
@@ -193,12 +195,13 @@ const fgh::BasisEntry& fgh::Basis::operator[](usize index)
 		print::error(WHERE, "Expected basis index ", index, ", but received ", saved_index, " when reading from ", this->input.filename.as_cstr());
 	}
 
+	this->input.read(this->entry.n);
 	this->input.read(this->entry.j);
 	this->input.read(this->entry.v);
 	this->input.read(this->entry.J);
 	this->input.read(this->entry.l);
 	this->input.read(this->entry.p);
-	this->input.read(this->entry.n);
+	this->input.read(this->entry.c);
 	this->input.read(this->entry.norm);
 	this->input.read(this->entry.eigenval);
 	this->input.read(this->entry.eigenvec);

@@ -129,6 +129,7 @@ int main(int argc, char *argv[])
 					if (lambda == lambda_list.min) {
 						result(channel_a, channel_b) = (channel_b == channel_a? barrier : 0.0);
 
+						assert(basis.list[channel_a].spin_mult   == basis.list[channel_b].spin_mult);
 						assert(basis.list[channel_a].r_list.min  == basis.list[channel_b].r_list.min);
 						assert(basis.list[channel_a].r_list.step == basis.list[channel_b].r_list.step);
 					}
@@ -138,10 +139,13 @@ int main(int argc, char *argv[])
 					}
 
 					f64 f = math::percival_seaton_coeff(basis.list[channel_a].J,
+					                                    basis.list[channel_a].n,
+					                                    basis.list[channel_b].n,
 					                                    basis.list[channel_a].j,
 					                                    basis.list[channel_b].j,
 					                                    basis.list[channel_a].l,
-					                                    basis.list[channel_b].l, lambda);
+					                                    basis.list[channel_b].l,
+					                                    lambda, basis.list[channel_a].spin_mult);
 					if (f == 0.0) {
 						continue;
 					}

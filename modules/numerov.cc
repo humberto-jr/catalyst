@@ -60,10 +60,12 @@ numerov::Basis::Basis(String &filename): filename(filename.move())
 
 		entry.value.J = data.J;
 		entry.value.v = data.v;
+		entry.value.n = data.n;
 		entry.value.j = data.j;
 		entry.value.l = data.l;
 		entry.value.p = data.p;
-		entry.value.n = data.n;
+		entry.value.c = data.c;
+		entry.value.spin_mult = data.spin_mult;
 		entry.value.norm = data.norm;
 		entry.value.r_list = data.r_list;
 		entry.value.eigenval = data.eigenval;
