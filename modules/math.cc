@@ -279,9 +279,13 @@ f64 math::riccati_bessel(const char type, f64 l, f64 x)
 
 f64 math::clebsch_gordan_coeff(s32 ja, s32 jb, s32 jc, s32 ma, s32 mb, s32 mc)
 {
-	s32 n = ja - jb + mc;
+	s32 expon = ja - jb + mc;
+
+	f64 phase = (math::is_even(expon)? 1.0 : -1.0);
+
 	f64 x = as_f64(2*jc + 1);
-	return std::pow(-1.0, n)*std::sqrt(x)*math::wigner_3j(ja, jb, jc, ma, mb, -mc);
+
+	return phase*std::sqrt(x)*math::wigner_3j(2*ja, 2*jb, 2*jc, 2*ma, 2*mb, -2*mc);
 }
 
 f64 math::percival_seaton_coeff(s32 J,
@@ -379,13 +383,13 @@ f64 math::gaunt_coeff(s32 q, s32 ja, s32 jb, s32 lambda)
 	// References:
 	// [1] Jonathan Tennyson. Computer Physics Reports 4, 1-36 (1986)
 
-	f64 phase = std::pow(-1.0, q);
+	f64 phase = (math::is_even(q)? 1.0 : -1.0);
 
-	f64 j0 = math::wigner_3j(jb, lambda, ja, 0, 0, 0);
+	f64 j0 = math::wigner_3j(2*jb, 2*lambda, 2*ja, 0, 0, 0);
 
-	f64 jq = math::wigner_3j(jb, lambda, ja, -q, 0, q);
+	f64 jq = math::wigner_3j(2*jb, 2*lambda, 2*ja, -2*q, 0, 2*q);
 
-	s32 prod = (2*ja + 1)*(2*jb + 1);
+	s64 prod = (2*ja + 1)*(2*jb + 1);
 
 	// NOTE: Eq. (3.15) of Ref. [1].
 	return phase*std::sqrt(as_f64(prod))*j0*jq;
