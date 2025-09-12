@@ -163,7 +163,7 @@ f64 math::legendre_poly(u32 l, f64 x)
 {
 	assert(std::fabs(x) <= 1.0);
 
-	return gsl_sf_legendre_Pl(l, x);
+	return gsl_sf_legendre_Pl(as_s32(l), x);
 }
 
 f64 math::assoc_legendre_poly(u32 l, u32 m, f64 x)
@@ -172,7 +172,7 @@ f64 math::assoc_legendre_poly(u32 l, u32 m, f64 x)
 	assert(l <= math::MAX_LEGENDRE_POLY_DEGREE);
 	assert(std::fabs(x) <= 1.0);
 
-	return gsl_sf_legendre_sphPlm(l, m, x);
+	return gsl_sf_legendre_sphPlm(as_s32(l), as_s32(m), x);
 }
 
 c64 math::sphe_harmonics(u32 l, s32 m, f64 theta, f64 phi)
@@ -181,7 +181,7 @@ c64 math::sphe_harmonics(u32 l, s32 m, f64 theta, f64 phi)
 
 	f64 ph = math::as_rad(phi);
 
-	u32 abs_m = std::abs(m);
+	u32 abs_m = as_u32(std::abs(m));
 
 	f64 x = std::cos(th);
 
@@ -228,10 +228,10 @@ f64 math::sphe_bessel(const char type, u32 l, f64 x)
 	// When the irregular type is used, x is the purely imaginary component.
 
 	switch (type) {
-		case 'j': return gsl_sf_bessel_jl(l, x);
-		case 'y': return gsl_sf_bessel_yl(l, x);
-		case 'i': return gsl_sf_bessel_il_scaled(l, x);
-		case 'k': return gsl_sf_bessel_kl_scaled(l, x);
+		case 'j': return gsl_sf_bessel_jl(as_s32(l), x);
+		case 'y': return gsl_sf_bessel_yl(as_s32(l), x);
+		case 'i': return gsl_sf_bessel_il_scaled(as_s32(l), x);
+		case 'k': return gsl_sf_bessel_kl_scaled(as_s32(l), x);
 
 		default:
 		print::error(WHERE, "Invalid type ", type);
@@ -402,7 +402,7 @@ f64 math::gaunt_coeff(s32 q, s32 ja, s32 jb, s32 lambda)
 template<typename T>
 static T simpson_driver(const T step, const Vec<T> &integrand)
 {
-	constexpr T fact = static_cast<T>(3.0/8.0);
+	constexpr T fact = static_cast<T>(3.0f/8.0f);
 
 	mut<usize> n_max = integrand.length() - 1;
 
@@ -415,12 +415,12 @@ static T simpson_driver(const T step, const Vec<T> &integrand)
 	mut<T> sum = integrand[0];
 
 	for (mut<usize> n = 1; n < (n_max - 3); n += 3) {
-		sum += static_cast<T>(3.0)*integrand[n + 0]
-		     + static_cast<T>(3.0)*integrand[n + 1]
-		     + static_cast<T>(2.0)*integrand[n + 2];
+		sum += static_cast<T>(3.0f)*integrand[n + 0]
+		     + static_cast<T>(3.0f)*integrand[n + 1]
+		     + static_cast<T>(2.0f)*integrand[n + 2];
 	}
 
-	sum += static_cast<T>(3.0)*integrand[n_max - 1] + integrand[n_max];
+	sum += static_cast<T>(3.0f)*integrand[n_max - 1] + integrand[n_max];
 
 	return fact*step*sum;
 }
@@ -447,7 +447,7 @@ static T simpson_driver(const T step,
 {
 	assert(integrand_a.length() == integrand_b.length());
 
-	constexpr T fact = static_cast<T>(3.0/8.0);
+	constexpr T fact = static_cast<T>(3.0f/8.0f);
 
 	mut<usize> n_max = integrand_a.length() - 1;
 
@@ -462,12 +462,12 @@ static T simpson_driver(const T step,
 	mut<T> sum = INTEGRAND(0);
 
 	for (mut<usize> n = 1; n < (n_max - 3); n += 3) {
-		sum += static_cast<T>(3.0)*INTEGRAND(n + 0)
-		     + static_cast<T>(3.0)*INTEGRAND(n + 1)
-		     + static_cast<T>(2.0)*INTEGRAND(n + 2);
+		sum += static_cast<T>(3.0f)*INTEGRAND(n + 0)
+		     + static_cast<T>(3.0f)*INTEGRAND(n + 1)
+		     + static_cast<T>(2.0f)*INTEGRAND(n + 2);
 	}
 
-	sum += static_cast<T>(3.0)*INTEGRAND(n_max - 1) + INTEGRAND(n_max);
+	sum += static_cast<T>(3.0f)*INTEGRAND(n_max - 1) + INTEGRAND(n_max);
 
 	#undef INTEGRAND
 
@@ -500,7 +500,7 @@ static T simpson_driver(const T step,
 	assert(integrand_a.length() == integrand_b.length());
 	assert(integrand_b.length() == integrand_c.length());
 
-	constexpr T fact = static_cast<T>(3.0/8.0);
+	constexpr T fact = static_cast<T>(3.0f/8.0f);
 
 	mut<usize> n_max = integrand_a.length() - 1;
 
@@ -515,12 +515,12 @@ static T simpson_driver(const T step,
 	mut<T> sum = INTEGRAND(0);
 
 	for (mut<usize> n = 1; n < (n_max - 3); n += 3) {
-		sum += static_cast<T>(3.0)*INTEGRAND(n + 0)
-		     + static_cast<T>(3.0)*INTEGRAND(n + 1)
-		     + static_cast<T>(2.0)*INTEGRAND(n + 2);
+		sum += static_cast<T>(3.0f)*INTEGRAND(n + 0)
+		     + static_cast<T>(3.0f)*INTEGRAND(n + 1)
+		     + static_cast<T>(2.0f)*INTEGRAND(n + 2);
 	}
 
-	sum += static_cast<T>(3.0)*INTEGRAND(n_max - 1) + INTEGRAND(n_max);
+	sum += static_cast<T>(3.0f)*INTEGRAND(n_max - 1) + INTEGRAND(n_max);
 
 	#undef INTEGRAND
 
