@@ -80,7 +80,7 @@ numerov::Basis::Basis(String &filename): filename(filename.move())
 // numerov::PotentialEntry:
 //
 
-numerov::PotentialEntry::PotentialEntry(usize channel_count = 0):
+numerov::PotentialEntry::PotentialEntry(usize channel_count):
 	R(0.0), value(channel_count, channel_count), index(0)
 {
 }
@@ -93,7 +93,7 @@ static constexpr usize POTENTIAL_FILE_HEADER = sizeof(numerov::MAGIC_NUMBER)
                                              + sizeof(numerov::FORMAT_VERSION)
                                              + sizeof(usize) + 4*sizeof(f64);
 
-numerov::Potential::Potential(c_str filename, u8 fmt_ver): input(filename)
+numerov::Potential::Potential(c_str filename, u8 fmt_ver): input(filename), entry(0)
 {
 	CHECK_FILE_HEADER(this->input, fmt_ver);
 
@@ -158,7 +158,7 @@ const numerov::PotentialEntry& numerov::Potential::operator[](usize grid_index)
 // numerov::RatioEntry:
 //
 
-numerov::RatioEntry::RatioEntry(usize channel_count = 0):
+numerov::RatioEntry::RatioEntry(usize channel_count):
 	R(0.0), energy(0.0), value(channel_count, channel_count)
 {
 }
@@ -179,7 +179,7 @@ static constexpr usize RATIO_FILE_HEADER = sizeof(numerov::MAGIC_NUMBER)
                                          + sizeof(usize) + sizeof(f64)
                                          + 2*sizeof(Range<f64>);
 
-numerov::Ratio::Ratio(c_str filename, u8 fmt_ver): stride(0), input(filename)
+numerov::Ratio::Ratio(c_str filename, u8 fmt_ver): stride(0), input(filename), entry(0)
 {
 	CHECK_FILE_HEADER(this->input, fmt_ver);
 
