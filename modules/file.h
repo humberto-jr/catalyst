@@ -25,7 +25,7 @@
 
 		static void seek_set(std::FILE *stream, usize count = 0)
 		{
-			auto info = std::fseek(stream, count, SEEK_SET);
+			auto info = std::fseek(stream, as_s64(count), SEEK_SET);
 
 			if (info != 0) {
 				print::error(WHERE, "Unable to set the position indicator at ", count, " bytes from the beginning");
@@ -34,7 +34,7 @@
 
 		static void seek_end(std::FILE *stream, usize count = 0)
 		{
-			auto info = std::fseek(stream, count, SEEK_END);
+			auto info = std::fseek(stream, as_s64(count), SEEK_END);
 
 			if (info != 0) {
 				print::error(WHERE, "Unable to set the position indicator at ", count, " bytes from the end");
@@ -453,11 +453,15 @@
 			{
 				auto caller_offset = std::ftell(this->stream);
 
+				assert(caller_offset != -1L);
+
 				this->seek_end();
 				auto count = std::ftell(this->stream);
-				this->seek_set(caller_offset);
+				this->seek_set(as_usize(caller_offset));
 
-				return count;
+				assert(count != -1L);
+
+				return as_usize(count);
 			}
 
 			inline bool end() const
