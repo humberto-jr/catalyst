@@ -102,7 +102,7 @@
 				this->check_avail_capacity();
 			}
 
-			this->end += std::snprintf(&this->buf[this->end], (this->capacity() - this->end), type_fmt<T>(), PAD, val);
+			this->end += as_usize(std::snprintf(&this->buf[this->end], (this->capacity() - this->end), type_fmt<T>(), PAD, val));
 		}
 
 		template<u8 PAD = DEFAULT_FMT_PADDING, typename T, typename... Ts>
