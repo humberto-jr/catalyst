@@ -14,6 +14,8 @@
 
 		f64 norm(f64 step, const Vec<f64> &eigenvec);
 
+		f64 centrifugal_term(const Range<f64> &r_list, const Vec<f64> &eigenvec);
+
 		struct BasisEntry {
 			mut<u32> J;
 			mut<u32> v;

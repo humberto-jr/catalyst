@@ -147,6 +147,19 @@ f64 fgh::norm(f64 step, const Vec<f64> &eigenvec)
 	return 1.0/std::sqrt(sum);
 }
 
+f64 fgh::centrifugal_term(const Range<f64> &r_list, const Vec<f64> &eigenvec)
+{
+	Vec<f64> integrand(eigenvec.length());
+
+	for (auto r : r_list.indexed()) {
+		f64 op = 1.0/(r.value*r.value);
+
+		integrand[r.index] = eigenvec[r.index]*op*eigenvec[r.index];
+	}
+
+	return math::simpson(r_list.step, integrand);
+}
+
 //
 // fgh::Basis:
 //
