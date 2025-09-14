@@ -480,15 +480,15 @@
 		}
 
 		if constexpr(is_f32<T>()) {
-			return "%*.6E";
+			return "% *.6E";
 		}
 
 		if constexpr(is_f64<T>()) {
-			return "%*.15E";
+			return "% *.15E";
 		}
 
 		if constexpr(is_f128<T>()) {
-			return "%*.18Lf";
+			return "% *.18Lf";
 		}
 
 		if constexpr(is_cstr<T>()) {
