@@ -1,7 +1,6 @@
 #if !defined(INPUT_HEADER)
 	#define INPUT_HEADER
 	#include "essentials.h"
-	#include "libtoml.h"
 	#include "nist.h"
 	#include <sstream>
 	#include <iostream>
