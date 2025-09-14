@@ -94,9 +94,21 @@ int main(int argc, char *argv[])
 	// PES:
 	//
 
-	const char arrang = toml.pes_arrangement();
+	const char arrang = as_char(96 + toml.value("pes", "arrang", 1, 3, 1));
 
-	pes::Frontend pes = toml.pes_extern_lib();
+	const auto atom_a = toml.isotope("pes", "atom_a", nist::Isotope::atom_unknown);
+
+	const auto atom_b = toml.isotope("pes", "atom_b", nist::Isotope::atom_unknown);
+
+	const auto atom_c = toml.isotope("pes", "atom_c", nist::Isotope::atom_unknown);
+
+	c_str pesname = toml.string("pes", "filename", "\0");
+
+	if (pesname[0] == '\0') {
+		print::error(WHERE, "Expecting the PES shared library (*.so) at pes.filename");
+	}
+
+	pes::Frontend pes(pesname, atom_a, atom_b, atom_c);
 
 	f64 mass = (arrang == 'a'? pes.mass_bc() : (arrang == 'b'? pes.mass_ac() : pes.mass_ab()));
 
