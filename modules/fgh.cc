@@ -189,8 +189,8 @@ fgh::Basis::Basis(c_str filename, u8 fmt_ver): len(0), stride(0), input(filename
 	// NOTE: There is an extra usize entry used for the basis indexing in each
 	// chunk of data stored in the file, which is not part of fgh::BasisEntry.
 	this->stride = sizeof(usize)
-	             + 6*sizeof(u32)
-	             + sizeof(s32) + 2*sizeof(f64) + this->entry.eigenvec.size();
+	             + 7*sizeof(s32)
+	             + 2*sizeof(f64) + this->entry.eigenvec.size();
 
 	CHECK_FILE_END(this->input)
 }
@@ -209,8 +209,8 @@ const fgh::BasisEntry& fgh::Basis::operator[](usize index)
 	}
 
 	this->input.read(this->entry.n);
-	this->input.read(this->entry.j);
 	this->input.read(this->entry.v);
+	this->input.read(this->entry.j);
 	this->input.read(this->entry.J);
 	this->input.read(this->entry.l);
 	this->input.read(this->entry.p);

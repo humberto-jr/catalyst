@@ -179,7 +179,7 @@
 			return l*(l + 1.0)/(2.0*mass*x*x);
 		}
 
-		inline static f64 centrifugal_term(u32 l, f64 mass, f64 x)
+		inline static f64 centrifugal_term(s32 l, f64 mass, f64 x)
 		{
 			return numerov::centrifugal_term(as_f64(l), mass, x);
 		}

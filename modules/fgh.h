@@ -17,13 +17,13 @@
 		f64 centrifugal_term(const Range<f64> &r_list, const Vec<f64> &eigenvec);
 
 		struct BasisEntry {
-			mut<u32> J;
-			mut<u32> v;
-			mut<u32> n;
-			mut<u32> j;
-			mut<u32> l;
+			mut<s32> J;
+			mut<s32> v;
+			mut<s32> n;
+			mut<s32> j;
+			mut<s32> l;
 			mut<s32> p;
-			mut<u32> c;
+			mut<s32> c;
 			mut<u8> spin_mult;
 			mut<f64> norm;
 			Range<f64> r_list;
