@@ -296,8 +296,8 @@ numerov::ScattMatrix::ScattMatrix(c_str filename, u8 fmt_ver):
 	// written in the input file. That is, the size of a numerov::ScattMatrixEntry
 	// object (without the 'size' and 'channel_count' members) plus three extra
 	// integers stored for internal checks (channels and energy indices, all usize).
-	this->entry.size = 2*sizeof(usize) + 10*sizeof(u32) + 2*sizeof(s32)
-	                 + 2*sizeof(f64) + energy_count*(sizeof(usize) + 3*sizeof(f64));
+	this->entry.size = 2*sizeof(usize) + 14*sizeof(s32) + 2*sizeof(f64)
+	                 + energy_count*(sizeof(usize) + 3*sizeof(f64));
 }
 
 c_str numerov::ScattMatrix::filename() const
@@ -331,20 +331,22 @@ const numerov::ScattMatrixEntry& numerov::ScattMatrix::operator()(usize channel_
 	CHECK_DATA_INDEX(this->input, channel_a, "channel a")
 	CHECK_DATA_INDEX(this->input, channel_b, "channel b")
 
-	this->input.read(this->entry.j_in);
+	this->input.read(this->entry.n_in);
 	this->input.read(this->entry.v_in);
+	this->input.read(this->entry.j_in);
 	this->input.read(this->entry.J_in);
 	this->input.read(this->entry.l_in);
 	this->input.read(this->entry.p_in);
-	this->input.read(this->entry.n_in);
+	this->input.read(this->entry.c_in);
 	this->input.read(this->entry.eigenval_in);
 
-	this->input.read(this->entry.j_out);
+	this->input.read(this->entry.n_out);
 	this->input.read(this->entry.v_out);
+	this->input.read(this->entry.j_out);
 	this->input.read(this->entry.J_out);
 	this->input.read(this->entry.l_out);
 	this->input.read(this->entry.p_out);
-	this->input.read(this->entry.n_out);
+	this->input.read(this->entry.c_out);
 	this->input.read(this->entry.eigenval_out);
 
 	for (mut<usize> n = 0; n < this->entry.value.length(); ++n) {

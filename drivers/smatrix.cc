@@ -115,26 +115,28 @@ int main(int argc, char *argv[])
 		for (mut<usize> channel_b = 0; channel_b < channel_count; ++channel_b) {
 			bool was_closed = true;
 
-			// NOTE: (x2 usize, 16 bytes) + (x10 u32, 40 bytes) + (x2 s32, 8 bytes) + (x2 f64, 16 bytes).
-			// It gives a total of 80 initial bytes for each pair of channels, ab.
+			// NOTE: (x2 usize, 16 bytes) + (x14 s32, 56 bytes) + (x2 f64, 16 bytes).
+			// It gives a total of 88 initial bytes for each pair of channels, ab.
 
 			smatrix.write(channel_a);
 			smatrix.write(channel_b);
 
-			smatrix.write(basis.list[channel_a].j);
+			smatrix.write(basis.list[channel_a].n);
 			smatrix.write(basis.list[channel_a].v);
+			smatrix.write(basis.list[channel_a].j);
 			smatrix.write(basis.list[channel_a].J);
 			smatrix.write(basis.list[channel_a].l);
 			smatrix.write(basis.list[channel_a].p);
-			smatrix.write(basis.list[channel_a].n);
+			smatrix.write(basis.list[channel_a].c);
 			smatrix.write(basis.list[channel_a].eigenval);
 
-			smatrix.write(basis.list[channel_b].j);
+			smatrix.write(basis.list[channel_b].n);
 			smatrix.write(basis.list[channel_b].v);
+			smatrix.write(basis.list[channel_b].j);
 			smatrix.write(basis.list[channel_b].J);
 			smatrix.write(basis.list[channel_b].l);
 			smatrix.write(basis.list[channel_b].p);
-			smatrix.write(basis.list[channel_b].n);
+			smatrix.write(basis.list[channel_b].c);
 			smatrix.write(basis.list[channel_b].eigenval);
 
 			// NOTE: Shifted and/or scaled energies are for printing. Only the
@@ -146,7 +148,7 @@ int main(int argc, char *argv[])
 				f64 total_energy = (list[task].total_energy + shift)*scale;
 
 				// NOTE: (x1 usize, 8 bytes) + (x3 f64, 24 bytes).
-				// For each chunk of 80 bytes, we add more energy_count*32 bytes.
+				// For each chunk of 88 bytes, we add more energy_count*32 bytes.
 
 				smatrix.write(task);
 				smatrix.write(list[task].total_energy);
@@ -165,18 +167,20 @@ int main(int argc, char *argv[])
 
 					print::line("# (",
 					            "Ch. = ", channel_a,
+					            ", n = ", basis.list[channel_a].n,
 					            ", v = ", basis.list[channel_a].v,
 					            ", j = ", basis.list[channel_a].j,
 					            ", l = ", basis.list[channel_a].l,
-					            ", n = ", basis.list[channel_a].n,
+					            ", c = ", basis.list[channel_a].c,
 					            ", J = ", basis.list[channel_a].J,
 					            ", eigenvalue = ", eigenval_a,
 					            ") --> (",
 					            "Ch. = ", channel_b,
+					            ", n' = ", basis.list[channel_b].n,
 					            ", v' = ", basis.list[channel_b].v,
 					            ", j' = ", basis.list[channel_b].j,
 					            ", l' = ", basis.list[channel_b].l,
-					            ", n' = ", basis.list[channel_b].n,
+					            ", n' = ", basis.list[channel_b].c,
 					            ", J' = ", basis.list[channel_b].J,
 					            ", eigenvalue = ", eigenval_b, ')');
 

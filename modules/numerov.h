@@ -82,20 +82,22 @@
 
 			mut<f64> mass;
 
-			mut<u32> j_in;
-			mut<u32> v_in;
-			mut<u32> J_in;
-			mut<u32> l_in;
+			mut<s32> n_in;
+			mut<s32> v_in;
+			mut<s32> j_in;
+			mut<s32> J_in;
+			mut<s32> l_in;
 			mut<s32> p_in;
-			mut<u32> n_in;
+			mut<s32> c_in;
 			mut<f64> eigenval_in;
 
-			mut<u32> j_out;
-			mut<u32> v_out;
-			mut<u32> J_out;
-			mut<u32> l_out;
+			mut<s32> n_out;
+			mut<s32> v_out;
+			mut<s32> j_out;
+			mut<s32> J_out;
+			mut<s32> l_out;
 			mut<s32> p_out;
-			mut<u32> n_out;
+			mut<s32> c_out;
 			mut<f64> eigenval_out;
 
 			Vec<f64> total_energy;
