@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
 					            ", v' = ", basis.list[channel_b].v,
 					            ", j' = ", basis.list[channel_b].j,
 					            ", l' = ", basis.list[channel_b].l,
-					            ", n' = ", basis.list[channel_b].c,
+					            ", c' = ", basis.list[channel_b].c,
 					            ", J' = ", basis.list[channel_b].J,
 					            ", eigenvalue = ", eigenval_b, ')');
 
