@@ -1,194 +1,193 @@
-#if !defined(NUMEROV_HEADER)
-	#define NUMEROV_HEADER
-	#include "essentials.h"
-	#include "fgh.h"
+#pragma once
 
-	namespace numerov {
-		// NOTE: The first file format is intended for input coupling potentials,
-		// the second for output Numerov ratio matrices and the third for S-matrices.
-		constexpr u8 FORMAT_VERSION = 3;
+#include "essentials.h"
+#include "fgh.h"
 
-		constexpr u32 MAGIC_NUMBER = 1701998454u;
+namespace numerov {
+	// NOTE: The first file format is intended for input coupling potentials,
+	// the second for output Numerov ratio matrices and the third for S-matrices.
+	constexpr u8 FORMAT_VERSION = 3;
 
-		struct Basis {
-			const String filename;
-			Vec<fgh::BasisEntry> list;
+	constexpr u32 MAGIC_NUMBER = 1701998454u;
 
-			Basis(String &filename);
-		};
+	struct Basis {
+		const String filename;
+		Vec<fgh::BasisEntry> list;
 
-		struct PotentialEntry {
-			mut<f64> R;
-			Mat<f64> value;
-			mut<usize> index;
+		Basis(String &filename);
+	};
 
-			PotentialEntry(usize channel_count);
-		};
+	struct PotentialEntry {
+		mut<f64> R;
+		Mat<f64> value;
+		mut<usize> index;
 
-		class Potential {
-			public:
-			Potential(c_str filename, u8 fmt_ver = 1);
+		PotentialEntry(usize channel_count);
+	};
 
-			c_str filename() const;
+	class Potential {
+		public:
+		Potential(c_str filename, u8 fmt_ver = 1);
 
-			f64 reduced_mass();
+		c_str filename() const;
 
-			usize channel_count() const;
+		f64 reduced_mass();
 
-			Range<f64> grid_range();
+		usize channel_count() const;
 
-			const PotentialEntry& operator[](usize grid_index);
+		Range<f64> grid_range();
 
-			private:
-			file::Input input;
-			PotentialEntry entry;
-		};
+		const PotentialEntry& operator[](usize grid_index);
 
-		struct RatioEntry {
-			mut<f64> R;
-			mut<f64> energy;
-			Mat<f64> value;
+		private:
+		file::Input input;
+		PotentialEntry entry;
+	};
 
-			RatioEntry(usize channel_count);
+	struct RatioEntry {
+		mut<f64> R;
+		mut<f64> energy;
+		Mat<f64> value;
 
-			usize size() const;
-		};
+		RatioEntry(usize channel_count);
 
-		class Ratio {
-			public:
-			Ratio(c_str filename, u8 fmt_ver = 2);
+		usize size() const;
+	};
 
-			c_str filename() const;
+	class Ratio {
+		public:
+		Ratio(c_str filename, u8 fmt_ver = 2);
 
-			f64 reduced_mass();
+		c_str filename() const;
 
-			usize channel_count() const;
+		f64 reduced_mass();
 
-			Range<f64> grid_range();
+		usize channel_count() const;
 
-			Range<f64> energy_range();
+		Range<f64> grid_range();
 
-			const RatioEntry& operator()(usize grid_index, usize energy_index);
+		Range<f64> energy_range();
 
-			private:
-			mut<usize> stride;
-			file::Input input;
-			RatioEntry entry;
-		};
+		const RatioEntry& operator()(usize grid_index, usize energy_index);
 
-		struct ScattMatrixEntry {
-			mut<usize> size;
-			mut<usize> channel_count;
+		private:
+		mut<usize> stride;
+		file::Input input;
+		RatioEntry entry;
+	};
 
-			mut<f64> mass;
+	struct ScattMatrixEntry {
+		mut<usize> size;
+		mut<usize> channel_count;
 
-			mut<s32> n_in;
-			mut<s32> v_in;
-			mut<s32> j_in;
-			mut<s32> J_in;
-			mut<s32> l_in;
-			mut<s32> p_in;
-			mut<s32> c_in;
-			mut<f64> eigenval_in;
+		mut<f64> mass;
 
-			mut<s32> n_out;
-			mut<s32> v_out;
-			mut<s32> j_out;
-			mut<s32> J_out;
-			mut<s32> l_out;
-			mut<s32> p_out;
-			mut<s32> c_out;
-			mut<f64> eigenval_out;
+		mut<s32> n_in;
+		mut<s32> v_in;
+		mut<s32> j_in;
+		mut<s32> J_in;
+		mut<s32> l_in;
+		mut<s32> p_in;
+		mut<s32> c_in;
+		mut<f64> eigenval_in;
 
-			Vec<f64> total_energy;
-			Vec<c64> value;
-		};
+		mut<s32> n_out;
+		mut<s32> v_out;
+		mut<s32> j_out;
+		mut<s32> J_out;
+		mut<s32> l_out;
+		mut<s32> p_out;
+		mut<s32> c_out;
+		mut<f64> eigenval_out;
 
-		class ScattMatrix {
-			public:
-			ScattMatrix(c_str filename, u8 fmt_ver = 3);
+		Vec<f64> total_energy;
+		Vec<c64> value;
+	};
 
-			c_str filename() const;
+	class ScattMatrix {
+		public:
+		ScattMatrix(c_str filename, u8 fmt_ver = 3);
 
-			f64 reduced_mass() const;
+		c_str filename() const;
 
-			usize channel_count() const;
+		f64 reduced_mass() const;
 
-			usize energy_count() const;
+		usize channel_count() const;
 
-			const ScattMatrixEntry& operator()(usize channel_a, usize channel_b);
+		usize energy_count() const;
 
-			private:
-			file::Input input;
-			ScattMatrixEntry entry;
-		};
+		const ScattMatrixEntry& operator()(usize channel_a, usize channel_b);
 
-		struct ScattAmplitudeEntry {
-			mut<s32> m_in;
-			mut<s32> m_out;
-			Vec<Vec<c64>> value;
-		};
+		private:
+		file::Input input;
+		ScattMatrixEntry entry;
+	};
 
-		class ScattAmplitude {
-			public:
-			ScattAmplitude(u32 j_in, u32 j_out, usize theta_count, usize energy_count);
+	struct ScattAmplitudeEntry {
+		mut<s32> m_in;
+		mut<s32> m_out;
+		Vec<Vec<c64>> value;
+	};
 
-			usize mm_count() const;
+	class ScattAmplitude {
+		public:
+		ScattAmplitude(u32 j_in, u32 j_out, usize theta_count, usize energy_count);
 
-			usize theta_count() const;
+		usize mm_count() const;
 
-			usize energy_count() const;
+		usize theta_count() const;
 
-			c64 mm_sum(usize theta_index, usize energy_index) const;
+		usize energy_count() const;
 
-			const ScattAmplitudeEntry& operator()(usize mm_index) const;
+		c64 mm_sum(usize theta_index, usize energy_index) const;
 
-			Vec<c64>& operator()(usize mm_index, usize theta_index) const;
+		const ScattAmplitudeEntry& operator()(usize mm_index) const;
 
-			c64& operator()(usize mm_index, usize theta_index, usize energy_index) const;
+		Vec<c64>& operator()(usize mm_index, usize theta_index) const;
 
-			private:
-			Vec<ScattAmplitudeEntry> entry;
-		};
+		c64& operator()(usize mm_index, usize theta_index, usize energy_index) const;
 
-		void renormalized(f64 mass,
-		                  f64 step,
-		                  f64 total_energy,
-		                  const Mat<f64> &potential,
-		                  Mat<f64> &workspace,
-		                  Mat<f64> &old_ratio,
-		                  Mat<f64> &new_ratio);
+		private:
+		Vec<ScattAmplitudeEntry> entry;
+	};
 
-		usize build_react_matrix(f64 mass,
-		                         f64 step,
-		                         f64 R_max,
-		                         f64 total_energy,
-		                         const Mat<f64> &ratio,
-		                         const numerov::Basis &level, Mat<f64> &k);
+	void renormalized(f64 mass,
+	                  f64 step,
+	                  f64 total_energy,
+	                  const Mat<f64> &potential,
+	                  Mat<f64> &workspace,
+	                  Mat<f64> &old_ratio,
+	                  Mat<f64> &new_ratio);
 
-		void build_scatt_matrix(const Mat<f64> &k,
-		                        Mat<f64> &re_s, Mat<f64> &im_s);
+	usize build_react_matrix(f64 mass,
+	                         f64 step,
+	                         f64 R_max,
+	                         f64 total_energy,
+	                         const Mat<f64> &ratio,
+	                         const numerov::Basis &level, Mat<f64> &k);
 
-		void build_scatt_amplitude(const ScattMatrixEntry &s,
-		                           s32 m_in, s32 m_out, f64 theta, f64 phi, Vec<c64> &f);
+	void build_scatt_matrix(const Mat<f64> &k,
+	                        Mat<f64> &re_s, Mat<f64> &im_s);
 
-		void build_cross_section(const numerov::ScattAmplitude &f, u32 j_in,
-		                         const Vec<f64> &wavenum_in, const Vec<f64> &wavenum_out,
-		                         Mat<c64> &f_sum, Mat<f64> &dif_sigma, Vec<f64> &int_sigma);
+	void build_scatt_amplitude(const ScattMatrixEntry &s,
+	                           s32 m_in, s32 m_out, f64 theta, f64 phi, Vec<c64> &f);
 
-		inline static f64 centrifugal_term(f64 l, f64 mass, f64 x)
-		{
-			return l*(l + 1.0)/(2.0*mass*x*x);
-		}
+	void build_cross_section(const numerov::ScattAmplitude &f, u32 j_in,
+	                         const Vec<f64> &wavenum_in, const Vec<f64> &wavenum_out,
+	                         Mat<c64> &f_sum, Mat<f64> &dif_sigma, Vec<f64> &int_sigma);
 
-		inline static f64 centrifugal_term(s32 l, f64 mass, f64 x)
-		{
-			return numerov::centrifugal_term(as_f64(l), mass, x);
-		}
-
-		inline static f64 wavenumber(f64 mass, f64 total_energy, f64 eigenval)
-		{
-			return std::sqrt(2.0*mass*(total_energy - eigenval));
-		}
+	inline static f64 centrifugal_term(f64 l, f64 mass, f64 x)
+	{
+		return l*(l + 1.0)/(2.0*mass*x*x);
 	}
-#endif
+
+	inline static f64 centrifugal_term(s32 l, f64 mass, f64 x)
+	{
+		return numerov::centrifugal_term(as_f64(l), mass, x);
+	}
+
+	inline static f64 wavenumber(f64 mass, f64 total_energy, f64 eigenval)
+	{
+		return std::sqrt(2.0*mass*(total_energy - eigenval));
+	}
+}
