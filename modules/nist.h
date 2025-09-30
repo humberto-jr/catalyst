@@ -13495,6 +13495,383 @@ namespace nist {
 		}
 	}
 
+	static constexpr f64 nuclear_spin(const nist::Isotope a)
+	{
+		// NOTE: The nuclear spin quantum numbers are not from a NIST database,
+		// but this was the most convenient place for this data. This was taken
+		// from https://easyspin.org/easyspin/documentation/isotopetable.html
+		//
+		// Below we reproduce relevant comments as found in the original source.
+		//
+		// Nuclear magnetic moments are taken from
+		//   N.Stone
+		//   Table of Nuclear Magnetic Dipole and Electric Quadrupole Moments
+		//   International Atomic Energy Agency, INDC(NDS)-0658, February 2014
+		//     (https://www-nds.iaea.org/publications/indc/indc-nds-0658.pdf)
+		//   (Typo for Rh103: Moment is factor of 10 too large)
+		//
+		//  237Np, 239Pu, 243Am data from
+		//   N.E.Holden
+		//   Table of the Isotopes
+		//   CRC Handbook of Physics and Chemistry, section 11-2
+		//     (http://www.hbcponline.com//articles/11_02_92.pdf)
+		//
+		// Nuclear quadrupole moments are taken from
+		//   N.Stone
+		//   Table of Nuclear Quadrupole Moments
+		//   International Atomic Energy Agency, INDC(NDS)-650, December 2013
+		//     (https://www-nds.iaea.org/publications/indc/indc-nds-0650.pdf)
+		//  (Typo for Ac227: Sign should be +)
+		//
+		// See also
+		//   P.Pyykkö
+		//   Year-2008 Nuclear Quadrupole Moments
+		//   Mol.Phys. 106(16-18), 1965-1974 (2008)
+		//     (https://doi.org/10.1080/00268970802018367)
+		//
+		//   N.E.Holden
+		//   Table of the Isotopes
+		//   CRC Handbook of Physics and Chemistry, section 11-2
+		//     (http://www.hbcponline.com//articles/11_02_92.pdf)
+
+		switch (a) {
+			case nist::Isotope::atom_1H:    return 0.5;
+			case nist::Isotope::atom_2H:    return 1.0;
+			case nist::Isotope::atom_3H:    return 0.5;
+			case nist::Isotope::atom_3He:   return 0.5;
+			case nist::Isotope::atom_4He:   return 0.0;
+			case nist::Isotope::atom_6Li:   return 1.0;
+			case nist::Isotope::atom_7Li:   return 1.5;
+			case nist::Isotope::atom_9Be:   return 1.5;
+			case nist::Isotope::atom_10B:   return 3.0;
+			case nist::Isotope::atom_11B:   return 1.5;
+			case nist::Isotope::atom_12C:   return 0.0;
+			case nist::Isotope::atom_13C:   return 0.5;
+			case nist::Isotope::atom_14C:   return 0.0;
+			case nist::Isotope::atom_14N:   return 1.0;
+			case nist::Isotope::atom_15N:   return 0.5;
+			case nist::Isotope::atom_16O:   return 0.0;
+			case nist::Isotope::atom_17O:   return 2.5;
+			case nist::Isotope::atom_18O:   return 0.0;
+			case nist::Isotope::atom_19F:   return 0.5;
+			case nist::Isotope::atom_20Ne:  return 0.0;
+			case nist::Isotope::atom_21Ne:  return 1.5;
+			case nist::Isotope::atom_22Ne:  return 0.0;
+			case nist::Isotope::atom_22Na:  return 3.0;
+			case nist::Isotope::atom_23Na:  return 1.5;
+			case nist::Isotope::atom_24Mg:  return 0.0;
+			case nist::Isotope::atom_25Mg:  return 2.5;
+			case nist::Isotope::atom_26Mg:  return 0.0;
+			case nist::Isotope::atom_27Al:  return 2.5;
+			case nist::Isotope::atom_28Si:  return 0.0;
+			case nist::Isotope::atom_29Si:  return 0.5;
+			case nist::Isotope::atom_30Si:  return 0.0;
+			case nist::Isotope::atom_31P:   return 0.5;
+			case nist::Isotope::atom_32S:   return 0.0;
+			case nist::Isotope::atom_33S:   return 1.5;
+			case nist::Isotope::atom_34S:   return 0.0;
+			case nist::Isotope::atom_36S:   return 0.0;
+			case nist::Isotope::atom_35Cl:  return 1.5;
+			case nist::Isotope::atom_36Cl:  return 2.0;
+			case nist::Isotope::atom_37Cl:  return 1.5;
+			case nist::Isotope::atom_36Ar:  return 0.0;
+			case nist::Isotope::atom_38Ar:  return 0.0;
+			case nist::Isotope::atom_39Ar:  return 3.5;
+			case nist::Isotope::atom_40Ar:  return 0.0;
+			case nist::Isotope::atom_39K:   return 1.5;
+			case nist::Isotope::atom_40K:   return 4.0;
+			case nist::Isotope::atom_41K:   return 1.5;
+			case nist::Isotope::atom_40Ca:  return 0.0;
+			case nist::Isotope::atom_41Ca:  return 3.5;
+			case nist::Isotope::atom_42Ca:  return 0.0;
+			case nist::Isotope::atom_43Ca:  return 3.5;
+			case nist::Isotope::atom_44Ca:  return 0.0;
+			case nist::Isotope::atom_46Ca:  return 0.0;
+			case nist::Isotope::atom_48Ca:  return 0.0;
+			case nist::Isotope::atom_45Sc:  return 3.5;
+			case nist::Isotope::atom_46Ti:  return 0.0;
+			case nist::Isotope::atom_47Ti:  return 2.5;
+			case nist::Isotope::atom_48Ti:  return 0.0;
+			case nist::Isotope::atom_49Ti:  return 3.5;
+			case nist::Isotope::atom_50Ti:  return 0.0;
+			case nist::Isotope::atom_50V:   return 6.0;
+			case nist::Isotope::atom_51V:   return 3.5;
+			case nist::Isotope::atom_50Cr:  return 0.0;
+			case nist::Isotope::atom_52Cr:  return 0.0;
+			case nist::Isotope::atom_53Cr:  return 1.5;
+			case nist::Isotope::atom_54Cr:  return 0.0;
+			case nist::Isotope::atom_53Mn:  return 3.5;
+			case nist::Isotope::atom_55Mn:  return 2.5;
+			case nist::Isotope::atom_54Fe:  return 0.0;
+			case nist::Isotope::atom_56Fe:  return 0.0;
+			case nist::Isotope::atom_57Fe:  return 0.5;
+			case nist::Isotope::atom_58Fe:  return 0.0;
+			case nist::Isotope::atom_59Co:  return 3.5;
+			case nist::Isotope::atom_60Co:  return 5.0;
+			case nist::Isotope::atom_58Ni:  return 0.0;
+			case nist::Isotope::atom_60Ni:  return 0.0;
+			case nist::Isotope::atom_61Ni:  return 1.5;
+			case nist::Isotope::atom_62Ni:  return 0.0;
+			case nist::Isotope::atom_64Ni:  return 0.0;
+			case nist::Isotope::atom_63Cu:  return 1.5;
+			case nist::Isotope::atom_65Cu:  return 1.5;
+			case nist::Isotope::atom_64Zn:  return 0.0;
+			case nist::Isotope::atom_66Zn:  return 0.0;
+			case nist::Isotope::atom_67Zn:  return 2.5;
+			case nist::Isotope::atom_68Zn:  return 0.0;
+			case nist::Isotope::atom_70Zn:  return 0.0;
+			case nist::Isotope::atom_69Ga:  return 1.5;
+			case nist::Isotope::atom_71Ga:  return 1.5;
+			case nist::Isotope::atom_70Ge:  return 0.0;
+			case nist::Isotope::atom_72Ge:  return 0.0;
+			case nist::Isotope::atom_73Ge:  return 4.5;
+			case nist::Isotope::atom_74Ge:  return 0.0;
+			case nist::Isotope::atom_76Ge:  return 0.0;
+			case nist::Isotope::atom_75As:  return 1.5;
+			case nist::Isotope::atom_74Se:  return 0.0;
+			case nist::Isotope::atom_76Se:  return 0.0;
+			case nist::Isotope::atom_77Se:  return 0.5;
+			case nist::Isotope::atom_78Se:  return 0.0;
+			case nist::Isotope::atom_79Se:  return 3.5;
+			case nist::Isotope::atom_80Se:  return 0.0;
+			case nist::Isotope::atom_82Se:  return 0.0;
+			case nist::Isotope::atom_79Br:  return 1.5;
+			case nist::Isotope::atom_81Br:  return 1.5;
+			case nist::Isotope::atom_78Kr:  return 0.0;
+			case nist::Isotope::atom_80Kr:  return 0.0;
+			case nist::Isotope::atom_82Kr:  return 0.0;
+			case nist::Isotope::atom_83Kr:  return 4.5;
+			case nist::Isotope::atom_84Kr:  return 0.0;
+			case nist::Isotope::atom_85Kr:  return 4.5;
+			case nist::Isotope::atom_86Kr:  return 0.0;
+			case nist::Isotope::atom_85Rb:  return 2.5;
+			case nist::Isotope::atom_87Rb:  return 1.5;
+			case nist::Isotope::atom_84Sr:  return 0.0;
+			case nist::Isotope::atom_86Sr:  return 0.0;
+			case nist::Isotope::atom_87Sr:  return 4.5;
+			case nist::Isotope::atom_88Sr:  return 0.0;
+			case nist::Isotope::atom_89Y:   return 0.5;
+			case nist::Isotope::atom_90Zr:  return 0.0;
+			case nist::Isotope::atom_91Zr:  return 2.5;
+			case nist::Isotope::atom_92Zr:  return 0.0;
+			case nist::Isotope::atom_94Zr:  return 0.0;
+			case nist::Isotope::atom_96Zr:  return 0.0;
+			case nist::Isotope::atom_93Nb:  return 4.5;
+			case nist::Isotope::atom_92Mo:  return 0.0;
+			case nist::Isotope::atom_94Mo:  return 0.0;
+			case nist::Isotope::atom_95Mo:  return 2.5;
+			case nist::Isotope::atom_96Mo:  return 0.0;
+			case nist::Isotope::atom_97Mo:  return 2.5;
+			case nist::Isotope::atom_98Mo:  return 0.0;
+			case nist::Isotope::atom_100Mo: return 0.0;
+			case nist::Isotope::atom_99Tc:  return 4.5;
+			case nist::Isotope::atom_96Ru:  return 0.0;
+			case nist::Isotope::atom_98Ru:  return 0.0;
+			case nist::Isotope::atom_99Ru:  return 2.5;
+			case nist::Isotope::atom_100Ru: return 0.0;
+			case nist::Isotope::atom_101Ru: return 2.5;
+			case nist::Isotope::atom_102Ru: return 0.0;
+			case nist::Isotope::atom_104Ru: return 0.0;
+			case nist::Isotope::atom_103Rh: return 0.5;
+			case nist::Isotope::atom_102Pd: return 0.0;
+			case nist::Isotope::atom_104Pd: return 0.0;
+			case nist::Isotope::atom_105Pd: return 2.5;
+			case nist::Isotope::atom_106Pd: return 0.0;
+			case nist::Isotope::atom_108Pd: return 0.0;
+			case nist::Isotope::atom_110Pd: return 0.0;
+			case nist::Isotope::atom_107Ag: return 0.5;
+			case nist::Isotope::atom_109Ag: return 0.5;
+			case nist::Isotope::atom_106Cd: return 0.0;
+			case nist::Isotope::atom_108Cd: return 0.0;
+			case nist::Isotope::atom_110Cd: return 0.0;
+			case nist::Isotope::atom_111Cd: return 0.5;
+			case nist::Isotope::atom_112Cd: return 0.0;
+			case nist::Isotope::atom_113Cd: return 0.5;
+			case nist::Isotope::atom_114Cd: return 0.0;
+			case nist::Isotope::atom_116Cd: return 0.0;
+			case nist::Isotope::atom_113In: return 4.5;
+			case nist::Isotope::atom_115In: return 4.5;
+			case nist::Isotope::atom_112Sn: return 0.0;
+			case nist::Isotope::atom_114Sn: return 0.0;
+			case nist::Isotope::atom_115Sn: return 0.5;
+			case nist::Isotope::atom_116Sn: return 0.0;
+			case nist::Isotope::atom_117Sn: return 0.5;
+			case nist::Isotope::atom_118Sn: return 0.0;
+			case nist::Isotope::atom_119Sn: return 0.5;
+			case nist::Isotope::atom_120Sn: return 0.0;
+			case nist::Isotope::atom_122Sn: return 0.0;
+			case nist::Isotope::atom_124Sn: return 0.0;
+			case nist::Isotope::atom_121Sb: return 2.5;
+			case nist::Isotope::atom_123Sb: return 3.5;
+			case nist::Isotope::atom_125Sb: return 3.5;
+			case nist::Isotope::atom_120Te: return 0.0;
+			case nist::Isotope::atom_122Te: return 0.0;
+			case nist::Isotope::atom_123Te: return 0.5;
+			case nist::Isotope::atom_124Te: return 0.0;
+			case nist::Isotope::atom_125Te: return 0.5;
+			case nist::Isotope::atom_126Te: return 0.0;
+			case nist::Isotope::atom_128Te: return 0.0;
+			case nist::Isotope::atom_130Te: return 0.0;
+			case nist::Isotope::atom_127I:  return 2.5;
+			case nist::Isotope::atom_129I:  return 3.5;
+			case nist::Isotope::atom_124Xe: return 0.0;
+			case nist::Isotope::atom_126Xe: return 0.0;
+			case nist::Isotope::atom_128Xe: return 0.0;
+			case nist::Isotope::atom_129Xe: return 0.5;
+			case nist::Isotope::atom_130Xe: return 0.0;
+			case nist::Isotope::atom_131Xe: return 1.5;
+			case nist::Isotope::atom_132Xe: return 0.0;
+			case nist::Isotope::atom_134Xe: return 0.0;
+			case nist::Isotope::atom_136Xe: return 0.0;
+			case nist::Isotope::atom_133Cs: return 3.5;
+			case nist::Isotope::atom_134Cs: return 4.0;
+			case nist::Isotope::atom_135Cs: return 3.5;
+			case nist::Isotope::atom_137Cs: return 3.5;
+			case nist::Isotope::atom_130Ba: return 0.0;
+			case nist::Isotope::atom_132Ba: return 0.0;
+			case nist::Isotope::atom_133Ba: return 0.5;
+			case nist::Isotope::atom_134Ba: return 0.0;
+			case nist::Isotope::atom_135Ba: return 1.5;
+			case nist::Isotope::atom_136Ba: return 0.0;
+			case nist::Isotope::atom_137Ba: return 1.5;
+			case nist::Isotope::atom_138Ba: return 0.0;
+			case nist::Isotope::atom_137La: return 3.5;
+			case nist::Isotope::atom_138La: return 5.0;
+			case nist::Isotope::atom_139La: return 3.5;
+			case nist::Isotope::atom_136Ce: return 0.0;
+			case nist::Isotope::atom_138Ce: return 0.0;
+			case nist::Isotope::atom_140Ce: return 0.0;
+			case nist::Isotope::atom_142Ce: return 0.0;
+			case nist::Isotope::atom_141Pr: return 2.5;
+			case nist::Isotope::atom_142Nd: return 0.0;
+			case nist::Isotope::atom_143Nd: return 3.5;
+			case nist::Isotope::atom_144Nd: return 0.0;
+			case nist::Isotope::atom_145Nd: return 3.5;
+			case nist::Isotope::atom_146Nd: return 0.0;
+			case nist::Isotope::atom_148Nd: return 0.0;
+			case nist::Isotope::atom_150Nd: return 0.0;
+			case nist::Isotope::atom_147Pm: return 3.5;
+			case nist::Isotope::atom_144Sm: return 0.0;
+			case nist::Isotope::atom_147Sm: return 3.5;
+			case nist::Isotope::atom_148Sm: return 0.0;
+			case nist::Isotope::atom_149Sm: return 3.5;
+			case nist::Isotope::atom_150Sm: return 0.0;
+			case nist::Isotope::atom_151Sm: return 2.5;
+			case nist::Isotope::atom_152Sm: return 0.0;
+			case nist::Isotope::atom_154Sm: return 0.0;
+			case nist::Isotope::atom_151Eu: return 2.5;
+			case nist::Isotope::atom_152Eu: return 3.0;
+			case nist::Isotope::atom_153Eu: return 2.5;
+			case nist::Isotope::atom_154Eu: return 3.0;
+			case nist::Isotope::atom_155Eu: return 2.5;
+			case nist::Isotope::atom_152Gd: return 0.0;
+			case nist::Isotope::atom_154Gd: return 0.0;
+			case nist::Isotope::atom_155Gd: return 1.5;
+			case nist::Isotope::atom_156Gd: return 0.0;
+			case nist::Isotope::atom_157Gd: return 1.5;
+			case nist::Isotope::atom_158Gd: return 0.0;
+			case nist::Isotope::atom_160Gd: return 0.0;
+			case nist::Isotope::atom_157Tb: return 1.5;
+			case nist::Isotope::atom_159Tb: return 1.5;
+			case nist::Isotope::atom_160Tb: return 3.0;
+			case nist::Isotope::atom_156Dy: return 0.0;
+			case nist::Isotope::atom_158Dy: return 0.0;
+			case nist::Isotope::atom_160Dy: return 0.0;
+			case nist::Isotope::atom_161Dy: return 2.5;
+			case nist::Isotope::atom_162Dy: return 0.0;
+			case nist::Isotope::atom_163Dy: return 2.5;
+			case nist::Isotope::atom_164Dy: return 0.0;
+			case nist::Isotope::atom_165Ho: return 3.5;
+			case nist::Isotope::atom_162Er: return 0.0;
+			case nist::Isotope::atom_164Er: return 0.0;
+			case nist::Isotope::atom_166Er: return 0.0;
+			case nist::Isotope::atom_167Er: return 3.5;
+			case nist::Isotope::atom_168Er: return 0.0;
+			case nist::Isotope::atom_170Er: return 0.0;
+			case nist::Isotope::atom_169Tm: return 0.5;
+			case nist::Isotope::atom_171Tm: return 0.5;
+			case nist::Isotope::atom_168Yb: return 0.0;
+			case nist::Isotope::atom_170Yb: return 0.0;
+			case nist::Isotope::atom_171Yb: return 0.5;
+			case nist::Isotope::atom_172Yb: return 0.0;
+			case nist::Isotope::atom_173Yb: return 2.5;
+			case nist::Isotope::atom_174Yb: return 0.0;
+			case nist::Isotope::atom_176Yb: return 0.0;
+			case nist::Isotope::atom_173Lu: return 3.5;
+			case nist::Isotope::atom_174Lu: return 1.0;
+			case nist::Isotope::atom_175Lu: return 3.5;
+			case nist::Isotope::atom_176Lu: return 7.0;
+			case nist::Isotope::atom_174Hf: return 0.0;
+			case nist::Isotope::atom_176Hf: return 0.0;
+			case nist::Isotope::atom_177Hf: return 3.5;
+			case nist::Isotope::atom_178Hf: return 0.0;
+			case nist::Isotope::atom_179Hf: return 4.5;
+			case nist::Isotope::atom_180Hf: return 0.0;
+			case nist::Isotope::atom_180Ta: return 9.0;
+			case nist::Isotope::atom_181Ta: return 3.5;
+			case nist::Isotope::atom_180W:  return 0.0;
+			case nist::Isotope::atom_182W:  return 0.0;
+			case nist::Isotope::atom_183W:  return 0.5;
+			case nist::Isotope::atom_184W:  return 0.0;
+			case nist::Isotope::atom_186W:  return 0.0;
+			case nist::Isotope::atom_185Re: return 2.5;
+			case nist::Isotope::atom_187Re: return 2.5;
+			case nist::Isotope::atom_184Os: return 0.0;
+			case nist::Isotope::atom_186Os: return 0.0;
+			case nist::Isotope::atom_187Os: return 0.5;
+			case nist::Isotope::atom_188Os: return 0.0;
+			case nist::Isotope::atom_189Os: return 1.5;
+			case nist::Isotope::atom_190Os: return 0.0;
+			case nist::Isotope::atom_192Os: return 0.0;
+			case nist::Isotope::atom_191Ir: return 1.5;
+			case nist::Isotope::atom_193Ir: return 1.5;
+			case nist::Isotope::atom_190Pt: return 0.0;
+			case nist::Isotope::atom_192Pt: return 0.0;
+			case nist::Isotope::atom_194Pt: return 0.0;
+			case nist::Isotope::atom_195Pt: return 0.5;
+			case nist::Isotope::atom_196Pt: return 0.0;
+			case nist::Isotope::atom_198Pt: return 0.0;
+			case nist::Isotope::atom_197Au: return 1.5;
+			case nist::Isotope::atom_196Hg: return 0.0;
+			case nist::Isotope::atom_198Hg: return 0.0;
+			case nist::Isotope::atom_199Hg: return 0.5;
+			case nist::Isotope::atom_200Hg: return 0.0;
+			case nist::Isotope::atom_201Hg: return 1.5;
+			case nist::Isotope::atom_202Hg: return 0.0;
+			case nist::Isotope::atom_204Hg: return 0.0;
+			case nist::Isotope::atom_203Tl: return 0.5;
+			case nist::Isotope::atom_204Tl: return 2.0;
+			case nist::Isotope::atom_205Tl: return 0.5;
+			case nist::Isotope::atom_204Pb: return 0.0;
+			case nist::Isotope::atom_206Pb: return 0.0;
+			case nist::Isotope::atom_207Pb: return 0.5;
+			case nist::Isotope::atom_208Pb: return 0.0;
+			case nist::Isotope::atom_207Bi: return 4.5;
+			case nist::Isotope::atom_209Bi: return 4.5;
+			case nist::Isotope::atom_209Po: return 0.5;
+			case nist::Isotope::atom_227Ac: return 1.5;
+			case nist::Isotope::atom_229Th: return 2.5;
+			case nist::Isotope::atom_232Th: return 0.0;
+			case nist::Isotope::atom_231Pa: return 1.5;
+			case nist::Isotope::atom_234U:  return 0.0;
+			case nist::Isotope::atom_235U:  return 3.5;
+			case nist::Isotope::atom_238U:  return 0.0;
+			case nist::Isotope::atom_237Np: return 2.5;
+			case nist::Isotope::atom_239Pu: return 0.5;
+			case nist::Isotope::atom_243Am: return 2.5;
+
+			// NOTE: Since not all isotopes are covered and returning zero nuclear
+			// spins as default would be misleading, not providing a valid isotope
+			// is considered a fatal error. More entries should be added on demand.
+
+			default:
+			print::error(WHERE, "Invalid isotope ", nist::atomic_symbol(a));
+		}
+
+		// NOTE: Unreachable.
+		return 0.0;
+	}
+
 	static inline u32 atomic_number(c_str symbol)
 	{
 		auto as_enum = nist::isotope_enum(symbol);
