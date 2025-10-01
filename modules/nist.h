@@ -13495,6 +13495,12 @@ namespace nist {
 		}
 	}
 
+	static inline u32 atomic_number(c_str symbol)
+	{
+		auto as_enum = nist::isotope_enum(symbol);
+		return nist::atomic_number(as_enum);
+	}
+
 	static constexpr f64 nuclear_spin(const nist::Isotope a)
 	{
 		// NOTE: The nuclear spin quantum numbers are not from a NIST database,
@@ -13872,10 +13878,10 @@ namespace nist {
 		return 0.0;
 	}
 
-	static inline u32 atomic_number(c_str symbol)
+	static constexpr s32 doubled_nuclear_spin(const nist::Isotope a)
 	{
-		auto as_enum = nist::isotope_enum(symbol);
-		return nist::atomic_number(as_enum);
+		// NOTE: The mantissa of 2I is zero. Thus, the cast is safe.
+		return as_s32(2.0*nist::nuclear_spin(a));
 	}
 
 	enum class Orbital: u8 {
