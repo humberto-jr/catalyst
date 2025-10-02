@@ -8,19 +8,29 @@ namespace nist {
 	// simply named the atomic unit, whereas atomic units of energy and
 	// length are referred to as Hartree and Bohr.
 
+	static constexpr f64 PI = 3.14159265358979323846264338328;
+
+	static constexpr f64 TWO_PI = 2.0*PI;
+
+	static constexpr f64 PLANCK_CONST = 6.62607015E-34; // J*s
+
+	static constexpr f64 REDUCED_PLANCK_CONST = PLANCK_CONST/TWO_PI;
+
+	static constexpr f64 ELEMENTARY_CHARGE = 1.602176634E-19; // C
+
 	static constexpr f64 INVERSE_FINE_STRUCT = 137.035999084;
 
-	static constexpr f64 BOHR_RADIUS = 5.29177210903E-11;  // m
+	static constexpr f64 BOHR_RADIUS = 5.29177210903E-11; // m
 
-	static constexpr f64 RYDBERG_CONST = 10973731.568160;  // 1/m
+	static constexpr f64 RYDBERG_CONST = 10973731.568160; // 1/m
 
-	static constexpr f64 BOLTZMANN_CONST = 1.380649E-23;   // J/K
+	static constexpr f64 BOLTZMANN_CONST = 1.380649E-23; // J/K
 
-	static constexpr f64 AVOGADRO_CONST = 6.02214076E23;   // 1/mol
+	static constexpr f64 AVOGADRO_CONST = 6.02214076E23; // 1/mol
 
 	static constexpr f64 ELECTRON_MASS = 9.1093837015E-31; // Kg
 
-	static constexpr f64 PROTON_MASS = 1.67262192369E-27;  // Kg
+	static constexpr f64 PROTON_MASS = 1.67262192369E-27; // Kg
 
 	static constexpr f64 PROTON_TO_ELECTRON_RATIO = PROTON_MASS/ELECTRON_MASS;
 
@@ -35,6 +45,8 @@ namespace nist {
 	static constexpr f64 KILOGRAM_TO_ATOMIC_MASS = 1000.0*AVOGADRO_CONST;
 
 	static constexpr f64 ATOMIC_MASS_TO_ATOMIC_UNIT = 1.0/(ELECTRON_MASS*KILOGRAM_TO_ATOMIC_MASS);
+
+	static constexpr f64 NUCLEAR_MAGNETON = (ELEMENTARY_CHARGE*REDUCED_PLANCK_CONST)/(2.0*PROTON_MASS); // C*m*m/s = J/T
 
 	enum class Isotope: u16 {
 		atom_1H = 0,
